@@ -39,7 +39,7 @@ this project — confirmed at audit time), so the shape below is the full copy t
 - **`AnalysisExecutionService`** (and every later service) holds the business logic, is HTTP-agnostic, returns `Outcome<T>` (`Ok / NotFound / Invalid / Forbidden / Conflict`). Calculation logic is never inlined here — it calls `CalculationEngine` (shared-helpers-inventory).
 - **Repositories** (`IAnalysisRepository`, `ISampleRepository`, …) are the only types touching `LimsDbContext`. A write spanning more than one aggregate (e.g. an exception decision that also changes the analysis's lock state) goes through `IUnitOfWork`.
 - **Cross-cutting services** — `ICurrentUser` (who's calling), `IAuditLogger` (writes the audit trail), `TimeProvider` (injected clock) — are constructor-injected into services, never instantiated ad hoc or read from `HttpContext` directly inside a service.
-- **Angular:** one feature folder per vertical (`features/analysis-execution/`, …); each feature's API access goes through a typed service wrapping the shared `api-client.ts` base — no raw `HttpClient` in components. Standalone components, `"use client"`-equivalent boundary pushed to leaves is n/a (Angular, not Next.js) — the equivalent discipline is: smart/container components own state and API calls, presentational components stay pure.
+- **Angular:** one feature folder per vertical (`features/analysis-execution/`, …), standalone components throughout (no `Component` suffix / `.component.` infix — `analysis-execution.ts`, class `AnalysisExecution`), consistent `lims-` selector prefix. Each feature's API access goes through a concrete service extending `LimsApiService` (itself extending `BaseApiService`) — no raw `HttpClient`, no `fetch`, no `Promise`-returning API calls (per `engineering-standards.md`'s extracted `Databank.WebApp` convention). Reads prefer `httpResource`/`rxResource`; mutations use the `Observable`-returning `post`/`put`/`delete`. Smart/container components own state (signals) and API calls; presentational components stay pure.
 
 ### Shared helpers — resolved up front
 
@@ -53,8 +53,8 @@ Checked against `ship/shared-helpers-inventory.md` (created this run — first r
 | `TimeProvider` (DI-registered) | new | `Api/Program.cs` registration |
 | `IUnitOfWork` | new | `backend/src/LimsControlLab.Infrastructure/IUnitOfWork.cs` |
 | `PagedResult<T>` + paging extension | new | `backend/src/LimsControlLab.Api/Common/PagedResult.cs` |
-| Angular paged-list helper + `EmptyState` | new | `frontend/src/app/shared/{paged-list.ts,empty-state.component.ts}` |
-| Typed API client base + auth interceptor | new | `frontend/src/app/shared/api/api-client.ts` |
+| Angular paged-list helper + `EmptyState` | new | `frontend/src/app/shared/{paged-list.ts,empty-state.ts}` |
+| `BaseApiService` + `LimsApiService` (abstract API base classes) | new | `frontend/src/app/shared/services/api/{base-api.service.ts,lims/lims-api.service.ts}` |
 
 ## 2. Construction decision log
 
@@ -66,6 +66,8 @@ Checked against `ship/shared-helpers-inventory.md` (created this run — first r
 | C4 | 2026-08-25 | technical | Audit logging is centralized in one `IAuditLogger` service called from each Service method after a successful write, never a bespoke audit insert per controller/service | n/a — structural | Brief R22/R23/R75 require a full audit trail but don't (and shouldn't) dictate the implementation pattern; centralizing it now prevents 13 independent audit-write implementations later (lesson L-Duplication) | shape | shape |
 | C5 | 2026-08-25 | technical | Reference vertical's minimal entity set (plan Task 3) is `Sample`, `Analysis`, `AnalysisTemplate` (minimal fields only — full template configurability is plan Task 4), `ExceptionRecord` | n/a — structural | Scoping Task 3 tightly to the lifecycle+exception+audit+concurrency pattern (not full template richness) is what makes it a clean copy template rather than a partial slice of Task 4's work | shape | shape |
 
-- **Additions this release:** 0  ·  **Technical decisions:** 5
+| C6 | 2026-08-25 | technical | Frontend conventions corrected to match the organisation's real `Databank.WebApp` codebase (Angular 21.1, Kendo v23, Vitest, `BaseApiService`/`httpResource` pattern, layout-first routing, four-tier environments) rather than generic Angular assumptions; `engineering-standards.md`, this file, `plan.md`, and `shared-helpers-inventory.md` updated accordingly | n/a — structural | The operator provided access to a real sibling Angular codebase (`C:\Users\j.bacalso\Documents\Databank\Databank.WebApp`) after the initial shape run; extracting its actual conventions is more reliable than an inferred default and corrects several specifics (test runner, API-layering pattern, naming) the first pass got only approximately right | shape | shape |
+
+- **Additions this release:** 0  ·  **Technical decisions:** 6
 
 No `addition` rows this run — every open structural question for the reference vertical was decidable from `brief.md`, `charter.md`, and `engineering-standards.md` without a requirements gap. **Can shape decide everything in front of it? Yes.** Cleared to `/ship:build`.

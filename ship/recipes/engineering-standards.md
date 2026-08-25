@@ -42,25 +42,76 @@
   shift/schedule logic (brief R10) is testable.
 - **Data:** EF Core migrations only, no ad hoc DDL.
 
-### Frontend — Angular 21+, standalone components, feature-based
-- **Standalone components** (no NgModules), lazy-loaded feature routes.
-- **Feature-based structure:** `features/<name>/` owns its components, services, and models; shared
-  primitives live in `shared/`.
-- **State:** component-local state via signals where possible; a lightweight store for genuinely
-  cross-component state (current user, site, role context).
-- **API access:** one typed service per feature/resource wrapping `HttpClient` — no raw `HttpClient`
-  calls scattered through components.
-- **UI:** **Kendo UI for Angular (v23, licensed)** as the base primitive set — Grid, Form, Scheduler,
-  and input components in particular fit this domain's history-search screens, template/schedule
-  configuration, and shift-based work views. Theme via Kendo's theming system rather than overriding
-  component internals; extend a Kendo component before hand-rolling an equivalent. Kendo's accessible-by-
-  default components are the starting point for the WCAG AA bar (charter §5), not a substitute for
-  verifying it per screen.
-- **Forms:** Angular Reactive Forms, validation rules mirroring the backend's — client-side validation is
-  a UX convenience, never the authorization or business-rule boundary; the server always re-checks.
+### Frontend — Angular 21.1+, extracted from the organisation's real Databank.WebApp codebase
+> **Provenance.** No written frontend standard existed for this project, but a real sibling codebase does
+> — `Databank.WebApp` (the organisation's Angular app for the enterprise Databank system), inspected
+> 2026-08-25. It runs the same stack this project targets (Angular 21.1.x, Kendo UI v23.0.1, the same
+> Telerik license mechanism) and is the actual convention this section is extracted from, not a generic
+> Angular default. Where that codebase itself has unresolved debt (raw `fetch`/`Promise` calls its own
+> comments flag for removal, `any`-typed models, no ESLint/Prettier/Husky installed, an inconsistent
+> component selector prefix), this standard states the **intended** pattern and does not carry the debt
+> forward — LIMS Control Lab does the mechanical gates (§1) and the clean pattern from its first commit.
+
+- **Standalone components by default**, each with its own `imports: [...]` array — including Kendo's
+  standalone component groups (`import { KENDO_BUTTON } from '@progress/kendo-angular-buttons'` etc. —
+  spreadable arrays, not per-component NgModule imports). The one place an `NgModule` is still legitimate
+  is a single app-wide `SharedModule` bundling reusable shell chrome (layouts, nav, header/footer) so
+  every standalone feature only needs `imports: [SharedModule]` for that — do not scatter individual
+  Kendo module imports across every shared chrome component; feature components import their own Kendo
+  groups directly instead of pulling in `SharedModule` for that purpose.
+- **Naming:** no `Component` suffix on class names and no `.component.` infix in filenames — `analysis-execution.ts` / `.html` / `.scss`, class `AnalysisExecution` (the modern Angular style; Databank.WebApp's own root-level files already follow it, even though some older feature files under it still use the `.component.ts` legacy form — LIMS is consistent from the start, not mixed). **One selector prefix for the whole app** (e.g. `lims-`), applied uniformly — Databank.WebApp splits between `app-` and `db-` inconsistently; don't repeat that.
+- **Feature-based structure:** `features/<name>/` owns its own components, services, and models;
+  reusable chrome and cross-cutting primitives live in `shared/{components,services,models,layouts,
+  directives,routes}/`, mirroring Databank.WebApp's real layout.
+- **Routing — layout-first:** top-level routes each mount exactly one layout component (e.g. a default
+  authenticated shell, an auth-flow layout) with no path segment of their own; the *actual* feature routes
+  nest as that layout's `children`, declared in one `<area>.routes.ts` file per area and lazy-loaded. Do
+  not hang feature routes directly off the root route array.
+- **API access — a `BaseApiService` inheritance chain, not ad hoc `HttpClient` calls:**
+  1. `shared/services/api/base-api.service.ts` — an abstract `BaseApiService` with an abstract
+     `apiBase: Signal<string>`, protected `get/post/put/delete` methods wrapping `HttpClient` (returning
+     `Observable`), and protected `getResource`/`rxGet` helpers wrapping Angular's `httpResource` /
+     `rxResource` (signal-driven, auto-refetch-on-param-change reads).
+  2. `shared/services/api/lims/lims-api.service.ts` — an abstract `LimsApiService extends BaseApiService`
+     fixing `apiBase` to `environment.limsControlLabApiUrl`.
+  3. Each feature's concrete service (`@Injectable({ providedIn: 'root' })`) extends `LimsApiService` and
+     exposes typed methods only — e.g. `getAnalysisResource(id: number)` returning
+     `HttpResourceRef<AnalysisDetailDto | undefined>`.
+  - **Prefer `httpResource`/`rxResource` for reads** — they're reactive to signal inputs and expose
+    `.value()`, `.isLoading()`, `.error()` directly, which is what feeds `computed()` state in components.
+    Traditional `Observable`-returning methods remain for mutations (post/put/delete).
+  - **No raw `fetch()` and no `Promise`-returning API methods** — Databank.WebApp's own code marks its
+    remaining `fetch`-based methods with `// TODO: Refactor... we DON'T want promises. That's pure
+    javascript stuff we don't do anymore.` Treat that as the standard stated plainly, not just a comment
+    in someone else's repo: LIMS never writes a new `fetch`/`Promise` API call.
+- **State:** signals + `computed()` for derived state, `effect()` for reacting to signal changes
+  (matching Databank.WebApp's real components) — no global store (NgRx or otherwise) unless a genuine
+  cross-feature state need emerges; cross-cutting context (current user/role/site) is one injectable
+  signal-based service, following the same DI pattern as `BaseApiService`.
+- **Environments — four tiers, file-replacement based:** `environment.model.ts` (a typed interface),
+  `environment.ts` (left blank/placeholder — never edited directly), and `environment.{local,dev,uat,
+  prod}.ts`, selected via `angular.json` `fileReplacements` per build configuration — matching
+  Databank.WebApp's real convention and charter §2's "same environments as the existing platform"
+  decision. Add `limsControlLabApiUrl` to the environment interface alongside whatever Databank's own
+  variant already defines.
+- **UI:** **Kendo UI for Angular (v23, licensed)** as the base primitive set — Grid, Form, Scheduler, and
+  input components fit this domain's history-search screens, template/schedule configuration, and
+  shift-based work views directly. Theme via Kendo's theming system (`styles/themes/<name>.scss` +
+  `styles/variables/_colors.scss`, mirroring Databank.WebApp's real structure) rather than overriding
+  component internals; extend a Kendo component before hand-rolling an equivalent. Kendo's
+  accessible-by-default components are the starting point for the WCAG AA bar (charter §5), not a
+  substitute for verifying it per screen.
+- **Forms:** Angular Reactive Forms (`FormBuilder`, `FormGroup`), validation rules mirroring the
+  backend's — client-side validation is a UX convenience, never the authorization or business-rule
+  boundary; the server always re-checks.
 - **Accessibility:** WCAG AA on every user-facing screen — semantic HTML first, ARIA only where native
   semantics fall short, keyboard navigation and visible focus management on every interactive flow
   (exception review, unlock/amend, ad-hoc scheduling), automated a11y linting in CI.
+- **Testing runner: Vitest** (via `@angular/build:unit-test`), not Jasmine/Karma — matching
+  Databank.WebApp's actual `package.json`/`angular.json` configuration for Angular 21.
+- **Kendo license activation:** the license key (constitution — gitignored, supplied as a secret) is
+  activated the same way Databank.WebApp does it — via the `@progress/kendo-licensing` package reading an
+  environment variable at build/CI time, never a key committed to or hardcoded in source.
 
 ## 0. Licensed dependency handling
 - **Kendo UI for Angular license key** (`docs/telerik-license.txt`, a signed Telerik license JWT) is a
@@ -73,9 +124,9 @@
   `TreatWarningsAsErrors`, a repo-root `.editorconfig` with any suppression individually justified.
 - **Frontend:** Angular ESLint flat config as a **zero-warning CI gate**; strict TypeScript
   (`"strict": true`) with `tsc --noEmit` as a separate zero-error typecheck script.
-- **Coverage:** collected in CI for both sides (e.g. Coverlet for .NET, Karma/Jest coverage for Angular),
-  **starting floor: 60% line coverage**, ratcheted up as the codebase matures — never lowered to make a
-  build pass.
+- **Coverage:** collected in CI for both sides (Coverlet for .NET, Vitest's built-in coverage for
+  Angular), **starting floor: 60% line coverage**, ratcheted up as the codebase matures — never lowered
+  to make a build pass.
 - **Pre-commit:** lint + format on staged files.
 
 ## 2. Verification tiers
@@ -88,8 +139,10 @@
   silent overwrite.
 
 **Frontend:**
-- Unit + integration tests exercising behaviour as a user would, with API calls mocked.
-- Component isolation via a catalogue tool (e.g. Storybook or Angular's component test harness).
+- Unit + integration tests via Vitest, exercising behaviour as a user would, with `HttpClient` calls
+  mocked (`HttpClientTestingModule`/`provideHttpClientTesting`) — including a case per `httpResource`
+  state (`isLoading`, populated `value`, `error`).
+- Component isolation via Angular's own component test harness (`@angular/cdk/testing` harnesses).
 
 **Shared:**
 - E2E smoke over the core loops — capture a reading, trigger and resolve an exception, unlock/amend a
@@ -168,7 +221,9 @@ the layer boundaries, and the shared-helpers check (§6) apply from this first v
 shape · server-side RBAC (role + site) in lockstep with the UI · paged if it lists · indexed/constrained
 where §3 applies · concurrency-safe if it touches a locked/derived value · structured logging + audit
 entries.
-**Frontend:** feature-scoped, standalone components · built on the component-library primitives (no
-hand-rolled equivalents) · reactive forms mirroring backend validation · typed API service (no raw
-`HttpClient` in components) · error/loading/empty/permission states handled · WCAG AA.
+**Frontend:** feature-scoped, standalone components (no `Component` suffix / `.component.` infix,
+consistent `lims-` selector prefix) · built on Kendo UI primitives (no hand-rolled equivalents) ·
+reactive forms mirroring backend validation · API access only via a `LimsApiService`-derived service
+using `httpResource`/`rxResource` for reads (no raw `HttpClient`, no `fetch`, no `Promise`-returning API
+calls) · error/loading/empty/permission states handled · WCAG AA.
 **Both:** shared-helpers inventory checked/updated · tests green across the tiers in §2.
