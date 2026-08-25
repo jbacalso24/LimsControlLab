@@ -15,3 +15,4 @@
 | 2026-08-25 14:24:41 +10:00 | Judison Bacalso | /ship:design-handoff |
 | 2026-08-25 14:24:46 +10:00 | Judison Bacalso | /ship:design-handoff v0.1.0 |
 | 2026-08-25 14:27:45 +10:00 | Judison Bacalso | /ship:plan v0.1.0 |
+| 2026-08-25 14:35:44 +10:00 | Judison Bacalso | /ship:shape v0.1.0 |
