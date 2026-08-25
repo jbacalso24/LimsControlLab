@@ -4,8 +4,8 @@
 
 | Key | Value | Notes |
 |-----|-------|-------|
-| `bundle.source` | `<tbd — set by /ship:charter>` | Set by `/ship:charter` from §1's delivery surface |
-| `bundle.platform` | `<tbd — set by /ship:charter>` | Set by `/ship:charter` from §1's delivery surface |
+| `bundle.source` | `.` | Repo root — backend delivery surface, audited in place at HEAD (no external design bundle) |
+| `bundle.platform` | `codebase` | Set by `/ship:charter` 2026-08-25 from charter.md §1's delivery surface (backend/codebase — full-stack build with no external design handoff) |
 | `release.target` | `v0.1.0` | Current release the pipeline is driving toward; names the dossier folder |
 | `dossier.dir` | `ship/` | Where per-release dossiers live (`ship/<release>/…`) |
 | `release.recipe` | `ship/recipes/release-recipe.md` | Project-specific release steps `/ship:release` runs |
