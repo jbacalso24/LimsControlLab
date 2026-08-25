@@ -10,3 +10,4 @@
 | Timestamp | Operator | Invocation |
 | --- | --- | --- |
 | 2026-08-25 13:48:29 +10:00 | Judison Bacalso | /ship:charter v0.1.0 |
+| 2026-08-25 14:16:56 +10:00 | Judison Bacalso | /ship:audit v0.1.0 |
