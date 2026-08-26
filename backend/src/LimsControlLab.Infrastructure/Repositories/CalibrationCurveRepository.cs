@@ -27,6 +27,15 @@ public sealed class CalibrationCurveRepository : ICalibrationCurveRepository
             .FirstOrDefaultAsync(c => c.AnalysisTemplateId == templateId && c.IsActive, ct);
     }
 
+    public async Task<IReadOnlyList<CalibrationCurve>> ListAsync(CancellationToken ct = default)
+    {
+        return await _db.CalibrationCurves
+            .Include(c => c.AnalysisTemplate)
+            .Include(c => c.Points.OrderBy(p => p.Order))
+            .OrderBy(c => c.Name)
+            .ToListAsync(ct);
+    }
+
     public async Task AddAsync(CalibrationCurve curve, CancellationToken ct = default)
     {
         _db.CalibrationCurves.Add(curve);

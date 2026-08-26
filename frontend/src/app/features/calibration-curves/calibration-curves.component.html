@@ -1,0 +1,144 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Calibration Curves</h1>
+      <p class="text-sm text-muted-foreground">View calibration standards and plotted curves</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12" role="status" aria-live="polite" aria-label="Loading calibration curves">
+      <z-card class="lg:col-span-5">
+        <z-card-content class="space-y-3">
+          <z-skeleton class="h-6 w-full" />
+          <z-skeleton class="h-6 w-full" />
+          <z-skeleton class="h-6 w-full" />
+          <z-skeleton class="h-6 w-3/4" />
+        </z-card-content>
+      </z-card>
+      <z-card class="lg:col-span-7">
+        <z-card-content>
+          <z-skeleton class="h-64 w-full" />
+        </z-card-content>
+      </z-card>
+    </div>
+  }
+
+  <!-- Coordinator-only access state (403) -->
+  @if (!loading() && forbidden()) {
+    <z-card>
+      <z-card-content class="py-12">
+        <div class="mx-auto flex max-w-md flex-col items-center text-center">
+          <div class="mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
+            <ng-icon name="lucideLock" class="h-6 w-6" />
+          </div>
+          <h2 class="mb-1 text-base font-semibold">Coordinator access required</h2>
+          <p class="text-sm text-muted-foreground">
+            Viewing calibration curves is a Lab Coordinator task. Sign in with a coordinator
+            account to view curves for your site.
+          </p>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Error State -->
+  @if (!loading() && !forbidden() && error()) {
+    <z-alert
+      zType="destructive"
+      class="border-destructive/50 bg-destructive/10"
+      zTitle="Error loading calibration curves"
+      [zDescription]="error()"
+    />
+    <button z-button zType="outline" (click)="reload()">Retry</button>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !forbidden() && !error() && !curves().length) {
+    <z-card>
+      <z-card-content class="py-12">
+        <z-empty
+          zIcon="lucideChartSpline"
+          zTitle="No calibration curves"
+          zDescription="Calibration curves created for your site's analysis templates will appear here."
+        />
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Curves + Chart -->
+  @if (!loading() && !forbidden() && !error() && curves().length) {
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <!-- Curve list -->
+      <z-card class="lg:col-span-5">
+        <z-card-header>
+          <z-card-title>Curves</z-card-title>
+          <z-card-description>Select a curve to plot it</z-card-description>
+        </z-card-header>
+        <z-card-content>
+          <div class="overflow-x-auto">
+            <table z-table>
+              <thead z-table-header>
+                <tr z-table-row>
+                  <th z-table-head>Name</th>
+                  <th z-table-head class="text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody z-table-body>
+                @for (curve of curves(); track curve.id) {
+                  <tr
+                    z-table-row
+                    class="cursor-pointer hover:bg-muted/50"
+                    [class.bg-muted]="selectedCurve()?.id === curve.id"
+                    (click)="selectCurve(curve)"
+                    tabindex="0"
+                    role="button"
+                    [attr.aria-pressed]="selectedCurve()?.id === curve.id"
+                    (keydown.enter)="selectCurve(curve)"
+                  >
+                    <td z-table-cell>
+                      <div class="font-medium text-foreground">{{ curve.name }}</div>
+                      <div class="text-xs text-muted-foreground">{{ curve.templateName }} &middot; {{ curve.site }}</div>
+                    </td>
+                    <td z-table-cell class="text-right">
+                      @if (curve.isActive) {
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
+                          <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                          <span>Active</span>
+                        </span>
+                      } @else {
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground border border-border">
+                          <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                          <span>Inactive</span>
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </z-card-content>
+      </z-card>
+
+      <!-- Detail + chart -->
+      <z-card class="lg:col-span-7">
+        @if (selectedCurve(); as curve) {
+          <z-card-header>
+            <z-card-title>{{ curve.name }}</z-card-title>
+            <z-card-description>{{ curve.templateName }} &middot; {{ curve.site }} &middot; {{ curve.points.length }} points</z-card-description>
+          </z-card-header>
+          <z-card-content>
+            <lims-calibration-chart [points]="curve.points" [name]="curve.name" />
+          </z-card-content>
+        } @else {
+          <z-card-content class="py-12">
+            <p class="text-center text-sm text-muted-foreground">Select a curve to view its plot.</p>
+          </z-card-content>
+        }
+      </z-card>
+    </div>
+  }
+</div>

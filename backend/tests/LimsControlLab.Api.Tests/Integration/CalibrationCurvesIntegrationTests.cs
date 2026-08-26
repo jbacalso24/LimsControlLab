@@ -193,6 +193,32 @@ public sealed class CalibrationCurvesIntegrationTests : IAsyncLifetime
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    [Fact]
+    public async Task ListCurvesByCoordinator_Returns200WithPointsAndTemplateName()
+    {
+        await CreateTestCurve();
+
+        var response = await _coordinatorClient.GetAsync("/api/v1/calibration-curves");
+
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+
+        var curves = await response.Content.ReadFromJsonAsync<List<CalibrationCurveViewDto>>();
+        Assert.NotNull(curves);
+        Assert.NotEmpty(curves);
+        Assert.NotEmpty(curves[0].Points);
+        Assert.NotEmpty(curves[0].TemplateName);
+    }
+
+    [Fact]
+    public async Task ListCurvesByAnalyst_Returns403()
+    {
+        await CreateTestCurve();
+
+        var response = await _analystClient.GetAsync("/api/v1/calibration-curves");
+
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
     private async Task CreateTestCurve()
     {
         var request = new CreateCalibrationCurveRequest

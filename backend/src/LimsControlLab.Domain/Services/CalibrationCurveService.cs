@@ -107,6 +107,28 @@ public sealed class CalibrationCurveService
         });
     }
 
+    public async Task<Outcome<List<CalibrationCurveView>>> ListAsync(CancellationToken ct)
+    {
+        var curves = await _repository.ListAsync(ct);
+
+        var views = curves.Select(curve => new CalibrationCurveView
+        {
+            Id = curve.Id,
+            Name = curve.Name,
+            AnalysisTemplateId = curve.AnalysisTemplateId,
+            TemplateName = curve.AnalysisTemplate?.Name ?? string.Empty,
+            Site = curve.AnalysisTemplate?.Site.ToString() ?? string.Empty,
+            IsActive = curve.IsActive,
+            Points = curve.Points
+                .OrderBy(p => p.Order)
+                .Select(p => new CalibrationPointView { XValue = p.XValue, YValue = p.YValue })
+                .ToList(),
+            RowVersion = Convert.ToBase64String(curve.RowVersion),
+        }).ToList();
+
+        return new Outcome<List<CalibrationCurveView>>.Ok(views);
+    }
+
     public async Task<Outcome<bool>> DeactivateAsync(int id, CancellationToken ct)
     {
         if (_currentUser.Role != Role.LabCoordinator)
@@ -142,4 +164,22 @@ public sealed record CalibrationCurveDto
     public required bool IsActive { get; init; }
     public required int PointCount { get; init; }
     public required string RowVersion { get; init; }
+}
+
+public sealed record CalibrationCurveView
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required int AnalysisTemplateId { get; init; }
+    public required string TemplateName { get; init; }
+    public required string Site { get; init; }
+    public required bool IsActive { get; init; }
+    public required List<CalibrationPointView> Points { get; init; }
+    public required string RowVersion { get; init; }
+}
+
+public sealed record CalibrationPointView
+{
+    public required decimal XValue { get; init; }
+    public required decimal YValue { get; init; }
 }

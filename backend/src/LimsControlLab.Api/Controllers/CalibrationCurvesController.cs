@@ -51,6 +51,31 @@ public sealed class CalibrationCurvesController : ControllerBase
     }
 
     [Authorize(Policy = "Role.LabCoordinator")]
+    [HttpGet]
+    [ProducesResponseType(typeof(List<CalibrationCurveViewDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(CancellationToken ct)
+    {
+        var result = await _service.ListAsync(ct);
+
+        if (result is Outcome<List<CalibrationCurveView>>.Ok ok)
+            return Ok(ok.Data.Select(v => new CalibrationCurveViewDto
+            {
+                Id = v.Id,
+                Name = v.Name,
+                AnalysisTemplateId = v.AnalysisTemplateId,
+                TemplateName = v.TemplateName,
+                Site = v.Site,
+                IsActive = v.IsActive,
+                Points = v.Points
+                    .Select(p => new CalibrationPointDto { XValue = p.XValue, YValue = p.YValue })
+                    .ToList(),
+                RowVersion = v.RowVersion,
+            }).ToList());
+
+        return result.ToActionResult(this);
+    }
+
+    [Authorize(Policy = "Role.LabCoordinator")]
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(CalibrationCurveDetailDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

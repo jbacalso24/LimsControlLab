@@ -27,3 +27,21 @@ public sealed record DeactivateCalibrationCurveRequest
 {
     public required string RowVersion { get; init; }
 }
+
+public sealed record CalibrationCurveViewDto
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required int AnalysisTemplateId { get; init; }
+    public required string TemplateName { get; init; }
+    public required string Site { get; init; }
+    public required bool IsActive { get; init; }
+    public required List<CalibrationPointDto> Points { get; init; }
+    public required string RowVersion { get; init; }
+}
+
+public sealed record CalibrationPointDto
+{
+    public required decimal XValue { get; init; }
+    public required decimal YValue { get; init; }
+}

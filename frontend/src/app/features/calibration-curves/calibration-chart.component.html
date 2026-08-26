@@ -1,0 +1,93 @@
+@if (!hasEnoughPoints()) {
+  <div class="flex min-h-[180px] items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground">
+    Not enough points to plot
+  </div>
+} @else {
+  <div class="w-full overflow-x-auto">
+    <svg
+      [attr.viewBox]="'0 0 ' + width + ' ' + height"
+      preserveAspectRatio="xMidYMid meet"
+      class="w-full min-w-[320px]"
+      style="height: auto;"
+      role="img"
+      [attr.aria-label]="(name() || 'Calibration curve') + ' plot with ' + plottedPoints().length + ' points'"
+    >
+      <!-- Gridlines -->
+      @for (tick of yTicks(); track tick.value) {
+        <line
+          [attr.x1]="plotLeft"
+          [attr.x2]="plotRight"
+          [attr.y1]="tick.screen"
+          [attr.y2]="tick.screen"
+          stroke="var(--border)"
+          stroke-width="1"
+        />
+        <text [attr.x]="plotLeft - 6" [attr.y]="tick.screen + 3" text-anchor="end" font-size="9" fill="var(--muted-foreground)">
+          {{ formatTick(tick.value) }}
+        </text>
+      }
+      @for (tick of xTicks(); track tick.value) {
+        <text [attr.x]="tick.screen" [attr.y]="plotBottom + 14" text-anchor="middle" font-size="9" fill="var(--muted-foreground)">
+          {{ formatTick(tick.value) }}
+        </text>
+      }
+
+      <!-- Axis lines -->
+      <line [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="plotBottom" [attr.y2]="plotBottom" stroke="var(--border)" stroke-width="1" />
+      <line [attr.x1]="plotLeft" [attr.x2]="plotLeft" [attr.y1]="plotTop" [attr.y2]="plotBottom" stroke="var(--border)" stroke-width="1" />
+
+      <!-- Axis titles -->
+      <text [attr.x]="(plotLeft + plotRight) / 2" [attr.y]="height - 4" text-anchor="middle" font-size="10" fill="var(--muted-foreground)">
+        {{ xAxisLabel() }}
+      </text>
+      <text
+        [attr.x]="-((plotTop + plotBottom) / 2)"
+        y="12"
+        text-anchor="middle"
+        font-size="10"
+        fill="var(--muted-foreground)"
+        transform="rotate(-90)"
+      >
+        {{ yAxisLabel() }}
+      </text>
+
+      <!-- Ideal y=x reference line -->
+      <line
+        [attr.x1]="referenceLine().x1"
+        [attr.y1]="referenceLine().y1"
+        [attr.x2]="referenceLine().x2"
+        [attr.y2]="referenceLine().y2"
+        stroke="var(--border)"
+        stroke-width="1"
+        stroke-dasharray="4 3"
+      />
+
+      <!-- Plotted curve -->
+      <g class="plot-group" [class.ready]="ready()">
+        <polyline [attr.points]="polylinePoints()" fill="none" stroke="var(--chart-1)" stroke-width="2" />
+        @for (point of plottedPoints(); track $index) {
+          <circle
+            class="calibration-point"
+            [class.calibration-point--hover]="hoveredIndex() === $index"
+            [attr.cx]="point.screenX"
+            [attr.cy]="point.screenY"
+            [attr.r]="hoveredIndex() === $index ? 5 : 4"
+            fill="var(--chart-1)"
+            (mouseenter)="hover($index)"
+            (mouseleave)="clearHover()"
+          >
+            <title>X: {{ formatTick(point.x) }}, Y: {{ formatTick(point.y) }}</title>
+          </circle>
+          @if (hoveredIndex() === $index) {
+            <g [attr.transform]="'translate(' + point.screenX + ',' + (point.screenY - 12) + ')'">
+              <rect x="-34" y="-16" width="68" height="16" rx="3" fill="var(--popover)" stroke="var(--border)" stroke-width="1" />
+              <text text-anchor="middle" y="-4" font-size="9" fill="var(--popover-foreground)">
+                {{ formatTick(point.x) }}, {{ formatTick(point.y) }}
+              </text>
+            </g>
+          }
+        }
+      </g>
+    </svg>
+  </div>
+}

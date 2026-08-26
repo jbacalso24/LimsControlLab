@@ -6,6 +6,7 @@ import { schedulingRoutes } from './scheduling/scheduling.routes';
 import { exceptionReviewRoutes } from './exception-review/exception-review.routes';
 import { historySearchRoutes } from './history-search/history-search.routes';
 import { sampleTransferRoutes } from './sample-transfer/sample-transfer.routes';
+import { calibrationCurvesRoutes } from './calibration-curves/calibration-curves.routes';
 
 export const featuresRoutes: Routes = [
   {
@@ -19,6 +20,7 @@ export const featuresRoutes: Routes = [
       ...exceptionReviewRoutes,
       ...historySearchRoutes,
       ...sampleTransferRoutes,
+      ...calibrationCurvesRoutes,
     ],
   },
 ];

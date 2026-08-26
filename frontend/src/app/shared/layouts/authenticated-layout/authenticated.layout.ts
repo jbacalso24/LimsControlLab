@@ -17,6 +17,7 @@ import {
   lucideChevronsUpDown,
   lucideUserRound,
   lucideDatabase,
+  lucideChartSpline,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
@@ -57,6 +58,7 @@ import { environment } from '../../../../environments/environment';
       lucideChevronsUpDown,
       lucideUserRound,
       lucideDatabase,
+      lucideChartSpline,
     }),
   ],
 })
@@ -82,6 +84,11 @@ export class AuthenticatedLayout {
     },
     { label: 'Schedules', route: '/analysis/schedules', icon: 'lucideCalendarClock' },
     { label: 'Templates', route: '/analysis/templates', icon: 'lucideFileText' },
+    {
+      label: 'Calibration Curves',
+      route: '/analysis/calibration-curves',
+      icon: 'lucideChartSpline',
+    },
     {
       label: 'Exception Review',
       route: '/analysis/exception-review',
