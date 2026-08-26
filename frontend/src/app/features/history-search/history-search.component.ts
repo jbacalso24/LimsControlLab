@@ -11,6 +11,14 @@ import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
+import {
+  ZardTableComponent,
+  ZardTableHeaderComponent,
+  ZardTableBodyComponent,
+  ZardTableRowComponent,
+  ZardTableHeadComponent,
+  ZardTableCellComponent,
+} from '@/shared/components/table/table.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle } from '@ng-icons/lucide';
@@ -31,6 +39,12 @@ import { lucideAlertCircle } from '@ng-icons/lucide';
     ZardSpinnerComponent,
     ZardEmptyComponent,
     ZardPaginationComponent,
+    ZardTableComponent,
+    ZardTableHeaderComponent,
+    ZardTableBodyComponent,
+    ZardTableRowComponent,
+    ZardTableHeadComponent,
+    ZardTableCellComponent,
     StatusBadgeComponent,
     NgIcon,
   ],

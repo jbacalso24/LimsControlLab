@@ -13,9 +13,13 @@ import {
   lucideMoon,
   lucideMenu,
   lucideX,
+  lucideLogOut,
+  lucideChevronsUpDown,
+  lucideUserRound,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
+import { ZardDropdownImports } from '../../components/dropdown/dropdown.imports';
 import { CurrentUserService } from '../../services/auth/current-user.service';
 
 @Component({
@@ -28,6 +32,7 @@ import { CurrentUserService } from '../../services/auth/current-user.service';
     NgIcon,
     ZardButtonComponent,
     ZardBadgeComponent,
+    ...ZardDropdownImports,
   ],
   templateUrl: './authenticated.layout.html',
   styleUrl: './authenticated.layout.scss',
@@ -43,6 +48,9 @@ import { CurrentUserService } from '../../services/auth/current-user.service';
       lucideMoon,
       lucideMenu,
       lucideX,
+      lucideLogOut,
+      lucideChevronsUpDown,
+      lucideUserRound,
     }),
   ],
 })
@@ -117,6 +125,15 @@ export class AuthenticatedLayout {
 
   get currentUser() {
     return this.currentUserService.user();
+  }
+
+  /** Two-letter avatar initials derived from the username (e.g. "invicta_analyst" -> "IA"). */
+  get userInitials(): string {
+    const name = this.currentUser?.username ?? '';
+    const parts = name.split(/[._\s-]+/).filter(Boolean);
+    if (parts.length === 0) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
   logout() {
