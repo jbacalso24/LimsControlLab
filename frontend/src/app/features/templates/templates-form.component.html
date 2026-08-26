@@ -113,43 +113,37 @@
               <!-- Test Configuration -->
               <div class="space-y-1.5">
                 <label z-label for="testConfiguration">Test Configuration</label>
-                <textarea
-                  z-textarea
-                  id="testConfiguration"
+                <z-json-editor
                   formControlName="testConfiguration"
-                  placeholder="Enter test configuration (JSON)"
-                  [disabled]="submitting()"
-                  rows="4"
-                ></textarea>
-                <p class="text-xs text-muted-foreground">Optional JSON configuration for test parameters</p>
+                  ariaLabel="Test configuration JSON"
+                  placeholder='{ "tests": [] }'
+                  [rows]="6"
+                />
+                <p class="text-xs text-muted-foreground">JSON configuration for test parameters, units and methods.</p>
               </div>
 
               <!-- Calculation Definitions -->
               <div class="space-y-1.5">
                 <label z-label for="calculationDefinitions">Calculation Definitions</label>
-                <textarea
-                  z-textarea
-                  id="calculationDefinitions"
+                <z-json-editor
                   formControlName="calculationDefinitions"
-                  placeholder="Enter calculation definitions (JSON)"
-                  [disabled]="submitting()"
-                  rows="4"
-                ></textarea>
-                <p class="text-xs text-muted-foreground">Optional JSON definitions for calculations</p>
+                  ariaLabel="Calculation definitions JSON"
+                  placeholder='{ "formula": "" }'
+                  [rows]="6"
+                />
+                <p class="text-xs text-muted-foreground">JSON definitions for derived calculations.</p>
               </div>
 
               <!-- Validation Rules -->
               <div class="space-y-1.5">
                 <label z-label for="validationRules">Validation Rules</label>
-                <textarea
-                  z-textarea
-                  id="validationRules"
+                <z-json-editor
                   formControlName="validationRules"
-                  placeholder="Enter validation rules (JSON)"
-                  [disabled]="submitting()"
-                  rows="4"
-                ></textarea>
-                <p class="text-xs text-muted-foreground">Optional JSON rules for validating test results</p>
+                  ariaLabel="Validation rules JSON"
+                  placeholder='{ "rules": [] }'
+                  [rows]="6"
+                />
+                <p class="text-xs text-muted-foreground">JSON rules for validating captured results.</p>
               </div>
             </div>
           </z-card-content>

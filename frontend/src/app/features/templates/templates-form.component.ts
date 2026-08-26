@@ -10,10 +10,11 @@ import {
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputComponent } from '@/shared/components/input/input.component';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
-import { ZardTextareaComponent } from '@/shared/components/textarea/textarea.component';
+import { ZardJsonEditorComponent } from '@/shared/components/json-editor/json-editor.component';
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { CreateAnalysisTemplateRequest } from '../../shared/generated/models/create-analysis-template-request';
 import { UpdateAnalysisTemplateRequest } from '../../shared/generated/models/update-analysis-template-request';
@@ -31,7 +32,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
     ZardInputComponent,
     ZardSelectComponent,
     ZardSelectItemComponent,
-    ZardTextareaComponent,
+    ZardJsonEditorComponent,
     ZardCardComponent,
     ZardCardHeaderComponent,
     ZardCardTitleComponent,
@@ -48,6 +49,7 @@ export class TemplatesFormComponent implements OnInit {
   private apiService = inject(TemplatesApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   sites = SITES;
   form: FormGroup;
@@ -127,6 +129,7 @@ export class TemplatesFormComponent implements OnInit {
       this.apiService.updateTemplate(this.templateId!, request).subscribe({
         next: () => {
           this.submitting.set(false);
+          this.toast.success(`Template "${request.name}" updated.`);
           this.router.navigate(['../..'], { relativeTo: this.route });
         },
         error: (err) => {
@@ -153,6 +156,7 @@ export class TemplatesFormComponent implements OnInit {
       this.apiService.createTemplate(request).subscribe({
         next: () => {
           this.submitting.set(false);
+          this.toast.success(`Template "${request.name}" created.`);
           this.router.navigate(['..'], { relativeTo: this.route });
         },
         error: (err) => {

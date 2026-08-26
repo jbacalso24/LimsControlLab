@@ -8,6 +8,8 @@ import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
+import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
@@ -41,6 +43,8 @@ import { NgIcon } from '@ng-icons/core';
 export class TemplatesListComponent {
   private apiService = inject(TemplatesApiService);
   private currentUserService = inject(CurrentUserService);
+  private dialog = inject(ZardDialogService);
+  private toast = inject(ToastService);
 
   loading = signal(false);
   error = signal('');
@@ -75,19 +79,26 @@ export class TemplatesListComponent {
   }
 
   retire(template: AnalysisTemplateDto): void {
-    if (!confirm(`Are you sure you want to retire "${template.name}"?`)) {
-      return;
-    }
-
-    this.retiring.set(true);
-    this.apiService.retireTemplate(Number(template.id)).subscribe({
-      next: () => {
-        this.retiring.set(false);
-        this.loadTemplates();
-      },
-      error: () => {
-        this.retiring.set(false);
-        this.error.set('Failed to retire template. Please try again.');
+    this.dialog.create({
+      zTitle: `Retire "${template.name}"?`,
+      zDescription:
+        'Retired templates can no longer be used to start new analyses. Existing analyses keep their template version.',
+      zOkText: 'Retire template',
+      zOkDestructive: true,
+      zCancelText: 'Cancel',
+      zOnOk: () => {
+        this.retiring.set(true);
+        this.apiService.retireTemplate(Number(template.id)).subscribe({
+          next: () => {
+            this.retiring.set(false);
+            this.toast.success(`Template "${template.name}" retired.`);
+            this.loadTemplates();
+          },
+          error: () => {
+            this.retiring.set(false);
+            this.toast.error(`Could not retire "${template.name}". Please try again.`);
+          },
+        });
       },
     });
   }
