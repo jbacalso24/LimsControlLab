@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardContentComponent, ZardCardTitleComponent } from '@/shared/components/card/card.component';
-import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
-import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
-import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { WorkQueueApiService } from './services/work-queue-api.service';
 import { SearchResultItemDto } from '../../shared/generated/models/search-result-item-dto';
@@ -21,9 +18,6 @@ import { SearchResultItemDto } from '../../shared/generated/models/search-result
     ZardCardHeaderComponent,
     ZardCardContentComponent,
     ZardCardTitleComponent,
-    ZardSpinnerComponent,
-    ZardEmptyComponent,
-    ZardAlertComponent,
     StatusBadgeComponent,
   ],
   templateUrl: './work-queue.component.html',

@@ -4,10 +4,9 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardTableComponent, ZardTableHeaderComponent, ZardTableBodyComponent, ZardTableRowComponent, ZardTableHeadComponent, ZardTableCellComponent } from '@/shared/components/table/table.component';
-import { ZardCardComponent, ZardCardHeaderComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
-import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
@@ -30,11 +29,9 @@ import { NgIcon } from '@ng-icons/core';
     ZardTableHeadComponent,
     ZardTableCellComponent,
     ZardCardComponent,
-    ZardCardHeaderComponent,
     ZardCardContentComponent,
     ZardSpinnerComponent,
     ZardEmptyComponent,
-    ZardAlertComponent,
     ZardBadgeComponent,
     NgIcon,
   ],

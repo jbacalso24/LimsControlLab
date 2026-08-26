@@ -6,7 +6,6 @@ import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
 import { ZardBadgeComponent } from '@/shared/components/badge';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
-import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardTableImports } from '@/shared/components/table';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
@@ -25,7 +24,6 @@ import { CurrentUserService } from '../../shared/services/auth/current-user.serv
     ZardCardContentComponent,
     ZardBadgeComponent,
     ZardSpinnerComponent,
-    ZardEmptyComponent,
     ...ZardTableImports,
   ],
   templateUrl: './scheduling-list.component.html',

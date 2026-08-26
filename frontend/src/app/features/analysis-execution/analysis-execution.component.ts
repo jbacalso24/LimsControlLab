@@ -11,7 +11,7 @@ import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, Instrumen
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
-import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent, ZardCardFooterComponent } from '@/shared/components/card';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card';
 import { ZardTextareaComponent } from '@/shared/components/textarea';
 import { ZardBadgeComponent } from '@/shared/components/badge';
 import { ZardAlertComponent } from '@/shared/components/alert';
@@ -35,7 +35,6 @@ import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
     ZardCardHeaderComponent,
     ZardCardTitleComponent,
     ZardCardContentComponent,
-    ZardCardFooterComponent,
     ZardTextareaComponent,
     ZardBadgeComponent,
     ZardAlertComponent,
