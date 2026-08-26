@@ -20,7 +20,9 @@ public sealed class InstrumentsController : ControllerBase
         _currentUser = currentUser;
     }
 
-    [Authorize(Policy = "Role.ControlLabAnalyst")]
+    // Instruments are reference data both roles read (e.g. the reading-capture
+    // instrument picker); site scoping is enforced in the service layer.
+    [Authorize]
     [HttpGet]
     [ProducesResponseType(typeof(List<global::LimsControlLab.Domain.Services.InstrumentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> List(CancellationToken ct)
@@ -33,7 +35,9 @@ public sealed class InstrumentsController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [Authorize(Policy = "Role.ControlLabAnalyst")]
+    // Instruments are reference data both roles read (e.g. the reading-capture
+    // instrument picker); site scoping is enforced in the service layer.
+    [Authorize]
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(global::LimsControlLab.Domain.Services.InstrumentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

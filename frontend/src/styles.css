@@ -189,6 +189,16 @@
   html,
   body {
     height: 100%;
+    /* Lock the document; the app shell's <main> is the only scroll container so
+       the sidebar and header stay pinned. */
+    overflow: hidden;
+  }
+  /* app-root is an inline custom element by default; make it a full-height block
+     that clips, so the app shell owns the scroll instead of the document. */
+  app-root {
+    display: block;
+    height: 100%;
+    overflow: hidden;
   }
 
   input[type='number']::-webkit-inner-spin-button,

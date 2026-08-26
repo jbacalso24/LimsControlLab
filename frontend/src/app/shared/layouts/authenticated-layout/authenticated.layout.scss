@@ -1,2 +1,7 @@
-/* Tailwind classes handle all layout and styling */
-
+/* The component host is inline by default; make it a full-height block so the
+   inner `h-screen` shell contains its own scroll (only <main> scrolls, the
+   sidebar and header stay put). */
+:host {
+  display: block;
+  height: 100%;
+}
