@@ -16,11 +16,16 @@ import {
   lucideLogOut,
   lucideChevronsUpDown,
   lucideUserRound,
+  lucideDatabase,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
 import { ZardDropdownImports } from '../../components/dropdown/dropdown.imports';
+import { ZardDialogService } from '../../components/dialog/dialog.service';
 import { CurrentUserService } from '../../services/auth/current-user.service';
+import { AdminApiService } from '../../services/api/admin-api.service';
+import { ToastService } from '../../services/toast/toast.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'lims-authenticated-layout',
@@ -51,12 +56,19 @@ import { CurrentUserService } from '../../services/auth/current-user.service';
       lucideLogOut,
       lucideChevronsUpDown,
       lucideUserRound,
+      lucideDatabase,
     }),
   ],
 })
 export class AuthenticatedLayout {
   private currentUserService = inject(CurrentUserService);
   private router = inject(Router);
+  private dialog = inject(ZardDialogService);
+  private admin = inject(AdminApiService);
+  private toast = inject(ToastService);
+
+  /** Reset demo data is only meaningful against a Development API. */
+  readonly showResetData = !environment.production;
 
   isDarkMode = signal(false);
   isSidebarOpen = signal(false);
@@ -139,6 +151,38 @@ export class AuthenticatedLayout {
   logout() {
     this.currentUserService.clearToken();
     this.router.navigate(['/login']);
+  }
+
+  /** Dev-only: confirm, then wipe + reseed the illustrative dataset via the API. */
+  resetDemoData() {
+    this.dialog.create({
+      zTitle: 'Reset demo data?',
+      zDescription:
+        'This wipes all analyses, samples, schedules, results and exceptions, then reseeds the illustrative dataset. This cannot be undone.',
+      zOkText: 'Reset data',
+      zOkDestructive: true,
+      zCancelText: 'Cancel',
+      zOnOk: () => {
+        const pending = this.toast.show('info', 'Wiping and reseeding the database.', {
+          title: 'Resetting demo data',
+          duration: 0,
+        });
+        this.admin.resetData().subscribe({
+          next: (r) => {
+            this.toast.dismiss(pending);
+            this.toast.success(
+              `Reseeded ${r.analyses} analyses across ${r.samples} samples. Reloading.`,
+              { title: 'Demo data reset' },
+            );
+            setTimeout(() => window.location.reload(), 1000);
+          },
+          error: () => {
+            this.toast.dismiss(pending);
+            this.toast.error('Could not reset demo data. The API must be running in Development.');
+          },
+        });
+      },
+    });
   }
 
   toggleDarkMode() {

@@ -87,6 +87,12 @@
               <span>Dark mode</span>
             }
           </button>
+          @if (showResetData) {
+            <button z-dropdown-menu-item (click)="resetDemoData()">
+              <ng-icon name="lucideDatabase" class="h-4 w-4" />
+              <span>Reset demo data</span>
+            </button>
+          }
           <div z-dropdown-menu-separator></div>
           <button z-dropdown-menu-item (click)="logout()" class="text-destructive focus:text-destructive">
             <ng-icon name="lucideLogOut" class="h-4 w-4" />

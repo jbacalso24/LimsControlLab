@@ -41,8 +41,10 @@ public static class SeedData
 
         // Delete every table in FK-safe order (children before parents). ExceptionRecords
         // reference Readings AND Analyses, so they must be removed before either.
+        // ExceptionRecords, Readings and IntegrationLogs all reference Analyses, so they go first.
         await db.ExceptionRecords.ExecuteDeleteAsync(ct);
         await db.Readings.ExecuteDeleteAsync(ct);
+        await db.IntegrationLogs.ExecuteDeleteAsync(ct);
         await db.CalibrationPoints.ExecuteDeleteAsync(ct);
         await db.CalibrationCurves.ExecuteDeleteAsync(ct);
         await db.SampleTransfers.ExecuteDeleteAsync(ct);
@@ -53,7 +55,6 @@ public static class SeedData
         await db.AnalysisTemplates.ExecuteDeleteAsync(ct);
         await db.SamplingMethods.ExecuteDeleteAsync(ct);
         await db.Instruments.ExecuteDeleteAsync(ct);
-        await db.IntegrationLogs.ExecuteDeleteAsync(ct);
         await db.AuditLogs.ExecuteDeleteAsync(ct);
         await db.Users.ExecuteDeleteAsync(ct);
 
