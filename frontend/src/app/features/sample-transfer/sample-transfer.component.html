@@ -255,10 +255,10 @@
                 <!-- Stale Row Version Alert -->
                 @if (staleRowVersionError()) {
                   <z-alert class="border-warning/50 bg-warning/10">
-                    <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-warning-foreground"></ng-icon>
+                    <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-warning-foreground dark:text-warning"></ng-icon>
                     <div class="ml-3 flex-1">
-                      <p class="text-sm font-medium text-warning-foreground">Sample Changed</p>
-                      <p class="text-xs text-warning-foreground/90 mt-0.5">This sample was modified by another user. Please close and reload to see the latest changes.</p>
+                      <p class="text-sm font-medium text-warning-foreground dark:text-warning">Sample Changed</p>
+                      <p class="text-xs text-warning-foreground/90 dark:text-warning/90 mt-0.5">This sample was modified by another user. Please close and reload to see the latest changes.</p>
                     </div>
                   </z-alert>
                 }

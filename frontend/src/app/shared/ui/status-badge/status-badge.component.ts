@@ -30,7 +30,7 @@ export class StatusBadgeComponent {
     Completed: { tone: 'bg-success/12 text-success border border-success/25', label: 'Completed' },
     InProgress: { tone: 'bg-info/12 text-info border border-info/25', label: 'In Progress' },
     NotStarted: { tone: 'bg-muted text-muted-foreground border border-border', label: 'Not Started' },
-    OnHold: { tone: 'bg-warning/15 text-warning-foreground border border-warning/30', label: 'On Hold' },
+    OnHold: { tone: 'bg-warning/15 text-warning-foreground dark:text-warning border border-warning/30', label: 'On Hold' },
     Cancelled: { tone: 'bg-destructive/12 text-destructive border border-destructive/25', label: 'Cancelled' },
   };
 
