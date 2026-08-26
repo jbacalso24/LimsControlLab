@@ -37,7 +37,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
 
@@ -52,7 +52,7 @@ describe('HistorySearchComponent', () => {
     httpMock.expectOne((r) => r.url.includes('/search/results')).flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
 
@@ -73,7 +73,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
   });
@@ -103,7 +103,7 @@ describe('HistorySearchComponent', () => {
         },
       ],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 1,
     };
 
@@ -132,7 +132,7 @@ describe('HistorySearchComponent', () => {
     httpMock.expectOne((r) => r.url.includes('/search/results')).flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 100,
     });
 
@@ -145,7 +145,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 2,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 100,
     });
   });
@@ -156,7 +156,7 @@ describe('HistorySearchComponent', () => {
     httpMock.expectOne((r) => r.url.includes('/search/results')).flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
 
@@ -176,7 +176,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
   });
@@ -189,7 +189,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 100,
     });
 
@@ -205,7 +205,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 100,
     });
   });
@@ -219,7 +219,7 @@ describe('HistorySearchComponent', () => {
     req.flush({
       items: [],
       pageNumber: 1,
-      pageSize: 50,
+      pageSize: 10,
       totalCount: 0,
     });
 

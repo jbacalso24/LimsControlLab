@@ -70,7 +70,7 @@ export class HistorySearchComponent {
   items = signal<SearchResultItemDto[]>([]);
   totalCount = signal(0);
   searched = signal(false);
-  pageSize = 50;
+  pageSize = 10;
   currentPageIndex = signal(1);
 
   totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));

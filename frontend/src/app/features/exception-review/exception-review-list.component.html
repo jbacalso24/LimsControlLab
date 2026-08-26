@@ -80,7 +80,7 @@
               </tr>
             </thead>
             <tbody z-table-body>
-              @for (analysis of analyses(); track analysis.id) {
+              @for (analysis of pagedAnalyses(); track analysis.id) {
                 <tr z-table-row class="hover:bg-muted/50">
                   <td z-table-cell class="font-medium">{{ analysis.sampleId }}</td>
                   <td z-table-cell>{{ analysis.templateId }}</td>
@@ -115,6 +115,11 @@
             </tbody>
           </table>
         </div>
+        @if (totalPages() > 1) {
+          <div class="flex justify-center pt-6">
+            <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Exceptions pagination"></z-pagination>
+          </div>
+        }
       </z-card-content>
     </z-card>
   }

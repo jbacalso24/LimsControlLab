@@ -69,7 +69,7 @@
                 </tr>
               </thead>
               <tbody z-table-body>
-                @for (template of templates(); track template.id) {
+                @for (template of pagedTemplates(); track template.id) {
                   <tr z-table-row>
                     <td z-table-cell>
                       <a [routerLink]="['.', template.id, 'edit']" class="text-primary hover:underline">
@@ -112,6 +112,11 @@
               </tbody>
             </table>
           </div>
+          @if (totalPages() > 1) {
+            <div class="flex justify-center pt-6">
+              <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Templates pagination"></z-pagination>
+            </div>
+          }
         </z-card-content>
       </z-card>
     </div>

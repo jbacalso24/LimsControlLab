@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
@@ -35,6 +36,7 @@ import { NgIcon } from '@ng-icons/core';
     ZardSpinnerComponent,
     ZardEmptyComponent,
     ZardBadgeComponent,
+    ZardPaginationComponent,
     NgIcon,
   ],
   templateUrl: './templates-list.component.html',
@@ -51,6 +53,14 @@ export class TemplatesListComponent {
   templates = signal<AnalysisTemplateDto[]>([]);
   retiring = signal(false);
 
+  pageSize = 10;
+  pageIndex = signal(1);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.templates().length / this.pageSize)));
+  pagedTemplates = computed(() => {
+    const start = (this.pageIndex() - 1) * this.pageSize;
+    return this.templates().slice(start, start + this.pageSize);
+  });
+
   ngOnInit(): void {
     this.loadTemplates();
   }
@@ -61,6 +71,7 @@ export class TemplatesListComponent {
     this.apiService.listTemplates().subscribe({
       next: (data) => {
         this.templates.set(data);
+        this.pageIndex.set(1);
         this.loading.set(false);
       },
       error: () => {

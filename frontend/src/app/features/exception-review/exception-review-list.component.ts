@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -16,6 +16,7 @@ import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.compon
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -42,6 +43,7 @@ import { lucideAlertCircle, lucideLock, lucideCircleCheck } from '@ng-icons/luci
     ZardCardHeaderComponent,
     ZardCardTitleComponent,
     ZardCardContentComponent,
+    ZardPaginationComponent,
     StatusBadgeComponent,
     NgIcon,
   ],
@@ -59,6 +61,14 @@ export class ExceptionReviewListComponent {
   error = signal('');
   forbidden = signal(false);
   analyses = signal<ResultReviewDto[]>([]);
+
+  pageSize = 10;
+  pageIndex = signal(1);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.analyses().length / this.pageSize)));
+  pagedAnalyses = computed(() => {
+    const start = (this.pageIndex() - 1) * this.pageSize;
+    return this.analyses().slice(start, start + this.pageSize);
+  });
   showUnlockDialog = signal(false);
   unlocking = signal(false);
   unlockError = signal('');
@@ -84,6 +94,7 @@ export class ExceptionReviewListComponent {
     this.apiService.listExceptionAnalyses().subscribe({
       next: (data) => {
         this.analyses.set(data);
+        this.pageIndex.set(1);
         this.loading.set(false);
       },
       error: (err) => {
