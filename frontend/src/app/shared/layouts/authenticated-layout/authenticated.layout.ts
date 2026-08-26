@@ -52,6 +52,7 @@ export class AuthenticatedLayout {
 
   isDarkMode = signal(false);
   isSidebarOpen = signal(false);
+  collapsed = signal(false);
 
   navItems = [
     {
@@ -81,6 +82,7 @@ export class AuthenticatedLayout {
   constructor() {
     // Initialize dark mode from localStorage or system preference
     if (typeof window !== 'undefined') {
+      this.collapsed.set(localStorage.getItem('lims-sidebar-collapsed') === 'true');
       const stored = localStorage.getItem('lims-theme');
       if (stored === 'dark') {
         this.isDarkMode.set(true);
@@ -127,7 +129,20 @@ export class AuthenticatedLayout {
   }
 
   toggleSidebar() {
-    this.isSidebarOpen.update(v => !v);
+    const desktop =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(min-width: 1024px)').matches;
+    if (desktop) {
+      this.collapsed.update((v) => !v);
+      try {
+        localStorage.setItem('lims-sidebar-collapsed', String(this.collapsed()));
+      } catch {
+        // ignore storage write errors (private mode, etc.)
+      }
+    } else {
+      this.isSidebarOpen.update((v) => !v);
+    }
   }
 
   closeSidebar() {
