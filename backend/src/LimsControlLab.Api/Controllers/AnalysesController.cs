@@ -56,6 +56,14 @@ public sealed class AnalysesController : ControllerBase
                 RowVersion = e.RowVersion,
             }).ToList();
 
+            var availableTestDtos = ok.Data.AvailableTests.Select(t => new TestDefinitionDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Unit = t.Unit,
+                Method = t.Method,
+            }).ToList();
+
             return Ok(new AnalysisDetailDto
             {
                 Id = ok.Data.Id,
@@ -63,6 +71,7 @@ public sealed class AnalysesController : ControllerBase
                 TemplateId = ok.Data.TemplateId,
                 Status = ok.Data.Status,
                 IsLocked = ok.Data.IsLocked,
+                AvailableTests = availableTestDtos,
                 Readings = readingDtos,
                 Exceptions = exceptionDtos,
                 RowVersion = ok.Data.RowVersion,

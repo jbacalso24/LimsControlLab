@@ -1,3 +1,4 @@
+using System.Text.Json;
 using LimsControlLab.Domain.Auditing;
 using LimsControlLab.Domain.Auth;
 using LimsControlLab.Domain.Calculations;
@@ -45,12 +46,27 @@ public sealed class AnalysisExecutionService
         if (templateVersion == null)
             return new Outcome<ReadingCaptureResult>.NotFound($"Template version not found for analysis.");
 
+        // Tests (and their units) are defined by the bound template version (R1).
+        // When the template defines tests, the reading must target one of them and the
+        // unit is taken from that test definition - the client cannot invent either.
+        var definedTests = ParseTests(templateVersion.TestConfiguration);
+        var unit = request.Unit;
+        if (definedTests.Count > 0)
+        {
+            var matchedTest = definedTests.Find(t => t.Id == request.TestId);
+            if (matchedTest == null)
+                return new Outcome<ReadingCaptureResult>.Invalid(
+                    "testId",
+                    $"Test {request.TestId} is not defined for this analysis template.");
+            unit = matchedTest.Unit;
+        }
+
         var reading = new Reading
         {
             AnalysisId = analysisId,
             TestId = request.TestId,
             Value = request.Value,
-            Unit = request.Unit,
+            Unit = unit,
             CapturedAtUtc = request.CapturedAtUtc,
             CapturedByUserId = _currentUser.UserId,
             InstrumentId = request.InstrumentId,
@@ -236,6 +252,7 @@ public sealed class AnalysisExecutionService
             TemplateId = analysis.TemplateId,
             Status = analysis.Status.ToString(),
             IsLocked = analysis.IsLocked,
+            AvailableTests = ParseTests(analysis.TemplateVersion?.TestConfiguration),
             Readings = readings,
             Exceptions = analysis.Exceptions.Select(e => new ExceptionInfo
             {
@@ -250,6 +267,60 @@ public sealed class AnalysisExecutionService
         };
 
         return new Outcome<AnalysisDetailResult>.Ok(result);
+    }
+
+    /// <summary>
+    /// Parses the tests defined by a template version's TestConfiguration JSON
+    /// (shape: {"tests":[{"id":1,"name":"Pol","unit":"°Z","method":"BSES"}]}).
+    /// Returns an empty list when the configuration is absent, empty, or malformed -
+    /// callers treat "no defined tests" as "accept any test id / unit" for backwards compatibility.
+    /// </summary>
+    private static List<TestDefinition> ParseTests(string? testConfiguration)
+    {
+        var tests = new List<TestDefinition>();
+        if (string.IsNullOrWhiteSpace(testConfiguration))
+            return tests;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(testConfiguration);
+            if (!doc.RootElement.TryGetProperty("tests", out var testsElement)
+                || testsElement.ValueKind != JsonValueKind.Array)
+                return tests;
+
+            foreach (var element in testsElement.EnumerateArray())
+            {
+                if (element.ValueKind != JsonValueKind.Object)
+                    continue;
+                if (!element.TryGetProperty("id", out var idEl) || idEl.ValueKind != JsonValueKind.Number)
+                    continue;
+
+                var name = element.TryGetProperty("name", out var nameEl) && nameEl.ValueKind == JsonValueKind.String
+                    ? nameEl.GetString()!
+                    : $"Test {idEl.GetInt32()}";
+                var unit = element.TryGetProperty("unit", out var unitEl) && unitEl.ValueKind == JsonValueKind.String
+                    ? unitEl.GetString()!
+                    : string.Empty;
+                var method = element.TryGetProperty("method", out var methodEl) && methodEl.ValueKind == JsonValueKind.String
+                    ? methodEl.GetString()
+                    : null;
+
+                tests.Add(new TestDefinition
+                {
+                    Id = idEl.GetInt32(),
+                    Name = name,
+                    Unit = unit,
+                    Method = method,
+                });
+            }
+        }
+        catch (JsonException)
+        {
+            // Malformed configuration is treated as "no defined tests".
+            return [];
+        }
+
+        return tests;
     }
 
     private static ReadingValidationDetail RecomputeValidationDetail(decimal value, string persistedStatus, AnalysisTemplateVersion? templateVersion)
@@ -475,9 +546,18 @@ public sealed record AnalysisDetailResult
     public required int TemplateId { get; init; }
     public required string Status { get; init; }
     public required bool IsLocked { get; init; }
+    public required List<TestDefinition> AvailableTests { get; init; }
     public required List<ReadingInfo> Readings { get; init; }
     public required List<ExceptionInfo> Exceptions { get; init; }
     public required string RowVersion { get; init; }
+}
+
+public sealed record TestDefinition
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required string Unit { get; init; }
+    public string? Method { get; init; }
 }
 
 public sealed record ReadingInfo

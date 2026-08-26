@@ -39,6 +39,14 @@ public sealed record AnalysisStatusDto
     public required string RowVersion { get; init; }
 }
 
+public sealed record TestDefinitionDto
+{
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required string Unit { get; init; }
+    public string? Method { get; init; }
+}
+
 public sealed record AnalysisDetailDto
 {
     public required int Id { get; init; }
@@ -46,6 +54,7 @@ public sealed record AnalysisDetailDto
     public required int TemplateId { get; init; }
     public required string Status { get; init; }
     public required bool IsLocked { get; init; }
+    public required List<TestDefinitionDto> AvailableTests { get; init; }
     public required List<ReadingDto> Readings { get; init; }
     public required List<ExceptionDto> Exceptions { get; init; }
     public required string RowVersion { get; init; }

@@ -612,4 +612,140 @@ public sealed class AnalysisExecutionServiceTests
         // Falls back to the raw id string when the user cannot be resolved.
         Assert.Equal("999", ok.Data.Readings.First(r => r.Id == 2).CapturedByUsername);
     }
+
+    private static Analysis BuildAnalysisWithTestConfig(string? testConfiguration)
+    {
+        var templateVersion = new AnalysisTemplateVersion
+        {
+            Id = 1,
+            TemplateId = 1,
+            Version = 1,
+            MinTolerance = 0m,
+            MaxTolerance = 1000m,
+            TestConfiguration = testConfiguration,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+        };
+
+        return new Analysis
+        {
+            Id = 1,
+            SampleId = 1,
+            TemplateId = 1,
+            TemplateVersionId = 1,
+            Status = LifecycleStatus.InProgress,
+            StartedAtUtc = DateTimeOffset.UtcNow,
+            StartedByUserId = 1,
+            IsLocked = false,
+            TemplateVersion = templateVersion,
+            Readings = new List<Reading>(),
+            Exceptions = new List<ExceptionRecord>(),
+        };
+    }
+
+    private static AnalysisExecutionService BuildService(
+        Mock<IAnalysisRepository> mockRepository,
+        Mock<ICurrentUser>? mockCurrentUser = null)
+    {
+        mockCurrentUser ??= new Mock<ICurrentUser>();
+        return new AnalysisExecutionService(
+            mockRepository.Object,
+            new Mock<ICalibrationCurveRepository>().Object,
+            new Mock<IAuditLogger>().Object,
+            mockCurrentUser.Object,
+            CreateTimeProvider(),
+            new Mock<IUserRepository>().Object);
+    }
+
+    [Fact]
+    public async Task GetAnalysisDetailAsync_ParsesAvailableTestsFromTemplateConfiguration()
+    {
+        var config = "{\"tests\":[{\"id\":1,\"name\":\"Pol\",\"unit\":\"°Z\",\"method\":\"BSES\"},{\"id\":2,\"name\":\"Temperature\",\"unit\":\"°C\"}],\"sampleMethod\":\"Single (snap)\"}";
+        var analysis = BuildAnalysisWithTestConfig(config);
+        var mockRepository = new Mock<IAnalysisRepository>();
+        mockRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(analysis);
+        var service = BuildService(mockRepository);
+
+        var result = await service.GetAnalysisDetailAsync(1, CancellationToken.None);
+
+        var ok = Assert.IsType<Outcome<AnalysisDetailResult>.Ok>(result);
+        Assert.Equal(2, ok.Data.AvailableTests.Count);
+        var pol = ok.Data.AvailableTests[0];
+        Assert.Equal(1, pol.Id);
+        Assert.Equal("Pol", pol.Name);
+        Assert.Equal("°Z", pol.Unit);
+        Assert.Equal("BSES", pol.Method);
+        Assert.Null(ok.Data.AvailableTests[1].Method);
+    }
+
+    [Fact]
+    public async Task GetAnalysisDetailAsync_ReturnsEmptyAvailableTests_WhenConfigMalformed()
+    {
+        var analysis = BuildAnalysisWithTestConfig("{ not valid json");
+        var mockRepository = new Mock<IAnalysisRepository>();
+        mockRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(analysis);
+        var service = BuildService(mockRepository);
+
+        var result = await service.GetAnalysisDetailAsync(1, CancellationToken.None);
+
+        var ok = Assert.IsType<Outcome<AnalysisDetailResult>.Ok>(result);
+        Assert.Empty(ok.Data.AvailableTests);
+    }
+
+    [Fact]
+    public async Task CaptureReadingAsync_RejectsTestIdNotDefinedByTemplate()
+    {
+        var config = "{\"tests\":[{\"id\":1,\"name\":\"Pol\",\"unit\":\"°Z\"}]}";
+        var analysis = BuildAnalysisWithTestConfig(config);
+        var mockRepository = new Mock<IAnalysisRepository>();
+        mockRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(analysis);
+        var mockCurrentUser = new Mock<ICurrentUser>();
+        mockCurrentUser.Setup(u => u.UserId).Returns(1);
+        mockCurrentUser.Setup(u => u.Role).Returns(Role.ControlLabAnalyst);
+        var service = BuildService(mockRepository, mockCurrentUser);
+
+        var request = new CaptureReadingRequest
+        {
+            TestId = 99,
+            Value = 50m,
+            Unit = "fake",
+            CapturedAtUtc = DateTimeOffset.UtcNow,
+        };
+
+        var result = await service.CaptureReadingAsync(1, request, CancellationToken.None);
+
+        var invalid = Assert.IsType<Outcome<ReadingCaptureResult>.Invalid>(result);
+        Assert.Equal("testId", invalid.Field);
+    }
+
+    [Fact]
+    public async Task CaptureReadingAsync_SetsUnitFromTestDefinition_IgnoringClientUnit()
+    {
+        var config = "{\"tests\":[{\"id\":1,\"name\":\"Pol\",\"unit\":\"°Z\"}]}";
+        var analysis = BuildAnalysisWithTestConfig(config);
+        Reading? captured = null;
+        var mockRepository = new Mock<IAnalysisRepository>();
+        mockRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(analysis);
+        mockRepository
+            .Setup(r => r.AddReadingAsync(It.IsAny<Reading>(), It.IsAny<CancellationToken>()))
+            .Callback<Reading, CancellationToken>((r, _) => captured = r)
+            .Returns(Task.CompletedTask);
+        var mockCurrentUser = new Mock<ICurrentUser>();
+        mockCurrentUser.Setup(u => u.UserId).Returns(1);
+        mockCurrentUser.Setup(u => u.Role).Returns(Role.ControlLabAnalyst);
+        var service = BuildService(mockRepository, mockCurrentUser);
+
+        var request = new CaptureReadingRequest
+        {
+            TestId = 1,
+            Value = 50m,
+            Unit = "wrong-unit",
+            CapturedAtUtc = DateTimeOffset.UtcNow,
+        };
+
+        var result = await service.CaptureReadingAsync(1, request, CancellationToken.None);
+
+        Assert.IsType<Outcome<ReadingCaptureResult>.Ok>(result);
+        Assert.NotNull(captured);
+        Assert.Equal("°Z", captured!.Unit);
+    }
 }
