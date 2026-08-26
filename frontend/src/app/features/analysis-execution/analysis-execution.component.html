@@ -107,18 +107,33 @@
             <form [formGroup]="readingForm" (ngSubmit)="submitReading()" class="space-y-4">
               <div class="grid gap-4 sm:grid-cols-2">
                 <div class="space-y-1.5">
-                  <label z-label for="testId">Test ID</label>
-                  <input
-                    z-input
-                    id="testId"
-                    type="text"
-                    formControlName="testId"
-                    placeholder="Enter test ID"
-                    [disabled]="submittingReading()"
-                    aria-describedby="testId-error"
-                  />
+                  <label z-label for="testId">Test</label>
+                  @if (availableTests().length > 0) {
+                    <z-select
+                      id="testId"
+                      formControlName="testId"
+                      zPlaceholder="Select a test"
+                      aria-describedby="testId-error"
+                    >
+                      @for (test of availableTests(); track test.id) {
+                        <z-select-item [zValue]="test.id.toString()">
+                          {{ test.name }} ({{ test.unit }})
+                        </z-select-item>
+                      }
+                    </z-select>
+                  } @else {
+                    <input
+                      z-input
+                      id="testId"
+                      type="text"
+                      formControlName="testId"
+                      placeholder="Enter test ID"
+                      [disabled]="submittingReading()"
+                      aria-describedby="testId-error"
+                    />
+                  }
                   @if (testIdControl.invalid && testIdControl.touched) {
-                    <p id="testId-error" class="text-xs text-destructive">Test ID is required</p>
+                    <p id="testId-error" class="text-xs text-destructive">Test is required</p>
                   }
                 </div>
 
@@ -141,15 +156,27 @@
 
                 <div class="space-y-1.5">
                   <label z-label for="unit">Unit</label>
-                  <input
-                    z-input
-                    id="unit"
-                    type="text"
-                    formControlName="unit"
-                    placeholder="Enter unit"
-                    [disabled]="submittingReading()"
-                    aria-describedby="unit-error"
-                  />
+                  @if (availableTests().length > 0) {
+                    <input
+                      z-input
+                      id="unit"
+                      type="text"
+                      formControlName="unit"
+                      placeholder="Select a test to set the unit"
+                      readonly
+                      aria-describedby="unit-error"
+                    />
+                  } @else {
+                    <input
+                      z-input
+                      id="unit"
+                      type="text"
+                      formControlName="unit"
+                      placeholder="Enter unit"
+                      [disabled]="submittingReading()"
+                      aria-describedby="unit-error"
+                    />
+                  }
                   @if (unitControl.invalid && unitControl.touched) {
                     <p id="unit-error" class="text-xs text-destructive">Unit is required</p>
                   }
@@ -236,7 +263,7 @@
                 <tbody z-table-body>
                   @for (reading of analysis()!.readings; track reading.id) {
                     <tr z-table-row>
-                      <td z-table-cell>{{ reading.testId }}</td>
+                      <td z-table-cell>{{ testName(reading.testId) }}</td>
                       <td z-table-cell class="text-right tabular-nums">{{ reading.value }} {{ reading.unit }}</td>
                       <td z-table-cell class="text-sm text-muted-foreground">-</td>
                       <td z-table-cell class="text-sm text-muted-foreground">{{ reading.capturedByUsername || reading.capturedBy }}</td>

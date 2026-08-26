@@ -1,1 +1,33 @@
 /* Styles managed by Tailwind CSS and Zard components */
+
+.test-row {
+  transition:
+    opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@starting-style {
+  .test-row {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+.test-row.leaving {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+  transition-duration: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-row,
+  .test-row.leaving {
+    transition: opacity 0.12s ease;
+    transform: none;
+  }
+  @starting-style {
+    .test-row {
+      transform: none;
+    }
+  }
+}

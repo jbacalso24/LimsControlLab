@@ -14,11 +14,19 @@ export interface AnalysisDetailDto {
   readings: ReadingDto[];
   exceptions: ExceptionDto[];
   rowVersion: string;
+  availableTests: TestDefinitionDto[];
+}
+
+export interface TestDefinitionDto {
+  id: number | string;
+  name: string;
+  unit: string;
+  method?: string;
 }
 
 export interface ReadingDto {
   id: number;
-  testId: string;
+  testId: number | string;
   value: number;
   unit: string;
   capturedAtUtc: string;

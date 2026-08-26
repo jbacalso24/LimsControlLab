@@ -47,6 +47,10 @@ describe('AnalysisExecutionComponent', () => {
       },
     ],
     rowVersion: 'v1',
+    availableTests: [
+      { id: 1, name: 'Pol', unit: '°Z' },
+      { id: 2, name: 'Temperature', unit: '°C' },
+    ],
   };
 
   beforeEach(async () => {
@@ -166,6 +170,22 @@ describe('AnalysisExecutionComponent', () => {
       fixture.detectChanges();
     });
 
+    it('should offer the template tests as a dropdown', () => {
+      // The Test field renders as a z-select (not a free-text input) sourced from availableTests.
+      const testSelect = fixture.nativeElement.querySelector('z-select#testId');
+      expect(testSelect).toBeTruthy();
+
+      const options = component.availableTests();
+      expect(options.map((t) => t.name)).toEqual(['Pol', 'Temperature']);
+      expect(options.map((t) => t.unit)).toEqual(['°Z', '°C']);
+    });
+
+    it('should auto-fill the unit when a test is selected', () => {
+      component.testIdControl.setValue('2');
+
+      expect(component.unitControl.value).toBe('°C');
+    });
+
     it('should validate required fields', () => {
       component.readingForm.patchValue({
         testId: '',
@@ -179,7 +199,7 @@ describe('AnalysisExecutionComponent', () => {
 
     it('should validate numeric value', () => {
       component.readingForm.patchValue({
-        testId: 'TEST-002',
+        testId: 1,
         value: 'not-a-number',
         unit: 'mg/L',
         capturedAtUtc: new Date('2026-08-26T10:00:00Z'),
@@ -192,7 +212,7 @@ describe('AnalysisExecutionComponent', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newReading: any = {
         id: 2,
-        testId: 'TEST-002',
+        testId: 1,
         value: 30,
         unit: 'mg/L',
         capturedAtUtc: '2026-08-26T11:00:00Z',
@@ -202,7 +222,7 @@ describe('AnalysisExecutionComponent', () => {
       };
 
       component.readingForm.patchValue({
-        testId: 'TEST-002',
+        testId: 1,
         value: 30,
         unit: 'mg/L',
         capturedAtUtc: new Date('2026-08-26T11:00:00Z'),
@@ -218,7 +238,7 @@ describe('AnalysisExecutionComponent', () => {
       component.submitReading();
 
       expect(apiService.addReading).toHaveBeenCalledWith(1, expect.objectContaining({
-        testId: 'TEST-002',
+        testId: 1,
         value: 30,
         unit: 'mg/L',
       }));
@@ -226,7 +246,7 @@ describe('AnalysisExecutionComponent', () => {
 
     it('should handle reading validation error', () => {
       component.readingForm.patchValue({
-        testId: 'TEST-002',
+        testId: 1,
         value: 50,
         unit: 'mg/L',
         capturedAtUtc: new Date('2026-08-26T11:00:00Z'),
@@ -259,7 +279,7 @@ describe('AnalysisExecutionComponent', () => {
 
     it('should disable form during submission', async () => {
       component.readingForm.patchValue({
-        testId: 'TEST-002',
+        testId: 1,
         value: 25,
         unit: 'mg/L',
         capturedAtUtc: new Date('2026-08-26T11:00:00Z'),
@@ -283,7 +303,7 @@ describe('AnalysisExecutionComponent', () => {
 
       addReading$.next({
         id: 2,
-        testId: 'TEST-002',
+        testId: 1,
         value: 25,
         unit: 'mg/L',
         capturedAtUtc: '2026-08-26T11:00:00Z',

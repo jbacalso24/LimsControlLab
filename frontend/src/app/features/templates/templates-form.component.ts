@@ -2,8 +2,11 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  AbstractControl,
+  FormArray,
   FormBuilder,
   FormGroup,
+  ValidationErrors,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
@@ -18,9 +21,23 @@ import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { CreateAnalysisTemplateRequest } from '../../shared/generated/models/create-analysis-template-request';
 import { UpdateAnalysisTemplateRequest } from '../../shared/generated/models/update-analysis-template-request';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
+const CURATED_UNITS = ['°Z', '°C', '°Bx', '%', 'ICUMS', 'g/L', 'pH', 'mL', 'ppm'];
+
+/** A single row of the structured test editor. `id` is null for rows not yet persisted. */
+interface TestRowValue {
+  id: number | null;
+  name: string;
+  unit: string;
+  method: string;
+}
+
+function atLeastOneTest(control: AbstractControl): ValidationErrors | null {
+  return control instanceof FormArray && control.length > 0 ? null : { required: true };
+}
 
 @Component({
   selector: 'lims-templates-form',
@@ -43,6 +60,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
   ],
   templateUrl: './templates-form.component.html',
   styleUrl: './templates-form.component.scss',
+  viewProviders: [provideIcons({ lucidePlus, lucideTrash2 })],
 })
 export class TemplatesFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -61,16 +79,108 @@ export class TemplatesFormComponent implements OnInit {
   private templateId: number | null = null;
   private rowVersion = '';
 
+  /** Every Test Configuration JSON key other than `tests`, preserved verbatim on save. */
+  private preservedConfig: Record<string, unknown> = {};
+  /** Stable per-row identity for @for tracking and exit animations (not the persisted test id). */
+  rowKeys: number[] = [];
+  private nextRowKey = 0;
+  availableUnits: string[] = [...CURATED_UNITS];
+
   constructor() {
     this.form = this.fb.group({
       name: ['', Validators.required],
       site: ['', Validators.required],
       minTolerance: [''],
       maxTolerance: [''],
-      testConfiguration: [''],
+      tests: this.fb.array([], atLeastOneTest),
       validationRules: [''],
       calculationDefinitions: [''],
     });
+  }
+
+  get testsArray(): FormArray {
+    return this.form.get('tests') as FormArray;
+  }
+
+  testGroup(index: number): FormGroup {
+    return this.testsArray.at(index) as FormGroup;
+  }
+
+  private buildTestRow(row?: Partial<TestRowValue>): FormGroup {
+    return this.fb.group({
+      id: [row?.id ?? null],
+      name: [row?.name ?? '', Validators.required],
+      unit: [row?.unit ?? '', Validators.required],
+      method: [row?.method ?? ''],
+    });
+  }
+
+  addTestRow(): void {
+    this.testsArray.push(this.buildTestRow());
+    this.rowKeys.push(this.nextRowKey++);
+  }
+
+  removeTestRow(index: number, key: number): void {
+    const i = this.rowKeys.indexOf(key);
+    if (i === -1) {
+      return;
+    }
+    this.testsArray.removeAt(i);
+    this.rowKeys.splice(i, 1);
+  }
+
+  /** Parses the Test Configuration JSON into rows + preserved keys. Never throws. */
+  private parseTestConfiguration(raw: string | null | undefined): { rows: TestRowValue[]; preserved: Record<string, unknown> } {
+    if (!raw) {
+      return { rows: [], preserved: {} };
+    }
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { rows: [], preserved: {} };
+      }
+      const { tests, ...preserved } = parsed as Record<string, unknown>;
+      const rawTests = Array.isArray(tests) ? tests : [];
+      const rows: TestRowValue[] = rawTests
+        .filter((t): t is Record<string, unknown> => !!t && typeof t === 'object')
+        .map((t) => ({
+          id: typeof t['id'] === 'number' ? (t['id'] as number) : null,
+          name: typeof t['name'] === 'string' ? (t['name'] as string) : '',
+          unit: typeof t['unit'] === 'string' ? (t['unit'] as string) : '',
+          method: typeof t['method'] === 'string' ? (t['method'] as string) : '',
+        }));
+      return { rows, preserved };
+    } catch {
+      return { rows: [], preserved: {} };
+    }
+  }
+
+  private applyTestConfiguration(raw: string | null | undefined): void {
+    const { rows, preserved } = this.parseTestConfiguration(raw);
+    this.preservedConfig = preserved;
+    this.testsArray.clear();
+    this.rowKeys = [];
+    for (const row of rows) {
+      this.testsArray.push(this.buildTestRow(row));
+      this.rowKeys.push(this.nextRowKey++);
+    }
+    const loadedUnits = rows.map((r) => r.unit).filter((u) => u && !CURATED_UNITS.includes(u));
+    this.availableUnits = [...CURATED_UNITS, ...new Set(loadedUnits)];
+  }
+
+  /** Rebuilds the Test Configuration JSON string, assigning ids to new rows and preserving other keys. */
+  private buildTestConfiguration(): string {
+    const rows = this.testsArray.controls.map((c) => c.value as TestRowValue);
+    let maxId = rows.reduce((max, r) => (r.id !== null && r.id > max ? r.id : max), 0);
+    const tests = rows.map((r) => {
+      const id = r.id ?? ++maxId;
+      const test: Record<string, unknown> = { id, name: r.name, unit: r.unit };
+      if (r.method) {
+        test['method'] = r.method;
+      }
+      return test;
+    });
+    return JSON.stringify({ ...this.preservedConfig, tests });
   }
 
   ngOnInit(): void {
@@ -92,10 +202,10 @@ export class TemplatesFormComponent implements OnInit {
           name: template.name,
           minTolerance: template.minTolerance,
           maxTolerance: template.maxTolerance,
-          testConfiguration: template.testConfiguration,
           validationRules: template.validationRules,
           calculationDefinitions: template.calculationDefinitions,
         });
+        this.applyTestConfiguration(template.testConfiguration);
         this.form.get('site')?.disable();
         this.loading.set(false);
       },
@@ -108,6 +218,7 @@ export class TemplatesFormComponent implements OnInit {
 
   submit(): void {
     if (this.form.invalid) {
+      this.testsArray.markAllAsTouched();
       return;
     }
 
@@ -115,6 +226,7 @@ export class TemplatesFormComponent implements OnInit {
     this.submitError.set('');
 
     const formValue = this.form.value;
+    const testConfiguration = this.buildTestConfiguration();
 
     if (this.isEdit()) {
       const request: UpdateAnalysisTemplateRequest = {
@@ -122,7 +234,7 @@ export class TemplatesFormComponent implements OnInit {
         rowVersion: this.rowVersion,
         minTolerance: formValue.minTolerance || undefined,
         maxTolerance: formValue.maxTolerance || undefined,
-        testConfiguration: formValue.testConfiguration || undefined,
+        testConfiguration,
         validationRules: formValue.validationRules || undefined,
         calculationDefinitions: formValue.calculationDefinitions || undefined,
       };
@@ -149,7 +261,7 @@ export class TemplatesFormComponent implements OnInit {
         site: formValue.site,
         minTolerance: formValue.minTolerance || undefined,
         maxTolerance: formValue.maxTolerance || undefined,
-        testConfiguration: formValue.testConfiguration || undefined,
+        testConfiguration,
         validationRules: formValue.validationRules || undefined,
         calculationDefinitions: formValue.calculationDefinitions || undefined,
       };

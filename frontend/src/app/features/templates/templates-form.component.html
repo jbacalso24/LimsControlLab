@@ -110,16 +110,98 @@
           </z-card-header>
           <z-card-content>
             <div class="space-y-4">
-              <!-- Test Configuration -->
-              <div class="space-y-1.5">
-                <label z-label for="testConfiguration">Test Configuration</label>
-                <z-json-editor
-                  formControlName="testConfiguration"
-                  ariaLabel="Test configuration JSON"
-                  placeholder='{ "tests": [] }'
-                  [rows]="6"
-                />
-                <p class="text-xs text-muted-foreground">JSON configuration for test parameters, units and methods.</p>
+              <!-- Tests -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label z-label>Tests</label>
+                  <button
+                    type="button"
+                    z-button
+                    zType="outline"
+                    zSize="sm"
+                    (click)="addTestRow()"
+                    [disabled]="submitting()"
+                  >
+                    <ng-icon name="lucidePlus" class="mr-1 h-3.5 w-3.5" />
+                    Add test
+                  </button>
+                </div>
+
+                <div class="space-y-2">
+                  @for (key of rowKeys; track key; let i = $index) {
+                    <div
+                      class="test-row grid gap-2 rounded-md border border-border bg-card p-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-start"
+                      [formGroup]="testGroup(i)"
+                    >
+                      <div class="space-y-1">
+                        <label z-label class="text-xs" [for]="'test-name-' + key">Name</label>
+                        <input
+                          z-input
+                          [id]="'test-name-' + key"
+                          type="text"
+                          formControlName="name"
+                          placeholder="e.g. Pol"
+                          [disabled]="submitting()"
+                        />
+                        @if (testGroup(i).get('name')?.invalid && testGroup(i).get('name')?.touched) {
+                          <p class="text-xs text-destructive">Name is required</p>
+                        }
+                      </div>
+
+                      <div class="space-y-1">
+                        <label z-label class="text-xs" [for]="'test-unit-' + key">Unit</label>
+                        <input
+                          z-input
+                          [id]="'test-unit-' + key"
+                          type="text"
+                          formControlName="unit"
+                          placeholder="e.g. °Z"
+                          list="test-unit-options"
+                          [disabled]="submitting()"
+                        />
+                        @if (testGroup(i).get('unit')?.invalid && testGroup(i).get('unit')?.touched) {
+                          <p class="text-xs text-destructive">Unit is required</p>
+                        }
+                      </div>
+
+                      <div class="space-y-1">
+                        <label z-label class="text-xs" [for]="'test-method-' + key">Method</label>
+                        <input
+                          z-input
+                          [id]="'test-method-' + key"
+                          type="text"
+                          formControlName="method"
+                          placeholder="e.g. BSES"
+                          [disabled]="submitting()"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        z-button
+                        zType="ghost"
+                        zSize="icon-sm"
+                        class="sm:mt-6"
+                        (click)="removeTestRow(i, key)"
+                        [disabled]="submitting()"
+                        aria-label="Remove test"
+                      >
+                        <ng-icon name="lucideTrash2" class="h-4 w-4" />
+                      </button>
+                    </div>
+                  }
+                </div>
+
+                <datalist id="test-unit-options">
+                  @for (unit of availableUnits; track unit) {
+                    <option [value]="unit"></option>
+                  }
+                </datalist>
+
+                @if (testsArray.invalid && testsArray.touched) {
+                  <p class="text-xs text-destructive">Add at least one test with a name and unit.</p>
+                }
+                <p class="text-xs text-muted-foreground">Tests analysts can select when capturing readings for this template.</p>
               </div>
 
               <!-- Calculation Definitions -->

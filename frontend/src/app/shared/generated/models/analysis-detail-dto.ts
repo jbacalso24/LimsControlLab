@@ -3,7 +3,9 @@
 
 import { ExceptionDto } from '../models/exception-dto';
 import { ReadingDto } from '../models/reading-dto';
+import { TestDefinitionDto } from '../models/test-definition-dto';
 export interface AnalysisDetailDto {
+  availableTests: Array<TestDefinitionDto>;
   exceptions: Array<ExceptionDto>;
   id: (number | string);
   readings: Array<ReadingDto>;

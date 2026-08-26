@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto } from './services/analysis-execution-api.service';
+import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto, TestDefinitionDto } from './services/analysis-execution-api.service';
 import { StatusChangeRequest } from '../../shared/generated/models/status-change-request';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -89,6 +89,10 @@ export class AnalysisExecutionComponent implements OnInit {
     return this.instruments().filter(i => i.isActive);
   });
 
+  availableTests = computed<TestDefinitionDto[]>(() => {
+    return this.analysis()?.availableTests ?? [];
+  });
+
   // Valid lifecycle actions for the current status (BRD R20). Server re-checks.
   availableActions = computed<string[]>(() => {
     switch (this.analysis()?.status) {
@@ -115,6 +119,26 @@ export class AnalysisExecutionComponent implements OnInit {
       capturedAtUtc: [null, Validators.required],
       instrumentId: [''],
     });
+
+    this.testIdControl.valueChanges.subscribe((testId) => this.applyUnitForTest(testId));
+  }
+
+  /** Auto-fills the read-only unit control from the selected test's definition (BRD: unit is not free-typed). */
+  private applyUnitForTest(testId: string | number | null): void {
+    const tests = this.availableTests();
+    if (tests.length === 0 || testId === null || testId === '') {
+      return;
+    }
+    const test = tests.find((t) => t.id.toString() === testId.toString());
+    if (test) {
+      this.unitControl.setValue(test.unit, { emitEvent: false });
+    }
+  }
+
+  /** Displays the test name in the readings table instead of the raw test ID. */
+  testName(testId: string | number): string {
+    const test = this.availableTests().find((t) => t.id.toString() === testId.toString());
+    return test ? test.name : testId.toString();
   }
 
   ngOnInit(): void {
@@ -130,6 +154,10 @@ export class AnalysisExecutionComponent implements OnInit {
       next: (data) => {
         this.analysis.set(data);
         this.loading.set(false);
+        const tests = data?.availableTests ?? [];
+        if (tests.length === 1) {
+          this.testIdControl.setValue(tests[0].id.toString());
+        }
       },
       error: (err) => {
         this.loading.set(false);
@@ -219,7 +247,7 @@ export class AnalysisExecutionComponent implements OnInit {
     const formValue = this.readingForm.value;
 
     const request = {
-      testId: formValue.testId,
+      testId: Number(formValue.testId),
       value: Number(formValue.value),
       unit: formValue.unit,
       capturedAtUtc: formValue.capturedAtUtc,
