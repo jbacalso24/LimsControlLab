@@ -12,6 +12,7 @@ import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
 import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { CreateScheduleRequest } from '../../shared/generated/models/create-schedule-request';
 import { UpdateScheduleRequest } from '../../shared/generated/models/update-schedule-request';
@@ -41,6 +42,7 @@ export class SchedulingFormComponent implements OnInit {
   private apiService = inject(SchedulingApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   sites = SITES;
   shiftPatterns = SHIFT_PATTERNS;
@@ -127,6 +129,7 @@ export class SchedulingFormComponent implements OnInit {
       this.apiService.updateSchedule(this.scheduleId!, request).subscribe({
         next: () => {
           this.submitting.set(false);
+          this.toast.success(`Schedule "${request.name}" updated.`);
           this.router.navigate(['../..'], { relativeTo: this.route });
         },
         error: (err) => {
@@ -153,6 +156,7 @@ export class SchedulingFormComponent implements OnInit {
       this.apiService.createSchedule(request).subscribe({
         next: () => {
           this.submitting.set(false);
+          this.toast.success(`Schedule "${request.name}" created.`);
           this.router.navigate(['..'], { relativeTo: this.route });
         },
         error: (err) => {
