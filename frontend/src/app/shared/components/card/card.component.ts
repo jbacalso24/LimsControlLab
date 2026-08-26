@@ -29,7 +29,11 @@ import {
   imports: [ZardStringTemplateOutletDirective],
   template: `
     @let title = zTitle();
-    <ng-container *zStringTemplateOutlet="title">{{ title }}</ng-container>
+    @if (title === undefined || title === null) {
+      <ng-content />
+    } @else {
+      <ng-container *zStringTemplateOutlet="title">{{ title }}</ng-container>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -51,7 +55,11 @@ export class ZardCardTitleComponent {
   imports: [ZardStringTemplateOutletDirective],
   template: `
     @let description = zDescription();
-    <ng-container *zStringTemplateOutlet="description">{{ description }}</ng-container>
+    @if (description === undefined || description === null) {
+      <ng-content />
+    } @else {
+      <ng-container *zStringTemplateOutlet="description">{{ description }}</ng-container>
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
