@@ -82,14 +82,20 @@
               </tr>
             </thead>
             <tbody z-table-body>
-              @for (schedule of schedules(); track schedule.id) {
+              @for (schedule of pagedSchedules(); track schedule.id) {
                 <tr z-table-row>
                   <td z-table-cell class="font-medium">{{ schedule.name }}</td>
                   <td z-table-cell>{{ schedule.site }}</td>
                   <td z-table-cell>{{ schedule.analysisType || 'N/A' }}</td>
                   <td z-table-cell>{{ schedule.shiftPattern }}</td>
                   <td z-table-cell class="text-sm text-muted-foreground">{{ schedule.recurrencePattern || 'N/A' }}</td>
-                  <td z-table-cell class="text-sm text-muted-foreground">{{ schedule.assignedToUserId || 'Unassigned' }}</td>
+                  <td z-table-cell>
+                    @if (!schedule.assignedToUserId) {
+                      <span class="text-muted-foreground">Unassigned</span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground" [attr.title]="'User #' + schedule.assignedToUserId">Assigned</span>
+                    }
+                  </td>
                   <td z-table-cell>
                     @if (schedule.isActive) {
                       <z-badge class="bg-success/12 text-success border border-success/25 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium">
@@ -120,6 +126,13 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="flex justify-center pt-6">
+            <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Schedules pagination"></z-pagination>
+          </div>
+        }
       </z-card-content>
     </z-card>
   }

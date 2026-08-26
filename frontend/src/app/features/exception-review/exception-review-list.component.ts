@@ -17,8 +17,9 @@ import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideLock, lucideCircleCheck } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-exception-review-list',
@@ -46,15 +47,17 @@ import { lucideAlertCircle } from '@ng-icons/lucide';
   ],
   templateUrl: './exception-review-list.component.html',
   styleUrl: './exception-review-list.component.scss',
-  viewProviders: [provideIcons({ lucideAlertCircle })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideLock, lucideCircleCheck })],
 })
 export class ExceptionReviewListComponent {
   private apiService = inject(ExceptionReviewApiService);
   private currentUserService = inject(CurrentUserService);
   private formBuilder = inject(FormBuilder);
+  private toast = inject(ToastService);
 
   loading = signal(false);
   error = signal('');
+  forbidden = signal(false);
   analyses = signal<ResultReviewDto[]>([]);
   showUnlockDialog = signal(false);
   unlocking = signal(false);
@@ -77,14 +80,19 @@ export class ExceptionReviewListComponent {
   private loadAnalyses(): void {
     this.loading.set(true);
     this.error.set('');
+    this.forbidden.set(false);
     this.apiService.listExceptionAnalyses().subscribe({
       next: (data) => {
         this.analyses.set(data);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.error.set('Failed to load exception analyses. Please try again.');
+        if (err.status === 403) {
+          this.forbidden.set(true);
+        } else {
+          this.error.set('Failed to load exception analyses. Please try again.');
+        }
       },
     });
   }
@@ -135,6 +143,7 @@ export class ExceptionReviewListComponent {
     this.apiService.unlockResult(Number(analysis.id), request).subscribe({
       next: () => {
         this.unlocking.set(false);
+        this.toast.success(`Result for sample ${analysis.sampleId} unlocked.`);
         this.closeUnlockDialog();
         this.loadAnalyses();
       },

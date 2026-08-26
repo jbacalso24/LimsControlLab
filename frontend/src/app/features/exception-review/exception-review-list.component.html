@@ -14,8 +14,26 @@
     </div>
   }
 
+  <!-- Coordinator-only access state (403) -->
+  @if (!loading() && forbidden()) {
+    <z-card>
+      <z-card-content class="py-12">
+        <div class="mx-auto flex max-w-md flex-col items-center text-center">
+          <div class="mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
+            <ng-icon name="lucideLock" class="h-6 w-6" />
+          </div>
+          <h2 class="mb-1 text-base font-semibold">Coordinator access required</h2>
+          <p class="text-sm text-muted-foreground">
+            Reviewing and unlocking exception analyses is a Lab Coordinator task. Sign in with a
+            coordinator account to review exceptions for your site.
+          </p>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
   <!-- Error State -->
-  @if (!loading() && error()) {
+  @if (!loading() && !forbidden() && error()) {
     <z-card>
       <z-card-content>
         <div class="flex items-start gap-4">
@@ -31,12 +49,20 @@
   }
 
   <!-- Empty State -->
-  @if (!loading() && !error() && !analyses().length) {
-    <z-empty />
+  @if (!loading() && !forbidden() && !error() && !analyses().length) {
+    <z-card>
+      <z-card-content class="py-12">
+        <z-empty
+          zIcon="lucideCircleCheck"
+          [zTitle]="'No exceptions to review'"
+          [zDescription]="'Completed analyses with out-of-tolerance results will appear here for review.'"
+        />
+      </z-card-content>
+    </z-card>
   }
 
   <!-- Analyses Table -->
-  @if (!loading() && !error() && analyses().length) {
+  @if (!loading() && !forbidden() && !error() && analyses().length) {
     <z-card>
       <z-card-content>
         <div class="overflow-x-auto">
