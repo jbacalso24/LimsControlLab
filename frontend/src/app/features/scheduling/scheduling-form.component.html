@@ -1,151 +1,230 @@
-<div class="lims-scheduling-form">
-  <h1>{{ isEdit() ? 'Edit Schedule' : 'Create Schedule' }}</h1>
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">{{ isEdit() ? 'Edit Schedule' : 'Create Schedule' }}</h1>
+    <p class="text-sm text-muted-foreground">{{ isEdit() ? 'Update the schedule configuration' : 'Set up a new recurring analysis schedule' }}</p>
+  </div>
 
+  <!-- Loading State -->
   @if (loading()) {
-    <div class="loading-state" role="status" aria-live="polite">
-      <p>Loading schedule...</p>
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
     </div>
-  } @else if (error()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Error</h2>
-      <p>{{ error() }}</p>
-    </div>
-  } @else {
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="form-group">
-        <label for="name">Name *</label>
-        <input
-          id="name"
-          type="text"
-          formControlName="name"
-          kendoTextBox
-          placeholder="Enter schedule name"
-          [disabled]="submitting()"
-          aria-describedby="name-error"
-        />
-        @if (form.get('name')?.invalid && form.get('name')?.touched) {
-          <span id="name-error" class="error-message">
-            Name is required
-          </span>
-        }
-      </div>
+  }
 
-      @if (!isEdit()) {
-        <div class="form-group">
-          <label for="site">Site *</label>
-          <kendo-dropdownlist
-            id="site"
-            formControlName="site"
-            [data]="sites"
-            [valuePrimitive]="true"
-            [defaultItem]="'Select a site'"
-            [disabled]="submitting()"
-            aria-label="Site"
-            aria-describedby="site-error"
-          ></kendo-dropdownlist>
-          @if (form.get('site')?.invalid && form.get('site')?.touched) {
-            <span id="site-error" class="error-message">
-              Site is required
-            </span>
-          }
+  <!-- Error State -->
+  @if (error()) {
+    <z-card>
+      <z-card-content>
+        <div class="flex items-start gap-4">
+          <svg class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div class="flex-1">
+            <h2 class="font-semibold text-destructive mb-1">Error Loading Schedule</h2>
+            <p class="text-sm text-muted-foreground">{{ error() }}</p>
+          </div>
         </div>
-      }
+      </z-card-content>
+    </z-card>
+  }
 
-      <div class="form-group">
-        <label for="shiftPattern">Shift Pattern *</label>
-        <kendo-dropdownlist
-          id="shiftPattern"
-          formControlName="shiftPattern"
-          [data]="shiftPatterns"
-          [valuePrimitive]="true"
-          [defaultItem]="'Select a shift pattern'"
-          [disabled]="submitting()"
-          aria-label="Shift Pattern"
-          aria-describedby="shiftPattern-error"
-        ></kendo-dropdownlist>
-        @if (form.get('shiftPattern')?.invalid && form.get('shiftPattern')?.touched) {
-          <span id="shiftPattern-error" class="error-message">
-            Shift pattern is required
-          </span>
-        }
-      </div>
+  <!-- Form -->
+  @if (!loading() && !error()) {
+    <z-card>
+      <z-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+          <!-- Basic Information Section -->
+          <div class="space-y-1.5 pb-4 border-b border-border">
+            <h3 class="text-sm font-medium">Basic Information</h3>
+          </div>
 
-      <div class="form-group">
-        <label for="analysisType">Analysis Type</label>
-        <input
-          id="analysisType"
-          type="text"
-          formControlName="analysisType"
-          kendoTextBox
-          placeholder="Enter analysis type"
-          [disabled]="submitting()"
-        />
-      </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <!-- Name -->
+            <div class="space-y-1.5">
+              <label z-label for="name">Name <span class="text-destructive">*</span></label>
+              <input
+                z-input
+                id="name"
+                type="text"
+                formControlName="name"
+                placeholder="Enter schedule name"
+                [disabled]="submitting()"
+                [attr.aria-describedby]="form.get('name')?.invalid && form.get('name')?.touched ? 'name-error' : null"
+              />
+              @if (form.get('name')?.invalid && form.get('name')?.touched) {
+                <p id="name-error" class="text-xs text-destructive">Name is required</p>
+              }
+            </div>
 
-      <div class="form-group">
-        <label for="recurrencePattern">Recurrence Pattern</label>
-        <textarea
-          id="recurrencePattern"
-          formControlName="recurrencePattern"
-          placeholder="Enter recurrence pattern (JSON)"
-          [disabled]="submitting()"
-          rows="4"
-        ></textarea>
-      </div>
+            <!-- Site (disabled on edit) -->
+            @if (!isEdit()) {
+              <div class="space-y-1.5">
+                <label z-label for="site">Site <span class="text-destructive">*</span></label>
+                <z-select
+                  id="site"
+                  formControlName="site"
+                  zPlaceholder="Select a site"
+                  [disabled]="submitting()"
+                  [attr.aria-describedby]="form.get('site')?.invalid && form.get('site')?.touched ? 'site-error' : null"
+                >
+                  @for (site of sites; track site) {
+                    <z-select-item [zValue]="site">{{ site }}</z-select-item>
+                  }
+                </z-select>
+                @if (form.get('site')?.invalid && form.get('site')?.touched) {
+                  <p id="site-error" class="text-xs text-destructive">Site is required</p>
+                }
+              </div>
+            } @else {
+              <div class="space-y-1.5">
+                <label z-label for="site">Site</label>
+                <input
+                  z-input
+                  id="site"
+                  type="text"
+                  formControlName="site"
+                  [disabled]="true"
+                />
+              </div>
+            }
+          </div>
 
-      <div class="form-group">
-        <label for="exclusionRules">Exclusion Rules</label>
-        <textarea
-          id="exclusionRules"
-          formControlName="exclusionRules"
-          placeholder="Enter exclusion rules (JSON)"
-          [disabled]="submitting()"
-          rows="4"
-        ></textarea>
-      </div>
+          <!-- Schedule Configuration Section -->
+          <div class="space-y-1.5 pb-4 border-b border-border pt-4">
+            <h3 class="text-sm font-medium">Schedule Configuration</h3>
+          </div>
 
-      <div class="form-group">
-        <label for="isActive">
-          <input
-            id="isActive"
-            type="checkbox"
-            formControlName="isActive"
-            [disabled]="submitting()"
-          />
-          Active
-        </label>
-      </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <!-- Analysis Type -->
+            <div class="space-y-1.5">
+              <label z-label for="analysisType">Analysis Type</label>
+              <input
+                z-input
+                id="analysisType"
+                type="text"
+                formControlName="analysisType"
+                placeholder="e.g. Pol, Brix, Water"
+                [disabled]="submitting()"
+              />
+            </div>
 
-      @if (submitError()) {
-        <div class="error-alert" role="alert" aria-live="polite">
-          <strong>Submission failed</strong>
-          <p>{{ submitError() }}</p>
-        </div>
-      }
+            <!-- Shift Pattern -->
+            <div class="space-y-1.5">
+              <label z-label for="shiftPattern">Shift Pattern <span class="text-destructive">*</span></label>
+              <z-select
+                id="shiftPattern"
+                formControlName="shiftPattern"
+                zPlaceholder="Select a shift pattern"
+                [disabled]="submitting()"
+                [attr.aria-describedby]="form.get('shiftPattern')?.invalid && form.get('shiftPattern')?.touched ? 'shiftPattern-error' : null"
+              >
+                @for (pattern of shiftPatterns; track pattern) {
+                  <z-select-item [zValue]="pattern">{{ pattern }}</z-select-item>
+                }
+              </z-select>
+              @if (form.get('shiftPattern')?.invalid && form.get('shiftPattern')?.touched) {
+                <p id="shiftPattern-error" class="text-xs text-destructive">Shift pattern is required</p>
+              }
+            </div>
+          </div>
 
-      <div class="form-actions">
-        <button
-          type="submit"
-          kendoButton
-          themeColor="primary"
-          [disabled]="form.invalid || submitting()"
-        >
-          @if (submitting()) {
-            Saving...
-          } @else {
-            Save Schedule
+          <!-- Recurrence Pattern -->
+          <div class="space-y-1.5">
+            <label z-label for="recurrencePattern">Recurrence Pattern</label>
+            <input
+              z-input
+              id="recurrencePattern"
+              type="text"
+              formControlName="recurrencePattern"
+              placeholder="e.g. Every 2 hours during shift"
+              [disabled]="submitting()"
+            />
+            <p class="text-xs text-muted-foreground">Describe when this schedule should run</p>
+          </div>
+
+          <!-- Exclusion Rules -->
+          <div class="space-y-1.5">
+            <label z-label for="exclusionRules">Exclusion Rules</label>
+            <input
+              z-input
+              id="exclusionRules"
+              type="text"
+              formControlName="exclusionRules"
+              placeholder="e.g. Excludes Sundays"
+              [disabled]="submitting()"
+            />
+            <p class="text-xs text-muted-foreground">Specify any dates or times when this schedule should not run</p>
+          </div>
+
+          <!-- Assigned To User ID -->
+          <div class="space-y-1.5">
+            <label z-label for="assignedToUserId">Assigned to User ID</label>
+            <input
+              z-input
+              id="assignedToUserId"
+              type="number"
+              formControlName="assignedToUserId"
+              placeholder="Optional: numeric user ID"
+              [disabled]="submitting()"
+            />
+            <p class="text-xs text-muted-foreground">Leave blank to assign to any available user</p>
+          </div>
+
+          <!-- Status Section -->
+          <div class="space-y-1.5 pb-4 border-b border-border pt-4">
+            <h3 class="text-sm font-medium">Status</h3>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                formControlName="isActive"
+                [disabled]="submitting()"
+                class="rounded border-border"
+              />
+              <span class="text-sm font-medium">Active</span>
+            </label>
+            <p class="text-xs text-muted-foreground">Enable this schedule to start running immediately</p>
+          </div>
+
+          <!-- Error Alert -->
+          @if (submitError()) {
+            <div class="p-3 bg-destructive/10 border border-destructive/50 rounded-lg">
+              <p class="text-sm font-medium text-destructive mb-1">Submission failed</p>
+              <p class="text-xs text-destructive/90">{{ submitError() }}</p>
+            </div>
           }
-        </button>
-        <button
-          type="button"
-          kendoButton
-          look="flat"
-          (click)="cancel()"
-          [disabled]="submitting()"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+
+          <!-- Form Actions -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-border">
+            <button
+              z-button
+              zType="outline"
+              type="button"
+              (click)="cancel()"
+              [disabled]="submitting()"
+            >
+              Cancel
+            </button>
+            <button
+              z-button
+              type="submit"
+              [disabled]="form.invalid || submitting()"
+              [zLoading]="submitting()"
+            >
+              @if (isEdit()) {
+                Update Schedule
+              } @else {
+                Create Schedule
+              }
+            </button>
+          </div>
+        </form>
+      </z-card-content>
+    </z-card>
   }
 </div>

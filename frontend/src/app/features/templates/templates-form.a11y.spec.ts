@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ActivatedRoute } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import axe from 'axe-core';
 import { TemplatesFormComponent } from './templates-form.component';
 
@@ -10,7 +11,7 @@ describe('TemplatesFormComponent - Accessibility', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TemplatesFormComponent],
+      imports: [TemplatesFormComponent, HttpClientTestingModule],
       providers: [
         provideAnimationsAsync(),
         {

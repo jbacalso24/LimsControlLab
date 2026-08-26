@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HistorySearchComponent } from './history-search.component';
-import { PageChangeEvent } from '@progress/kendo-angular-grid';
 
 describe('HistorySearchComponent', () => {
   let component: HistorySearchComponent;
@@ -139,8 +138,7 @@ describe('HistorySearchComponent', () => {
 
     fixture.detectChanges();
 
-    const event: PageChangeEvent = { skip: 50, take: 50 };
-    component.onPageChange(event);
+    component.onPageChange(2);
 
     const req = httpMock.expectOne((r) => r.url.includes('/search/results'));
     expect(req.request.params.get('pageNumber')).toBe('2');
@@ -183,7 +181,7 @@ describe('HistorySearchComponent', () => {
     });
   });
 
-  it('should reset skip to 0 when searching', () => {
+  it('should reset page index to 1 when searching', () => {
     fixture.detectChanges();
 
     // Consume initial search
@@ -196,11 +194,11 @@ describe('HistorySearchComponent', () => {
     });
 
     // Simulate being on page 2
-    component.skip.set(50);
+    component.currentPageIndex.set(2);
 
     component.search();
 
-    expect(component.skip()).toBe(0);
+    expect(component.currentPageIndex()).toBe(1);
 
     req = httpMock.expectOne((r) => r.url.includes('/search/results'));
     expect(req.request.params.get('pageNumber')).toBe('1');

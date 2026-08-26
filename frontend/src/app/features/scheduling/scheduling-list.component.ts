@@ -2,8 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { GridModule } from '@progress/kendo-angular-grid';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
+import { ZardBadgeComponent } from '@/shared/components/badge';
+import { ZardSpinnerComponent } from '@/shared/components/spinner';
+import { ZardEmptyComponent } from '@/shared/components/empty';
+import { ZardTableImports } from '@/shared/components/table';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
@@ -16,8 +20,13 @@ import { CurrentUserService } from '../../shared/services/auth/current-user.serv
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    GridModule,
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardCardContentComponent,
+    ZardBadgeComponent,
+    ZardSpinnerComponent,
+    ZardEmptyComponent,
+    ...ZardTableImports,
   ],
   templateUrl: './scheduling-list.component.html',
   styleUrl: './scheduling-list.component.scss',

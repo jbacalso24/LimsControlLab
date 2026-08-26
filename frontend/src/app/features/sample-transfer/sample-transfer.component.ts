@@ -7,9 +7,13 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
-import { DialogModule } from '@progress/kendo-angular-dialog';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideAlertCircle } from '@ng-icons/lucide';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
+import { ZardCardComponent, ZardCardContentComponent, ZardCardHeaderComponent, ZardCardTitleComponent } from '@/shared/components/card';
+import { ZardAlertComponent } from '@/shared/components/alert';
+import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { SampleTransferApiService } from './services/sample-transfer-api.service';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { SampleDto } from '../../shared/generated/models/sample-dto';
@@ -22,12 +26,20 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    DropDownsModule,
-    DialogModule,
+    NgIcon,
+    ZardButtonComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
+    ZardCardComponent,
+    ZardCardContentComponent,
+    ZardCardHeaderComponent,
+    ZardCardTitleComponent,
+    ZardAlertComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './sample-transfer.component.html',
   styleUrl: './sample-transfer.component.scss',
+  viewProviders: [provideIcons({ lucideAlertCircle })],
 })
 export class SampleTransferComponent implements OnInit {
   private apiService = inject(SampleTransferApiService);

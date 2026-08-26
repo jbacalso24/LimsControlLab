@@ -7,15 +7,17 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { TextBoxModule } from '@progress/kendo-angular-inputs';
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardInputComponent } from '@/shared/components/input';
+import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
+import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
+import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { CreateScheduleRequest } from '../../shared/generated/models/create-schedule-request';
 import { UpdateScheduleRequest } from '../../shared/generated/models/update-schedule-request';
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
-const SHIFT_PATTERNS = ['3x8', 'Continuous'];
+const SHIFT_PATTERNS = ['Day', 'Shift', 'Weekly'];
 
 @Component({
   selector: 'lims-scheduling-form',
@@ -23,9 +25,13 @@ const SHIFT_PATTERNS = ['3x8', 'Continuous'];
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    TextBoxModule,
-    DropDownListModule,
+    ZardButtonComponent,
+    ZardInputComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
+    ZardCardComponent,
+    ZardCardContentComponent,
+    ZardSpinnerComponent,
   ],
   templateUrl: './scheduling-form.component.html',
   styleUrl: './scheduling-form.component.scss',
@@ -56,6 +62,7 @@ export class SchedulingFormComponent implements OnInit {
       analysisType: [''],
       recurrencePattern: [''],
       exclusionRules: [''],
+      assignedToUserId: [''],
       isActive: [true],
     });
   }
@@ -78,10 +85,12 @@ export class SchedulingFormComponent implements OnInit {
         this.assignedToUserId = schedule.assignedToUserId;
         this.form.patchValue({
           name: schedule.name,
+          site: schedule.site,
           shiftPattern: schedule.shiftPattern,
           analysisType: schedule.analysisType,
           recurrencePattern: schedule.recurrencePattern,
           exclusionRules: schedule.exclusionRules,
+          assignedToUserId: schedule.assignedToUserId || '',
           isActive: schedule.isActive,
         });
         this.form.get('site')?.disable();

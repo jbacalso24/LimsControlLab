@@ -1,76 +1,126 @@
-<div class="lims-scheduling-list">
-  <div class="page-header">
-    <h1>Schedules</h1>
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Schedules</h1>
+      <p class="text-sm text-muted-foreground">Manage recurring analysis schedules across sites</p>
+    </div>
     @if (isLabCoordinator()) {
-      <a routerLink="./create" kendoButton themeColor="primary">
-        Create Schedule
+      <a routerLink="./create" z-button>
+        New schedule
       </a>
     }
   </div>
 
+  <!-- Loading State -->
   @if (loading()) {
-    <div class="loading-state" role="status" aria-live="polite">
-      <p>Loading schedules...</p>
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
     </div>
-  } @else if (error()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Error Loading Schedules</h2>
-      <p>{{ error() }}</p>
-      <button kendoButton (click)="reload()">Retry</button>
-    </div>
-  } @else if (!schedules().length) {
-    <div class="empty-state">
-      <p>No schedules found</p>
-      @if (isLabCoordinator()) {
-        <a routerLink="./create" kendoButton themeColor="primary">
-          Create the first schedule
-        </a>
-      }
-    </div>
-  } @else {
-    <kendo-grid [data]="schedules()" [skip]="0" [pageSize]="10">
-      <kendo-grid-column field="name" title="Name" [width]="150"></kendo-grid-column>
-      <kendo-grid-column field="site" title="Site" [width]="100"></kendo-grid-column>
-      <kendo-grid-column field="shiftPattern" title="Shift Pattern" [width]="120"></kendo-grid-column>
-      <kendo-grid-column field="analysisType" title="Analysis Type" [width]="120">
-        <ng-template kendoGridCellTemplate let-dataItem>
-          {{ dataItem.analysisType || 'N/A' }}
-        </ng-template>
-      </kendo-grid-column>
-      <kendo-grid-column field="isActive" title="Status" [width]="100">
-        <ng-template kendoGridCellTemplate let-dataItem>
-          <span [class]="dataItem.isActive ? 'status-active' : 'status-inactive'">
-            {{ dataItem.isActive ? 'Active' : 'Inactive' }}
-          </span>
-        </ng-template>
-      </kendo-grid-column>
-      @if (isLabCoordinator()) {
-        <kendo-grid-column title="Actions" [width]="150">
-          <ng-template kendoGridCellTemplate let-dataItem>
-            <div class="action-buttons">
-              <a
-                [routerLink]="['.', dataItem.id, 'edit']"
-                kendoButton
-                look="flat"
-                size="small"
-                aria-label="Edit schedule"
-              >
-                Edit
-              </a>
-              <button
-                kendoButton
-                look="flat"
-                size="small"
-                (click)="delete(dataItem)"
-                [disabled]="deleting()"
-                aria-label="Delete schedule"
-              >
-                Delete
-              </button>
-            </div>
-          </ng-template>
-        </kendo-grid-column>
-      }
-    </kendo-grid>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <z-card>
+      <z-card-content>
+        <div class="flex items-start gap-4">
+          <svg class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div class="flex-1">
+            <h2 class="font-semibold text-destructive mb-1">Error Loading Schedules</h2>
+            <p class="text-sm text-muted-foreground">{{ error() }}</p>
+            <button z-button zType="outline" (click)="reload()" class="mt-4">Retry</button>
+          </div>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !error() && !schedules().length) {
+    <z-card>
+      <z-card-content class="flex items-center justify-center min-h-[300px]">
+        <div class="text-center">
+          <svg class="h-12 w-12 text-muted-foreground mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"></path>
+            <path d="M4 8h16"></path>
+            <path d="M8 4v4"></path>
+            <path d="M16 4v4"></path>
+          </svg>
+          <p class="text-sm text-muted-foreground mb-4">No schedules found</p>
+          @if (isLabCoordinator()) {
+            <a routerLink="./create" z-button>
+              Create the first schedule
+            </a>
+          }
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Schedules Table -->
+  @if (!loading() && !error() && schedules().length) {
+    <z-card>
+      <z-card-content>
+        <div class="overflow-x-auto">
+          <table z-table>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Name</th>
+                <th z-table-head>Site</th>
+                <th z-table-head>Analysis Type</th>
+                <th z-table-head>Shift Pattern</th>
+                <th z-table-head>Recurrence</th>
+                <th z-table-head>Assigned</th>
+                <th z-table-head>Status</th>
+                @if (isLabCoordinator()) {
+                  <th z-table-head>Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @for (schedule of schedules(); track schedule.id) {
+                <tr z-table-row>
+                  <td z-table-cell class="font-medium">{{ schedule.name }}</td>
+                  <td z-table-cell>{{ schedule.site }}</td>
+                  <td z-table-cell>{{ schedule.analysisType || 'N/A' }}</td>
+                  <td z-table-cell>{{ schedule.shiftPattern }}</td>
+                  <td z-table-cell class="text-sm text-muted-foreground">{{ schedule.recurrencePattern || 'N/A' }}</td>
+                  <td z-table-cell class="text-sm text-muted-foreground">{{ schedule.assignedToUserId || 'Unassigned' }}</td>
+                  <td z-table-cell>
+                    @if (schedule.isActive) {
+                      <z-badge class="bg-success/12 text-success border border-success/25 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Active</span>
+                      </z-badge>
+                    } @else {
+                      <z-badge class="bg-muted text-muted-foreground border border-border inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Inactive</span>
+                      </z-badge>
+                    }
+                  </td>
+                  @if (isLabCoordinator()) {
+                    <td z-table-cell>
+                      <div class="flex items-center gap-2">
+                        <a [routerLink]="['.', schedule.id, 'edit']" z-button zType="outline" zSize="sm" aria-label="Edit schedule">
+                          Edit
+                        </a>
+                        <button z-button zType="outline" zSize="sm" (click)="delete(schedule)" [disabled]="deleting()" aria-label="Delete schedule">
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </z-card-content>
+    </z-card>
   }
 </div>

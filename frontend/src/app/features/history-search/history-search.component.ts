@@ -1,13 +1,19 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { GridModule, PageChangeEvent } from '@progress/kendo-angular-grid';
-import { InputsModule } from '@progress/kendo-angular-inputs';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { HistorySearchApiService } from './services/history-search-api.service';
 import { SearchResultsRequest } from '../../shared/generated/models/search-results-request';
 import { SearchResultItemDto } from '../../shared/generated/models/search-result-item-dto';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputComponent } from '@/shared/components/input/input.component';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
+import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
+import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideAlertCircle } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-history-search',
@@ -15,11 +21,20 @@ import { SearchResultItemDto } from '../../shared/generated/models/search-result
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    GridModule,
-    InputsModule,
-    DateInputsModule,
+    ZardButtonComponent,
+    ZardInputComponent,
+    ZardCardComponent,
+    ZardCardHeaderComponent,
+    ZardCardTitleComponent,
+    ZardCardContentComponent,
+    ZardAlertComponent,
+    ZardSpinnerComponent,
+    ZardEmptyComponent,
+    ZardPaginationComponent,
+    StatusBadgeComponent,
+    NgIcon,
   ],
+  viewProviders: [provideIcons({ lucideAlertCircle })],
   templateUrl: './history-search.component.html',
   styleUrl: './history-search.component.scss',
 })
@@ -41,19 +56,35 @@ export class HistorySearchComponent {
   items = signal<SearchResultItemDto[]>([]);
   totalCount = signal(0);
   searched = signal(false);
-
   pageSize = 50;
-  skip = signal(0);
+  currentPageIndex = signal(1);
+
+  totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));
+
+  private isInitialized = signal(false);
+  private skipPageChangeEffect = signal(false);
+
+  constructor() {
+    // Watch for page changes from pagination component (after initial load)
+    effect(() => {
+      const pageIndex = this.currentPageIndex();
+      if (this.isInitialized() && !this.skipPageChangeEffect() && pageIndex > 1) {
+        this.onPageChange(pageIndex);
+      }
+    });
+  }
 
   ngOnInit(): void {
     // Auto-load on init with empty filters
     this.search();
+    this.isInitialized.set(true);
   }
 
   search(): void {
     this.loading.set(true);
     this.error.set('');
-    this.skip.set(0);
+    this.skipPageChangeEffect.set(true);
+    this.currentPageIndex.set(1);
     this.searched.set(true);
 
     const request: SearchResultsRequest = this.buildRequest();
@@ -63,23 +94,24 @@ export class HistorySearchComponent {
         this.items.set(response.items);
         this.totalCount.set(Number(response.totalCount));
         this.loading.set(false);
+        this.skipPageChangeEffect.set(false);
       },
       error: () => {
         this.loading.set(false);
         this.error.set('Failed to load search results. Please try again.');
+        this.skipPageChangeEffect.set(false);
       },
     });
   }
 
-  onPageChange(event: PageChangeEvent): void {
-    const pageNumber = Math.floor(event.skip / this.pageSize) + 1;
+  onPageChange(pageIndex: number): void {
     this.loading.set(true);
     this.error.set('');
-    this.skip.set(event.skip);
+    this.currentPageIndex.set(pageIndex);
 
     const request: SearchResultsRequest = this.buildRequest();
 
-    this.apiService.searchResults(request, pageNumber, this.pageSize).subscribe({
+    this.apiService.searchResults(request, pageIndex, this.pageSize).subscribe({
       next: (response) => {
         this.items.set(response.items);
         this.totalCount.set(Number(response.totalCount));

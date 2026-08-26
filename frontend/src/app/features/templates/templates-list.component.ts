@@ -2,11 +2,17 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { GridModule } from '@progress/kendo-angular-grid';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardTableComponent, ZardTableHeaderComponent, ZardTableBodyComponent, ZardTableRowComponent, ZardTableHeadComponent, ZardTableCellComponent } from '@/shared/components/table/table.component';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
+import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'lims-templates-list',
@@ -16,8 +22,21 @@ import { CurrentUserService } from '../../shared/services/auth/current-user.serv
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    GridModule,
+    ZardButtonComponent,
+    ZardTableComponent,
+    ZardTableHeaderComponent,
+    ZardTableBodyComponent,
+    ZardTableRowComponent,
+    ZardTableHeadComponent,
+    ZardTableCellComponent,
+    ZardCardComponent,
+    ZardCardHeaderComponent,
+    ZardCardContentComponent,
+    ZardSpinnerComponent,
+    ZardEmptyComponent,
+    ZardAlertComponent,
+    ZardBadgeComponent,
+    NgIcon,
   ],
   templateUrl: './templates-list.component.html',
   styleUrl: './templates-list.component.scss',

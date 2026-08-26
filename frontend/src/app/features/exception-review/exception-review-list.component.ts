@@ -6,13 +6,19 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { GridModule } from '@progress/kendo-angular-grid';
-import { DialogModule } from '@progress/kendo-angular-dialog';
-import { TextAreaModule } from '@progress/kendo-angular-inputs';
 import { ExceptionReviewApiService } from './services/exception-review-api.service';
 import { ResultReviewDto } from '../../shared/generated/models/result-review-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardTextareaComponent } from '@/shared/components/textarea/textarea.component';
+import { ZardTableComponent, ZardTableHeaderComponent, ZardTableBodyComponent, ZardTableRowComponent, ZardTableHeadComponent, ZardTableCellComponent } from '@/shared/components/table/table.component';
+import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideAlertCircle } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-exception-review-list',
@@ -20,13 +26,27 @@ import { CurrentUserService } from '../../shared/services/auth/current-user.serv
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    GridModule,
-    DialogModule,
-    TextAreaModule,
+    ZardButtonComponent,
+    ZardTextareaComponent,
+    ZardTableComponent,
+    ZardTableHeaderComponent,
+    ZardTableBodyComponent,
+    ZardTableRowComponent,
+    ZardTableHeadComponent,
+    ZardTableCellComponent,
+    ZardSpinnerComponent,
+    ZardAlertComponent,
+    ZardEmptyComponent,
+    ZardCardComponent,
+    ZardCardHeaderComponent,
+    ZardCardTitleComponent,
+    ZardCardContentComponent,
+    StatusBadgeComponent,
+    NgIcon,
   ],
   templateUrl: './exception-review-list.component.html',
   styleUrl: './exception-review-list.component.scss',
+  viewProviders: [provideIcons({ lucideAlertCircle })],
 })
 export class ExceptionReviewListComponent {
   private apiService = inject(ExceptionReviewApiService);

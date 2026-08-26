@@ -1,145 +1,196 @@
-<div class="lims-templates-form">
-  <h1>{{ isEdit() ? 'Edit Template' : 'Create Template' }}</h1>
-
+<div class="space-y-6 mx-auto max-w-screen-2xl px-6 py-6">
   @if (loading()) {
-    <div class="loading-state" role="status" aria-live="polite">
-      <p>Loading template...</p>
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
     </div>
   } @else if (error()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Error</h2>
-      <p>{{ error() }}</p>
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">{{ isEdit() ? 'Edit Template' : 'Create Template' }}</h1>
+      </div>
+      <z-card>
+        <z-card-content>
+          <div class="flex items-start gap-4">
+            <ng-icon name="lucideAlertCircle" class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div class="flex-1">
+              <h2 class="font-semibold text-destructive mb-1">Error Loading Template</h2>
+              <p class="text-sm text-muted-foreground">{{ error() }}</p>
+            </div>
+          </div>
+        </z-card-content>
+      </z-card>
     </div>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="form-group">
-        <label for="name">Name *</label>
-        <input
-          id="name"
-          type="text"
-          formControlName="name"
-          kendoTextBox
-          placeholder="Enter template name"
-          [disabled]="submitting()"
-          aria-describedby="name-error"
-        />
-        @if (form.get('name')?.invalid && form.get('name')?.touched) {
-          <span id="name-error" class="error-message">
-            Name is required
-          </span>
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">{{ isEdit() ? 'Edit Template' : 'Create Template' }}</h1>
+        <p class="text-sm text-muted-foreground">{{ isEdit() ? 'Update the template configuration' : 'Create a new analysis template' }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+        <!-- Basic Fields Card -->
+        <z-card>
+          <z-card-header>
+            <z-card-title>Template Details</z-card-title>
+          </z-card-header>
+          <z-card-content>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <!-- Name Field -->
+              <div class="space-y-1.5">
+                <label z-label for="name">Name</label>
+                <input
+                  z-input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="Enter template name"
+                  [disabled]="submitting()"
+                  aria-describedby="name-error"
+                />
+                @if (form.get('name')?.invalid && form.get('name')?.touched) {
+                  <p id="name-error" class="text-xs text-destructive">Name is required</p>
+                }
+              </div>
+
+              <!-- Site Field (only on create) -->
+              @if (!isEdit()) {
+                <div class="space-y-1.5">
+                  <label z-label for="site">Site</label>
+                  <z-select
+                    id="site"
+                    formControlName="site"
+                    zPlaceholder="Select a site"
+                    [attr.aria-describedby]="form.get('site')?.invalid && form.get('site')?.touched ? 'site-error' : null"
+                  >
+                    @for (siteOption of sites; track siteOption) {
+                      <z-select-item [zValue]="siteOption">{{ siteOption }}</z-select-item>
+                    }
+                  </z-select>
+                  @if (form.get('site')?.invalid && form.get('site')?.touched) {
+                    <p id="site-error" class="text-xs text-destructive">Site is required</p>
+                  }
+                </div>
+              }
+
+              <!-- Min Tolerance Field -->
+              <div class="space-y-1.5">
+                <label z-label for="minTolerance">Min Tolerance</label>
+                <input
+                  z-input
+                  id="minTolerance"
+                  type="number"
+                  formControlName="minTolerance"
+                  placeholder="Enter minimum tolerance"
+                  step="0.01"
+                  [disabled]="submitting()"
+                />
+              </div>
+
+              <!-- Max Tolerance Field -->
+              <div class="space-y-1.5">
+                <label z-label for="maxTolerance">Max Tolerance</label>
+                <input
+                  z-input
+                  id="maxTolerance"
+                  type="number"
+                  formControlName="maxTolerance"
+                  placeholder="Enter maximum tolerance"
+                  step="0.01"
+                  [disabled]="submitting()"
+                />
+              </div>
+            </div>
+          </z-card-content>
+        </z-card>
+
+        <!-- Configuration Fields Card -->
+        <z-card>
+          <z-card-header>
+            <z-card-title>Configuration</z-card-title>
+          </z-card-header>
+          <z-card-content>
+            <div class="space-y-4">
+              <!-- Test Configuration -->
+              <div class="space-y-1.5">
+                <label z-label for="testConfiguration">Test Configuration</label>
+                <textarea
+                  z-textarea
+                  id="testConfiguration"
+                  formControlName="testConfiguration"
+                  placeholder="Enter test configuration (JSON)"
+                  [disabled]="submitting()"
+                  rows="4"
+                ></textarea>
+                <p class="text-xs text-muted-foreground">Optional JSON configuration for test parameters</p>
+              </div>
+
+              <!-- Calculation Definitions -->
+              <div class="space-y-1.5">
+                <label z-label for="calculationDefinitions">Calculation Definitions</label>
+                <textarea
+                  z-textarea
+                  id="calculationDefinitions"
+                  formControlName="calculationDefinitions"
+                  placeholder="Enter calculation definitions (JSON)"
+                  [disabled]="submitting()"
+                  rows="4"
+                ></textarea>
+                <p class="text-xs text-muted-foreground">Optional JSON definitions for calculations</p>
+              </div>
+
+              <!-- Validation Rules -->
+              <div class="space-y-1.5">
+                <label z-label for="validationRules">Validation Rules</label>
+                <textarea
+                  z-textarea
+                  id="validationRules"
+                  formControlName="validationRules"
+                  placeholder="Enter validation rules (JSON)"
+                  [disabled]="submitting()"
+                  rows="4"
+                ></textarea>
+                <p class="text-xs text-muted-foreground">Optional JSON rules for validating test results</p>
+              </div>
+            </div>
+          </z-card-content>
+        </z-card>
+
+        <!-- Error Alert -->
+        @if (submitError()) {
+          <z-alert class="border-destructive/50 bg-destructive/10">
+            <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-destructive" />
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-destructive">Submission failed</p>
+              <p class="text-xs text-destructive/90 mt-0.5">{{ submitError() }}</p>
+            </div>
+          </z-alert>
         }
-      </div>
 
-      @if (!isEdit()) {
-        <div class="form-group">
-          <label for="site">Site *</label>
-          <kendo-dropdownlist
-            id="site"
-            formControlName="site"
-            [data]="sites"
-            [valuePrimitive]="true"
-            [defaultItem]="'Select a site'"
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            z-button
+            zType="outline"
+            (click)="cancel()"
             [disabled]="submitting()"
-            aria-label="Site"
-            aria-describedby="site-error"
-          ></kendo-dropdownlist>
-          @if (form.get('site')?.invalid && form.get('site')?.touched) {
-            <span id="site-error" class="error-message">
-              Site is required
-            </span>
-          }
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            z-button
+            [disabled]="form.invalid || submitting()"
+            [zLoading]="submitting()"
+          >
+            @if (isEdit()) {
+              Update Template
+            } @else {
+              Create Template
+            }
+          </button>
         </div>
-      }
-
-      <div class="form-group">
-        <label for="minTolerance">Min Tolerance</label>
-        <input
-          id="minTolerance"
-          type="number"
-          formControlName="minTolerance"
-          kendoTextBox
-          placeholder="Enter minimum tolerance"
-          step="0.01"
-          [disabled]="submitting()"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="maxTolerance">Max Tolerance</label>
-        <input
-          id="maxTolerance"
-          type="number"
-          formControlName="maxTolerance"
-          kendoTextBox
-          placeholder="Enter maximum tolerance"
-          step="0.01"
-          [disabled]="submitting()"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="testConfiguration">Test Configuration</label>
-        <textarea
-          id="testConfiguration"
-          formControlName="testConfiguration"
-          placeholder="Enter test configuration (JSON)"
-          [disabled]="submitting()"
-          rows="4"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="validationRules">Validation Rules</label>
-        <textarea
-          id="validationRules"
-          formControlName="validationRules"
-          placeholder="Enter validation rules (JSON)"
-          [disabled]="submitting()"
-          rows="4"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="calculationDefinitions">Calculation Definitions</label>
-        <textarea
-          id="calculationDefinitions"
-          formControlName="calculationDefinitions"
-          placeholder="Enter calculation definitions (JSON)"
-          [disabled]="submitting()"
-          rows="4"
-        ></textarea>
-      </div>
-
-      @if (submitError()) {
-        <div class="error-alert" role="alert" aria-live="polite">
-          <strong>Submission failed</strong>
-          <p>{{ submitError() }}</p>
-        </div>
-      }
-
-      <div class="form-actions">
-        <button
-          type="submit"
-          kendoButton
-          themeColor="primary"
-          [disabled]="form.invalid || submitting()"
-        >
-          @if (submitting()) {
-            Saving...
-          } @else {
-            Save Template
-          }
-        </button>
-        <button
-          type="button"
-          kendoButton
-          look="flat"
-          (click)="cancel()"
-          [disabled]="submitting()"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   }
 </div>

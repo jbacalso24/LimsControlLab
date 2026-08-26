@@ -7,6 +7,7 @@ import { CurrentUserService } from '../../shared/services/auth/current-user.serv
 import { of, throwError } from 'rxjs';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
 import { provideRouter } from '@angular/router';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 describe('TemplatesListComponent', () => {
   let component: TemplatesListComponent;
@@ -21,6 +22,7 @@ describe('TemplatesListComponent', () => {
         TemplatesApiService,
         CurrentUserService,
         provideRouter([]),
+        provideAnimationsAsync(),
       ],
     }).compileComponents();
 

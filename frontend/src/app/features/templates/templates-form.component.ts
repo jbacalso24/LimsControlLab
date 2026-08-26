@@ -7,12 +7,17 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { TextBoxModule } from '@progress/kendo-angular-inputs';
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputComponent } from '@/shared/components/input/input.component';
+import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
+import { ZardTextareaComponent } from '@/shared/components/textarea/textarea.component';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { TemplatesApiService } from './services/templates-api.service';
 import { CreateAnalysisTemplateRequest } from '../../shared/generated/models/create-analysis-template-request';
 import { UpdateAnalysisTemplateRequest } from '../../shared/generated/models/update-analysis-template-request';
+import { NgIcon } from '@ng-icons/core';
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
 
@@ -22,9 +27,18 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    TextBoxModule,
-    DropDownListModule,
+    ZardButtonComponent,
+    ZardInputComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
+    ZardTextareaComponent,
+    ZardCardComponent,
+    ZardCardHeaderComponent,
+    ZardCardTitleComponent,
+    ZardCardContentComponent,
+    ZardAlertComponent,
+    ZardSpinnerComponent,
+    NgIcon,
   ],
   templateUrl: './templates-form.component.html',
   styleUrl: './templates-form.component.scss',

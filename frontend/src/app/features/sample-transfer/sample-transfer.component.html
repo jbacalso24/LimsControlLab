@@ -1,135 +1,215 @@
-<div class="lims-sample-transfer">
-  <div class="page-header">
-    <h1>Sample Transfer</h1>
-  </div>
-
+<div class="space-y-6">
   @if (loading()) {
-    <div class="loading-state" role="status" aria-live="polite">
-      <p>Loading sample...</p>
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <div class="text-center">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-foreground"></div>
+        <p class="mt-4 text-sm text-muted-foreground">Loading sample...</p>
+      </div>
     </div>
   } @else if (error404()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Sample Not Found</h2>
-      <p>The sample you're looking for does not exist.</p>
-      <button kendoButton (click)="goBack()">Go Back</button>
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
+        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
+      </div>
+      <z-card>
+        <z-card-content>
+          <div class="flex items-start gap-4">
+            <ng-icon name="lucideAlertCircle" class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5"></ng-icon>
+            <div class="flex-1">
+              <h2 class="font-semibold text-destructive mb-1">Sample Not Found</h2>
+              <p class="text-sm text-muted-foreground">The sample you are looking for does not exist.</p>
+              <button z-button zType="outline" (click)="goBack()" class="mt-4">Go Back</button>
+            </div>
+          </div>
+        </z-card-content>
+      </z-card>
     </div>
   } @else if (error403()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Access Denied</h2>
-      <p>You don't have access to this sample. Only the transferring and receiving sites can view incoming samples.</p>
-      <button kendoButton (click)="goBack()">Go Back</button>
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
+        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
+      </div>
+      <z-card>
+        <z-card-content>
+          <div class="flex items-start gap-4">
+            <ng-icon name="lucideAlertCircle" class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5"></ng-icon>
+            <div class="flex-1">
+              <h2 class="font-semibold text-destructive mb-1">Access Denied</h2>
+              <p class="text-sm text-muted-foreground">You do not have access to this sample. Only the transferring and receiving sites can view samples in transit.</p>
+              <button z-button zType="outline" (click)="goBack()" class="mt-4">Go Back</button>
+            </div>
+          </div>
+        </z-card-content>
+      </z-card>
     </div>
   } @else if (errorOther()) {
-    <div class="error-state" role="alert" aria-live="assertive">
-      <h2>Error Loading Sample</h2>
-      <p>{{ errorOther() }}</p>
-      <button kendoButton (click)="retry()">Retry</button>
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
+        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
+      </div>
+      <z-card>
+        <z-card-content>
+          <div class="flex items-start gap-4">
+            <ng-icon name="lucideAlertCircle" class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5"></ng-icon>
+            <div class="flex-1">
+              <h2 class="font-semibold text-destructive mb-1">Error Loading Sample</h2>
+              <p class="text-sm text-muted-foreground">{{ errorOther() }}</p>
+              <button z-button zType="outline" (click)="retry()" class="mt-4">Retry</button>
+            </div>
+          </div>
+        </z-card-content>
+      </z-card>
     </div>
   } @else if (sample()) {
-    <div class="sample-detail">
-      <div class="detail-grid">
-        <div class="detail-row">
-          <label>Sample ID:</label>
-          <span>{{ sample()!.identifier }}</span>
-        </div>
-        <div class="detail-row">
-          <label>Origin Site:</label>
-          <span>{{ sample()!.site }}</span>
-        </div>
-        <div class="detail-row">
-          <label>Current Site:</label>
-          <span>{{ sample()!.currentSite }}</span>
-        </div>
-        <div class="detail-row">
-          <label>Status:</label>
-          <span>{{ sample()!.status }}</span>
+    <div class="space-y-6">
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
+          <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
         </div>
       </div>
 
+      <!-- Sample Detail Card -->
+      <z-card>
+        <z-card-header>
+          <z-card-title>Sample Details</z-card-title>
+        </z-card-header>
+        <z-card-content>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Sample Identifier (Prominent) -->
+            <div>
+              <dt class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sample Identifier</dt>
+              <dd class="text-xl font-semibold text-foreground mt-1">{{ sample()!.identifier }}</dd>
+            </div>
+
+            <!-- Origin Site -->
+            <div>
+              <dt class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Origin Site</dt>
+              <dd class="text-sm font-semibold text-foreground mt-1">{{ sample()!.site }}</dd>
+            </div>
+
+            <!-- Current Site -->
+            <div>
+              <dt class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Analysing Site</dt>
+              <dd class="text-sm font-semibold text-foreground mt-1">{{ sample()!.currentSite }}</dd>
+            </div>
+
+            <!-- Lifecycle Status -->
+            <div>
+              <dt class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</dt>
+              <dd class="mt-1">
+                <lims-status-badge [status]="sample()!.status"></lims-status-badge>
+              </dd>
+            </div>
+          </dl>
+
+          <!-- Read-only indicator -->
+          @if (!canTransfer()) {
+            <div class="mt-6 border-t border-border pt-6">
+              <div class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-muted text-muted-foreground">
+                <span class="h-2 w-2 rounded-full bg-muted-foreground"></span>
+                <span>Read-only - only the analysing site can transfer</span>
+              </div>
+            </div>
+          }
+        </z-card-content>
+      </z-card>
+
+      <!-- Transfer Action -->
       @if (canTransfer()) {
-        <div class="transfer-section">
+        <div class="flex justify-end">
           <button
-            kendoButton
-            themeColor="primary"
+            z-button
             (click)="openTransferDialog()"
-            [disabled]="transferring()"
+            [zDisabled]="transferring()"
+            [zLoading]="transferring()"
             aria-label="Transfer sample to another site"
           >
             Transfer to Site
           </button>
         </div>
-      } @else {
-        <div class="read-only-notice">
-          <p>This sample is read-only. Only the current analysing site can transfer it.</p>
+      }
+
+      <!-- Transfer Modal (Inline Overlay) -->
+      @if (showTransferDialog()) {
+        <div class="fixed inset-0 z-50 bg-black/50 grid place-items-center">
+          <z-card class="w-full max-w-md mx-4">
+            <z-card-header>
+              <z-card-title>Transfer Sample</z-card-title>
+            </z-card-header>
+            <z-card-content>
+              <form [formGroup]="transferForm" (ngSubmit)="submitTransfer()" class="space-y-4">
+                <!-- Select Site -->
+                <div class="space-y-1.5">
+                  <label z-label for="toSite">Transfer to Site</label>
+                  <z-select
+                    id="toSite"
+                    formControlName="toSite"
+                    zPlaceholder="Select destination site"
+                    [attr.aria-describedby]="transferForm.get('toSite')?.invalid && transferForm.get('toSite')?.touched ? 'toSite-error' : null"
+                  >
+                    @for (site of availableSites; track site) {
+                      <z-select-item [zValue]="site">
+                        {{ site }}
+                      </z-select-item>
+                    }
+                  </z-select>
+                  @if (transferForm.get('toSite')?.invalid && transferForm.get('toSite')?.touched) {
+                    <p id="toSite-error" class="text-xs text-destructive">Please select a destination site</p>
+                  }
+                </div>
+
+                <!-- Error Alert -->
+                @if (transferError()) {
+                  <z-alert class="border-destructive/50 bg-destructive/10">
+                    <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-destructive"></ng-icon>
+                    <div class="ml-3 flex-1">
+                      <p class="text-sm font-medium text-destructive">Transfer failed</p>
+                      <p class="text-xs text-destructive/90 mt-0.5">{{ transferError() }}</p>
+                    </div>
+                  </z-alert>
+                }
+
+                <!-- Stale Row Version Alert -->
+                @if (staleRowVersionError()) {
+                  <z-alert class="border-warning/50 bg-warning/10">
+                    <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-warning-foreground"></ng-icon>
+                    <div class="ml-3 flex-1">
+                      <p class="text-sm font-medium text-warning-foreground">Sample Changed</p>
+                      <p class="text-xs text-warning-foreground/90 mt-0.5">This sample was modified by another user. Please close and reload to see the latest changes.</p>
+                    </div>
+                  </z-alert>
+                }
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-border">
+                  <button
+                    type="button"
+                    z-button
+                    zType="outline"
+                    (click)="closeTransferDialog()"
+                    [zDisabled]="transferring()"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    z-button
+                    [zDisabled]="transferForm.invalid || transferring()"
+                    [zLoading]="transferring()"
+                  >
+                    Transfer
+                  </button>
+                </div>
+              </form>
+            </z-card-content>
+          </z-card>
         </div>
       }
     </div>
-
-    @if (showTransferDialog()) {
-      <kendo-dialog [title]="'Transfer Sample'" (close)="closeTransferDialog()">
-        <div class="transfer-dialog-content">
-          <form [formGroup]="transferForm" (ngSubmit)="submitTransfer()">
-            <div class="form-group">
-              <label for="toSite">Transfer to Site *</label>
-              <kendo-dropdownlist
-                id="toSite"
-                formControlName="toSite"
-                [data]="availableSites"
-                [disabled]="transferring()"
-                aria-describedby="toSite-error"
-              ></kendo-dropdownlist>
-              @if (
-                transferForm.get('toSite')?.invalid &&
-                transferForm.get('toSite')?.touched
-              ) {
-                <span id="toSite-error" class="error-message">
-                  Please select a destination site
-                </span>
-              }
-            </div>
-
-            @if (transferError()) {
-              <div class="error-alert" role="alert" aria-live="polite">
-                <strong>Transfer failed</strong>
-                <p>{{ transferError() }}</p>
-              </div>
-            }
-
-            @if (staleRowVersionError()) {
-              <div class="stale-version-alert" role="alert" aria-live="assertive">
-                <h3>Sample Changed</h3>
-                <p>
-                  This sample was modified by another user. Please reload to see the latest
-                  changes.
-                </p>
-              </div>
-            }
-
-            <div class="dialog-buttons">
-              <button
-                type="button"
-                kendoButton
-                (click)="closeTransferDialog()"
-                [disabled]="transferring()"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                kendoButton
-                themeColor="primary"
-                [disabled]="transferForm.invalid || transferring()"
-              >
-                @if (transferring()) {
-                  Transferring...
-                } @else {
-                  Transfer
-                }
-              </button>
-            </div>
-          </form>
-        </div>
-      </kendo-dialog>
-    }
   }
 </div>
