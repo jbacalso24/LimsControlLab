@@ -17,7 +17,10 @@ describe('ExceptionReviewListComponent', () => {
   const mockLockedAnalysis: ResultReviewDto = {
     id: 1,
     sampleId: 100,
+    sampleIdentifier: 'INV-2026-0100',
     templateId: 50,
+    templateName: 'Final Molasses Purity',
+    site: 'Invicta',
     status: 'Completed',
     startedAtUtc: '2026-08-20T10:00:00Z',
     completedAtUtc: '2026-08-20T11:00:00Z',

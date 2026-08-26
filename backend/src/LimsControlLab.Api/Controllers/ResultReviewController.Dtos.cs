@@ -4,7 +4,10 @@ public sealed record ResultReviewDto
 {
     public required int Id { get; init; }
     public required int SampleId { get; init; }
+    public required string SampleIdentifier { get; init; }
     public required int TemplateId { get; init; }
+    public required string TemplateName { get; init; }
+    public required string Site { get; init; }
     public required string Status { get; init; }
     public required DateTimeOffset StartedAtUtc { get; init; }
     public DateTimeOffset? CompletedAtUtc { get; init; }

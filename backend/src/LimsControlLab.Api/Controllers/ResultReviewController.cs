@@ -32,7 +32,10 @@ public sealed class ResultReviewController : ControllerBase
             {
                 Id = a.Id,
                 SampleId = a.SampleId,
+                SampleIdentifier = a.SampleIdentifier,
                 TemplateId = a.TemplateId,
+                TemplateName = a.TemplateName,
+                Site = a.Site,
                 Status = a.Status,
                 StartedAtUtc = a.StartedAtUtc,
                 CompletedAtUtc = a.CompletedAtUtc,

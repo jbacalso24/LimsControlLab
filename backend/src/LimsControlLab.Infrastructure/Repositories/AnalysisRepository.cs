@@ -123,6 +123,7 @@ public sealed class AnalysisRepository : IAnalysisRepository
             .Include(a => a.Sample)
             .Include(a => a.Exceptions)
             .Include(a => a.TemplateVersion)
+            .Include(a => a.Template)
             .Where(a => a.Sample != null && a.Sample.Site == site && a.Exceptions.Any())
             .ToListAsync(ct);
     }

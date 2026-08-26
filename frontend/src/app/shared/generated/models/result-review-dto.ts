@@ -11,8 +11,11 @@ export interface ResultReviewDto {
   lockedByUserId?: (number | string | null);
   rowVersion: string;
   sampleId: (number | string);
+  sampleIdentifier: string;
+  site: string;
   startedAtUtc: string;
   startedByUserId: (number | string);
   status: string;
   templateId: (number | string);
+  templateName: string;
 }

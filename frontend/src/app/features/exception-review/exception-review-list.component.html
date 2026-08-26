@@ -69,8 +69,8 @@
           <table z-table>
             <thead z-table-header>
               <tr z-table-row>
-                <th z-table-head>Sample ID</th>
-                <th z-table-head>Template ID</th>
+                <th z-table-head>Sample</th>
+                <th z-table-head>Template</th>
                 <th z-table-head>Site</th>
                 <th z-table-head>Status</th>
                 <th z-table-head>Started</th>
@@ -82,9 +82,9 @@
             <tbody z-table-body>
               @for (analysis of pagedAnalyses(); track analysis.id) {
                 <tr z-table-row class="hover:bg-muted/50">
-                  <td z-table-cell class="font-medium">{{ analysis.sampleId }}</td>
-                  <td z-table-cell>{{ analysis.templateId }}</td>
-                  <td z-table-cell class="text-sm text-muted-foreground">-</td>
+                  <td z-table-cell class="font-medium">{{ analysis.sampleIdentifier }}</td>
+                  <td z-table-cell>{{ analysis.templateName }}</td>
+                  <td z-table-cell>{{ analysis.site }}</td>
                   <td z-table-cell>
                     <lims-status-badge [status]="analysis.status" />
                   </td>
