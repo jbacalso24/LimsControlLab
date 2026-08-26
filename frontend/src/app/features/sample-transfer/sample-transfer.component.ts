@@ -1,6 +1,6 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -8,15 +8,28 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideArrowLeftRight } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
 import { ZardCardComponent, ZardCardContentComponent, ZardCardHeaderComponent, ZardCardTitleComponent } from '@/shared/components/card';
 import { ZardAlertComponent } from '@/shared/components/alert';
+import { ZardSpinnerComponent } from '@/shared/components/spinner';
+import { ZardEmptyComponent } from '@/shared/components/empty';
+import { ZardTableImports } from '@/shared/components/table';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { SampleTransferApiService } from './services/sample-transfer-api.service';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { SampleDto } from '../../shared/generated/models/sample-dto';
+
+interface PickerSample {
+  sampleId: number;
+  identifier: string;
+  site: string;
+  status: string;
+  templateName: string;
+}
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
 
@@ -28,6 +41,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
     ReactiveFormsModule,
     NgIcon,
     ZardButtonComponent,
+    ZardInputComponent,
     ZardSelectComponent,
     ZardSelectItemComponent,
     ZardCardComponent,
@@ -35,17 +49,37 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
     ZardCardHeaderComponent,
     ZardCardTitleComponent,
     ZardAlertComponent,
+    ZardSpinnerComponent,
+    ZardEmptyComponent,
     StatusBadgeComponent,
+    ...ZardTableImports,
   ],
   templateUrl: './sample-transfer.component.html',
   styleUrl: './sample-transfer.component.scss',
-  viewProviders: [provideIcons({ lucideAlertCircle })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideArrowLeftRight })],
 })
 export class SampleTransferComponent implements OnInit {
   private apiService = inject(SampleTransferApiService);
   private currentUserService = inject(CurrentUserService);
   private formBuilder = inject(FormBuilder);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private toast = inject(ToastService);
+
+  // Picker mode (no :id in the route) — choose a sample to transfer.
+  pickerMode = signal(false);
+  pickerLoading = signal(false);
+  pickerError = signal('');
+  pickerSamples = signal<PickerSample[]>([]);
+  pickerFilter = signal('');
+  filteredPickerSamples = computed(() => {
+    const q = this.pickerFilter().trim().toLowerCase();
+    const rows = this.pickerSamples();
+    if (!q) return rows;
+    return rows.filter(
+      (s) => s.identifier.toLowerCase().includes(q) || s.templateName.toLowerCase().includes(q),
+    );
+  });
 
   loading = signal(false);
   error404 = signal(false);
@@ -65,9 +99,57 @@ export class SampleTransferComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
       const sampleId = params.get('id');
       if (sampleId) {
+        this.pickerMode.set(false);
+        this.sample.set(null);
         this.loadSample(Number(sampleId));
+      } else {
+        this.pickerMode.set(true);
+        this.sample.set(null);
+        this.loadPicker();
       }
     });
+  }
+
+  private loadPicker(): void {
+    this.pickerLoading.set(true);
+    this.pickerError.set('');
+    this.apiService.listSamplesForPicker().subscribe({
+      next: (res) => {
+        const seen = new Set<number>();
+        const rows: PickerSample[] = [];
+        for (const item of res.items ?? []) {
+          const id = Number(item.sampleId);
+          if (seen.has(id)) continue;
+          seen.add(id);
+          rows.push({
+            sampleId: id,
+            identifier: item.sampleIdentifier,
+            site: item.site,
+            status: item.status,
+            templateName: item.templateName,
+          });
+        }
+        rows.sort((a, b) => a.identifier.localeCompare(b.identifier));
+        this.pickerSamples.set(rows);
+        this.pickerLoading.set(false);
+      },
+      error: () => {
+        this.pickerLoading.set(false);
+        this.pickerError.set('Could not load samples. Please try again.');
+      },
+    });
+  }
+
+  reloadPicker(): void {
+    this.loadPicker();
+  }
+
+  openSample(sampleId: number): void {
+    this.router.navigate(['/analysis/sample-transfer', sampleId]);
+  }
+
+  onPickerFilter(value: string): void {
+    this.pickerFilter.set(value);
   }
 
   private createTransferForm(): FormGroup {
@@ -141,6 +223,7 @@ export class SampleTransferComponent implements OnInit {
     this.apiService.transferSample(Number(sampleData.id), request).subscribe({
       next: () => {
         this.transferring.set(false);
+        this.toast.success(`Sample ${sampleData.identifier} transferred to ${request.toSite}.`);
         this.closeTransferDialog();
         this.loadSample(Number(sampleData.id));
       },

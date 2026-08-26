@@ -1,4 +1,82 @@
 <div class="space-y-6">
+  @if (pickerMode()) {
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
+        <p class="text-sm text-muted-foreground">Select a sample to transfer between sites</p>
+      </div>
+
+      @if (pickerLoading()) {
+        <div class="flex items-center justify-center min-h-[300px]" role="status" aria-live="polite">
+          <z-spinner />
+        </div>
+      } @else if (pickerError()) {
+        <z-card>
+          <z-card-content>
+            <div class="flex items-start gap-4">
+              <ng-icon name="lucideAlertCircle" class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div class="flex-1">
+                <h2 class="font-semibold text-destructive mb-1">Could not load samples</h2>
+                <p class="text-sm text-muted-foreground">{{ pickerError() }}</p>
+                <button z-button zType="outline" (click)="reloadPicker()" class="mt-4">Retry</button>
+              </div>
+            </div>
+          </z-card-content>
+        </z-card>
+      } @else {
+        <z-card>
+          <z-card-content>
+            <div class="mb-4 max-w-sm">
+              <input
+                z-input
+                type="text"
+                placeholder="Filter by sample or template"
+                (input)="onPickerFilter($any($event.target).value)"
+                aria-label="Filter samples"
+              />
+            </div>
+            @if (filteredPickerSamples().length) {
+              <div class="overflow-x-auto">
+                <table z-table>
+                  <thead z-table-header>
+                    <tr z-table-row>
+                      <th z-table-head>Sample</th>
+                      <th z-table-head>Template</th>
+                      <th z-table-head>Site</th>
+                      <th z-table-head>Status</th>
+                      <th z-table-head class="text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody z-table-body>
+                    @for (row of filteredPickerSamples(); track row.sampleId) {
+                      <tr z-table-row class="hover:bg-muted/50">
+                        <td z-table-cell class="font-medium">{{ row.identifier }}</td>
+                        <td z-table-cell>{{ row.templateName }}</td>
+                        <td z-table-cell>{{ row.site }}</td>
+                        <td z-table-cell><lims-status-badge [status]="row.status" /></td>
+                        <td z-table-cell class="text-right">
+                          <button z-button zType="outline" zSize="sm" (click)="openSample(row.sampleId)" [attr.aria-label]="'Transfer sample ' + row.identifier">
+                            <ng-icon name="lucideArrowLeftRight" class="h-4 w-4" />
+                            Transfer
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <z-empty
+                zIcon="lucideArrowLeftRight"
+                [zTitle]="'No samples found'"
+                [zDescription]="'No samples match your filter.'"
+              />
+            }
+          </z-card-content>
+        </z-card>
+      }
+    </div>
+  } @else {
   @if (loading()) {
     <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
       <div class="text-center">
@@ -211,5 +289,6 @@
         </div>
       }
     </div>
+  }
   }
 </div>

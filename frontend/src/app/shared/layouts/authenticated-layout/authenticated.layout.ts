@@ -94,7 +94,7 @@ export class AuthenticatedLayout {
     },
     {
       label: 'Sample Transfer',
-      route: '/analysis/sample-transfer/1',
+      route: '/analysis/sample-transfer',
       icon: 'lucideArrowLeftRight',
     },
   ];
