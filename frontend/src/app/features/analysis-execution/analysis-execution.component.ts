@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto } from './services/analysis-execution-api.service';
+import { StatusChangeRequest } from '../../shared/generated/models/status-change-request';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
@@ -62,6 +63,8 @@ export class AnalysisExecutionComponent implements OnInit {
   submittingException = signal(false);
   exceptionError = signal('');
   staleRowVersionError = signal(false);
+  changingStatus = signal(false);
+  statusError = signal('');
 
   decisionOptions: string[] = ['Modify', 'Retest', 'AcceptWithComment'];
 
@@ -71,6 +74,20 @@ export class AnalysisExecutionComponent implements OnInit {
 
   activeInstruments = computed(() => {
     return this.instruments().filter(i => i.isActive);
+  });
+
+  // Valid lifecycle actions for the current status (BRD R20). Server re-checks.
+  availableActions = computed<string[]>(() => {
+    switch (this.analysis()?.status) {
+      case 'NotStarted':
+        return ['Start', 'Cancel'];
+      case 'InProgress':
+        return ['Pause', 'Complete', 'Cancel'];
+      case 'OnHold':
+        return ['Resume', 'Cancel'];
+      default:
+        return [];
+    }
   });
 
   readingForm: FormGroup;
@@ -128,6 +145,31 @@ export class AnalysisExecutionComponent implements OnInit {
 
   reload(): void {
     this.loadAnalysis(this.currentAnalysisId);
+  }
+
+  changeStatus(action: string): void {
+    const current = this.analysis();
+    if (!current || this.changingStatus()) {
+      return;
+    }
+    this.changingStatus.set(true);
+    this.statusError.set('');
+    const request: StatusChangeRequest = { action, rowVersion: current.rowVersion };
+    this.apiService.changeStatus(current.id, request).subscribe({
+      next: () => {
+        this.changingStatus.set(false);
+        this.loadAnalysis(current.id);
+      },
+      error: (err) => {
+        this.changingStatus.set(false);
+        if (err.status === 409) {
+          this.staleRowVersionError.set(true);
+          this.statusError.set('This analysis was modified. Please reload.');
+        } else {
+          this.statusError.set(err.error?.detail || 'Failed to change status. Please try again.');
+        }
+      },
+    });
   }
 
   get testIdControl() {

@@ -85,6 +85,6 @@ export class AnalysisExecutionApiService extends LimsApiService {
   }
 
   getInstruments(): Observable<InstrumentDto[]> {
-    return this.get<InstrumentDto[]>(`/api/v1/instruments`);
+    return this.get<InstrumentDto[]>(`/instruments`);
   }
 }
