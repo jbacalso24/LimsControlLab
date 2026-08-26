@@ -47,7 +47,18 @@ The UI must be fast to scan, fast to enter data into, and unambiguous about stat
    `<Pascal>Component`, `lims-` selector prefix, standalone components, signals + `computed()`, reactive
    forms, `httpResource`/`rxResource` for reads. `.scss` files should end up nearly empty — layout is
    Tailwind utility classes in the template, not bespoke SCSS.
-8. **Load `/taste-skill:taste-skill` first** and apply its anti-generic design judgment within the system
+8. **NEVER self-close a native non-void HTML element.** Angular's compiler rejects `<div … />`,
+   `<span … />`, `<p … />`, `<textarea … />`, `<td … />`, `<label … />`, `<a … />`, etc. with error
+   NG5002 ("Only void, custom and foreign elements can be self closed"), and `tsc --noEmit` does NOT catch
+   it — only a real template compile does. Always write explicit closing tags: `<span …></span>`,
+   `<div …></div>`, `<textarea …></textarea>`. ONLY these may self-close: void elements
+   (`<input />`, `<img />`, `<br />`, `<hr />`) and custom/component elements (`<z-badge />`, `<ng-icon />`,
+   `<lims-status-badge />`, `<router-outlet />`). When in doubt, use an explicit closing tag.
+9. **Reuse the shared `<lims-status-badge [status]="…" />`** (`@/shared/ui/status-badge/status-badge.component.ts`)
+   for any analysis/sample lifecycle status pill (NotStarted/InProgress/OnHold/Completed/Cancelled) — do
+   NOT re-inline the status-pill recipe per screen. Import `StatusBadgeComponent` and add to `imports`.
+   (For non-lifecycle pills like reading Valid/Invalid or exception Open/Resolved, use the §2 recipe inline.)
+10. **Load `/taste-skill:taste-skill` first** and apply its anti-generic design judgment within the system
    below. The system here is the guardrail; taste is how you make it feel finished (spacing rhythm, hover/
    focus states, empty-state warmth, alignment). Do not invent a different colour system or layout shell.
 

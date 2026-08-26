@@ -7,11 +7,19 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ButtonsModule } from '@progress/kendo-angular-buttons';
-import { TextBoxModule } from '@progress/kendo-angular-inputs';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
-import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto } from './services/analysis-execution-api.service';
+import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto } from './services/analysis-execution-api.service';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardInputComponent } from '@/shared/components/input';
+import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
+import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent, ZardCardFooterComponent } from '@/shared/components/card';
+import { ZardTextareaComponent } from '@/shared/components/textarea';
+import { ZardBadgeComponent } from '@/shared/components/badge';
+import { ZardAlertComponent } from '@/shared/components/alert';
+import { ZardEmptyComponent } from '@/shared/components/empty';
+import { ZardSpinnerComponent } from '@/shared/components/spinner';
+import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-analysis-execution',
@@ -19,13 +27,26 @@ import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto } from './
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    ButtonsModule,
-    TextBoxModule,
-    DateInputsModule,
-    DropDownListModule,
+    ZardButtonComponent,
+    ZardInputComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
+    ZardCardComponent,
+    ZardCardHeaderComponent,
+    ZardCardTitleComponent,
+    ZardCardContentComponent,
+    ZardCardFooterComponent,
+    ZardTextareaComponent,
+    ZardBadgeComponent,
+    ZardAlertComponent,
+    ZardEmptyComponent,
+    ZardSpinnerComponent,
+    StatusBadgeComponent,
+    NgIcon,
   ],
   templateUrl: './analysis-execution.component.html',
   styleUrl: './analysis-execution.component.scss',
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideChevronDown })],
 })
 export class AnalysisExecutionComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -35,6 +56,8 @@ export class AnalysisExecutionComponent implements OnInit {
   loading = signal(false);
   error = signal('');
   analysis = signal<AnalysisDetailDto | null>(null);
+  instruments = signal<InstrumentDto[]>([]);
+  instrumentsLoading = signal(false);
   submittingReading = signal(false);
   readingError = signal('');
   submittingException = signal(false);
@@ -45,6 +68,10 @@ export class AnalysisExecutionComponent implements OnInit {
 
   isLocked = computed(() => {
     return this.analysis()?.isLocked ?? false;
+  });
+
+  activeInstruments = computed(() => {
+    return this.instruments().filter(i => i.isActive);
   });
 
   readingForm: FormGroup;
@@ -64,6 +91,7 @@ export class AnalysisExecutionComponent implements OnInit {
   ngOnInit(): void {
     this.currentAnalysisId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadAnalysis(this.currentAnalysisId);
+    this.loadInstruments();
   }
 
   private loadAnalysis(analysisId: number): void {
@@ -81,6 +109,20 @@ export class AnalysisExecutionComponent implements OnInit {
         } else {
           this.error.set('Failed to load analysis. Please try again.');
         }
+      },
+    });
+  }
+
+  private loadInstruments(): void {
+    this.instrumentsLoading.set(true);
+    this.apiService.getInstruments().subscribe({
+      next: (data) => {
+        this.instruments.set(data);
+        this.instrumentsLoading.set(false);
+      },
+      error: () => {
+        // Instruments are optional; don't block the form if they fail to load
+        this.instrumentsLoading.set(false);
       },
     });
   }
@@ -105,6 +147,10 @@ export class AnalysisExecutionComponent implements OnInit {
     return this.readingForm.get('capturedAtUtc')!;
   }
 
+  get instrumentIdControl() {
+    return this.readingForm.get('instrumentId')!;
+  }
+
   submitReading(): void {
     if (this.readingForm.invalid || !this.analysis()) {
       return;
@@ -121,7 +167,7 @@ export class AnalysisExecutionComponent implements OnInit {
       value: Number(formValue.value),
       unit: formValue.unit,
       capturedAtUtc: formValue.capturedAtUtc,
-      instrumentId: formValue.instrumentId || undefined,
+      instrumentId: formValue.instrumentId ? Number(formValue.instrumentId) : undefined,
     };
 
     this.apiService.addReading(analysisId, request).subscribe({

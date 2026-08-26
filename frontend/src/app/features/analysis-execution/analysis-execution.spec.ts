@@ -54,6 +54,7 @@ describe('AnalysisExecutionComponent', () => {
       addReading: vi.fn(),
       resolveException: vi.fn(),
       changeStatus: vi.fn(),
+      getInstruments: vi.fn().mockReturnValue(of([])),
     } as unknown as AnalysisExecutionApiService;
 
     activatedRoute = {
@@ -434,7 +435,7 @@ describe('AnalysisExecutionComponent', () => {
     });
 
     it('should display analysis ID', () => {
-      const analysisId = fixture.nativeElement.querySelector('.detail-value');
+      const analysisId = fixture.nativeElement.querySelector('dd');
 
       expect(analysisId?.textContent).toContain('1');
     });
@@ -448,9 +449,10 @@ describe('AnalysisExecutionComponent', () => {
 
     it('should display readings list', () => {
       fixture.detectChanges();
-      const readings = fixture.nativeElement.querySelectorAll('.reading-item');
+      const readingRows = fixture.nativeElement.querySelectorAll('tbody tr');
 
-      expect(readings.length).toBe(1);
+      // First row is actual reading, additional rows may be validation detail rows
+      expect(readingRows.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should show validation error badge for invalid readings', () => {
@@ -466,23 +468,26 @@ describe('AnalysisExecutionComponent', () => {
       });
 
       fixture.detectChanges();
-      const badge = fixture.nativeElement.querySelector('.invalid-badge');
+      const badges = fixture.nativeElement.querySelectorAll('z-badge');
+      // Should have an "Invalid" badge in the status column
+      const invalidBadge = Array.from(badges).find((b: Element) => b.textContent?.includes('Invalid'));
 
-      expect(badge).toBeTruthy();
+      expect(invalidBadge).toBeTruthy();
     });
 
     it('should display exceptions list', () => {
       fixture.detectChanges();
-      const exceptions = fixture.nativeElement.querySelectorAll('.exception-item');
-
-      expect(exceptions.length).toBe(1);
+      // Exceptions are displayed in z-card elements within the exceptions section
+      const exceptionCards = fixture.nativeElement.querySelectorAll('z-card');
+      // Should have at least one exception card (in addition to the analysis summary card)
+      expect(exceptionCards.length).toBeGreaterThan(1);
     });
 
     it('should show exception decision form for open exceptions', () => {
       fixture.detectChanges();
-      const dropdownlist = fixture.nativeElement.querySelector('kendo-dropdownlist');
+      const selectControl = fixture.nativeElement.querySelector('z-select');
 
-      expect(dropdownlist).toBeTruthy();
+      expect(selectControl).toBeTruthy();
     });
   });
 

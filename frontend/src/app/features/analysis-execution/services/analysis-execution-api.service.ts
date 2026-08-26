@@ -40,6 +40,14 @@ export interface ExceptionDto {
   rowVersion: string;
 }
 
+export interface InstrumentDto {
+  id: number;
+  name: string;
+  model?: string;
+  site: string;
+  isActive: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -74,5 +82,9 @@ export class AnalysisExecutionApiService extends LimsApiService {
       `/analyses/${analysisId}/status`,
       request
     );
+  }
+
+  getInstruments(): Observable<InstrumentDto[]> {
+    return this.get<InstrumentDto[]>(`/api/v1/instruments`);
   }
 }
