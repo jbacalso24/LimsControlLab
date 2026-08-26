@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Suppress EF Core 10.0.0's transitive System.Security.Cryptography.Xml 9.0.0 CVE warnings pending patch -->
+    <WarningsSuppressedByDefault>NU1903</WarningsSuppressedByDefault>
+  </PropertyGroup>
+</Project>
