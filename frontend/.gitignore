@@ -49,3 +49,4 @@ Thumbs.db
 # Claude QA screenshot harness (dev-only, not part of the app)
 qa-shot.mjs
 qa-click.mjs
+qa-login.mjs

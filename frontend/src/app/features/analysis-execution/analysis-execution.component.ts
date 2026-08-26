@@ -15,10 +15,12 @@ import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/component
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card';
 import { ZardTextareaComponent } from '@/shared/components/textarea';
 import { ZardBadgeComponent } from '@/shared/components/badge';
+import { ZardTableImports } from '@/shared/components/table';
 import { ZardAlertComponent } from '@/shared/components/alert';
 import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
 
@@ -42,6 +44,7 @@ import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
     ZardEmptyComponent,
     ZardSpinnerComponent,
     StatusBadgeComponent,
+    ...ZardTableImports,
     NgIcon,
   ],
   templateUrl: './analysis-execution.component.html',
@@ -52,6 +55,16 @@ export class AnalysisExecutionComponent implements OnInit {
   private fb = inject(FormBuilder);
   private apiService = inject(AnalysisExecutionApiService);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
+
+  /** Past-tense confirmation copy per lifecycle action (matches the button that triggered it). */
+  private static readonly STATUS_TOASTS: Record<string, string> = {
+    Start: 'Analysis started.',
+    Pause: 'Analysis paused.',
+    Resume: 'Analysis resumed.',
+    Complete: 'Analysis completed and locked.',
+    Cancel: 'Analysis cancelled.',
+  };
 
   loading = signal(false);
   error = signal('');
@@ -158,6 +171,7 @@ export class AnalysisExecutionComponent implements OnInit {
     this.apiService.changeStatus(current.id, request).subscribe({
       next: () => {
         this.changingStatus.set(false);
+        this.toast.success(AnalysisExecutionComponent.STATUS_TOASTS[action] ?? 'Analysis updated.');
         this.loadAnalysis(current.id);
       },
       error: (err) => {
@@ -168,6 +182,7 @@ export class AnalysisExecutionComponent implements OnInit {
         } else {
           this.statusError.set(err.error?.detail || 'Failed to change status. Please try again.');
         }
+        this.toast.error('Could not update the analysis status.');
       },
     });
   }
@@ -214,6 +229,7 @@ export class AnalysisExecutionComponent implements OnInit {
     this.apiService.addReading(analysisId, request).subscribe({
       next: () => {
         this.submittingReading.set(false);
+        this.toast.success('Reading captured.');
         this.readingForm.reset();
         this.loadAnalysis(analysisId);
       },
@@ -260,6 +276,7 @@ export class AnalysisExecutionComponent implements OnInit {
     this.apiService.resolveException(analysisId, exception.id, request).subscribe({
       next: () => {
         this.submittingException.set(false);
+        this.toast.success('Exception resolved.');
         form.reset();
         this.exceptionForms.delete(exception.id);
         this.loadAnalysis(analysisId);
