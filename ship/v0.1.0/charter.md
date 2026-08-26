@@ -32,7 +32,7 @@
 
 ## 3. Reference architecture & standards
 - **Standard checked against:** none — no `ship/recipes/engineering-standards.md` existed for this project prior to this charter. This charter's decisions, drafted into `ship/recipes/engineering-standards.md`, **become the baseline** for this and future releases of this project.
-- **Frontend UI library:** Kendo UI for Angular, v23, licensed (`docs/telerik-license.txt` — a Telerik license key confirmed to cover the `KENDOUIANGULAR` product; gitignored, never committed, supplied to build/CI as a secret). Confirmed by the operator 2026-08-25.
+- **Frontend UI library:** ~~Kendo UI for Angular, v23, licensed (`docs/telerik-license.txt`)~~ **SUPERSEDED 2026-08-26 by amendment A1 (§3b).** Now **Zard UI** (shadcn-style Angular component primitives, copied into the repo via its CLI) styled with **Tailwind CSS v4**. *Original decision, preserved for the audit trail:* Kendo UI for Angular, v23, licensed (a Telerik license key covering the `KENDOUIANGULAR` product; gitignored, supplied to build/CI as a secret), confirmed by the operator 2026-08-25.
 
 ### 3a. Deviations from the standard
 *(none — this release establishes the standard rather than deviating from one)*
@@ -40,6 +40,13 @@
 | # | Requirement asks for | Standard requires | Chosen | Why | Decided by |
 |---|---------------------|-------------------|--------|-----|------------|
 | — | n/a | n/a | n/a | n/a | n/a |
+
+### 3b. Charter amendments *(post-confirmation, operator-authorised)*
+The confirmation gate (§6) closed 2026-08-25. A change to a §3 decision after that gate is a **charter amendment** — the constitution (§Off-limits) requires "no stack substitution without a recorded charter amendment." This subsection is that record.
+
+| # | Date | Amendment | Was | Now | Why | Decided by |
+|---|------|-----------|-----|-----|-----|------------|
+| A1 | 2026-08-26 | Frontend UI component library reversed | Kendo UI for Angular v23 (licensed) | **Zard UI** (shadcn-style, copied into repo via CLI) + **Tailwind CSS v4** | Operator decision to remove the proprietary, per-environment-licensed Kendo dependency in favour of an open-source component set the project owns the source of (no license secret to provision to every developer/CI/deploy environment, full control to restyle), and to modernise the UI from its current "very simple" state to a modern, easy-to-use design driven by the BRD §6.11 UI/UX requirements. Zard follows the shadcn philosophy — components are generated into `src/app/shared/components/` and owned, not imported from an npm package. Technical shape of the replacement (install method, component mapping, design system): shape.md **C18**. Downstream doc updates: `engineering-standards.md` UI/licensing sections, `plan.md` §4/§6/Task-17/19, removal of `docs/telerik-license.txt`. | Judison Bacalso (operator, orchestrator session) |
 
 ## 4. Constitution
 Drafted fresh at `ship/recipes/constitution.md` (no prior constitution existed). Inviolables, summarised:

@@ -1,1 +1,37 @@
+# --- Secrets / licenses ---
 docs/telerik-license.txt
+
+# --- Mimry ---
+.mimry/
+mimry-out/
+
+# --- Node / Angular (frontend) ---
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.angular/
+**/.angular/
+coverage/
+**/coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+
+# --- .NET (backend) ---
+**/bin/
+**/obj/
+*.user
+
+# --- Playwright / test output ---
+.playwright-mcp/
+test-results/
+playwright-report/
+**/playwright/.cache/
+
+# --- Editors / OS ---
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

@@ -7,7 +7,8 @@
 > in that release's `charter.md` §3a, not a fresh set of choices.
 >
 > **The stack: a .NET 10 layered Web API backend + an Angular 21+ (standalone components) frontend, built
-> on Kendo UI for Angular (v23, licensed — see the license-handling note in §1), both extending the
+> on Zard UI (shadcn-style Angular primitives copied into the repo) styled with Tailwind CSS v4** —
+> *amended 2026-08-26, charter §3b/A1; was Kendo UI for Angular v23 (licensed)* — **both extending the
 > existing LIMS platform and sharing its SQL Server database (`cane-db`).** Authentication is an interim
 > username/password mechanism, designed to be swapped for Entra ID SSO without changing the authorization
 > model (claims-based) underneath it.
@@ -47,18 +48,21 @@
 > — `Databank.WebApp` (the organisation's Angular app for the enterprise Databank system), inspected
 > 2026-08-25. It runs the same stack this project targets (Angular 21.1.x, Kendo UI v23.0.1, the same
 > Telerik license mechanism) and is the actual convention this section is extracted from, not a generic
-> Angular default. Where that codebase itself has unresolved debt (raw `fetch`/`Promise` calls its own
+> Angular default. **Note (2026-08-26, charter §3b/A1):** Databank.WebApp uses Kendo UI v23; LIMS Control
+> Lab **deliberately diverges on the UI library only** — Zard UI + Tailwind v4 instead of Kendo — while
+> keeping every other convention extracted here (naming, layout-first routing, `BaseApiService` chain,
+> Vitest, four-tier environments). The Kendo-specific lines below have been amended accordingly.
+> Where that codebase itself has unresolved debt (raw `fetch`/`Promise` calls its own
 > comments flag for removal, `any`-typed models, no ESLint/Prettier/Husky installed, an inconsistent
 > component selector prefix), this standard states the **intended** pattern and does not carry the debt
 > forward — LIMS Control Lab does the mechanical gates (§1) and the clean pattern from its first commit.
 
-- **Standalone components by default**, each with its own `imports: [...]` array — including Kendo's
-  standalone component groups (`import { KENDO_BUTTON } from '@progress/kendo-angular-buttons'` etc. —
-  spreadable arrays, not per-component NgModule imports). The one place an `NgModule` is still legitimate
-  is a single app-wide `SharedModule` bundling reusable shell chrome (layouts, nav, header/footer) so
-  every standalone feature only needs `imports: [SharedModule]` for that — do not scatter individual
-  Kendo module imports across every shared chrome component; feature components import their own Kendo
-  groups directly instead of pulling in `SharedModule` for that purpose.
+- **Standalone components by default**, each with its own `imports: [...]` array. Zard components are
+  themselves standalone Angular components (generated into `shared/components/<name>/`); a feature imports
+  the specific Zard component classes it uses (`import { ZardButtonComponent } from '@/shared/components/button'`
+  etc.) directly in its own `imports` array — there are no NgModules to import and no per-environment
+  license to activate. Reusable shell chrome (layouts, nav, header/footer) lives in `shared/`; feature
+  components import the Zard primitives they need directly rather than through a catch-all module.
 - **Naming:** no `Component` suffix on class names and no `.component.` infix in filenames — `analysis-execution.ts` / `.html` / `.scss`, class `AnalysisExecution` (the modern Angular style; Databank.WebApp's own root-level files already follow it, even though some older feature files under it still use the `.component.ts` legacy form — LIMS is consistent from the start, not mixed). **One selector prefix for the whole app** (e.g. `lims-`), applied uniformly — Databank.WebApp splits between `app-` and `db-` inconsistently; don't repeat that.
 - **Feature-based structure:** `features/<name>/` owns its own components, services, and models;
   reusable chrome and cross-cutting primitives live in `shared/{components,services,models,layouts,
@@ -94,13 +98,20 @@
   Databank.WebApp's real convention and charter §2's "same environments as the existing platform"
   decision. Add `limsControlLabApiUrl` to the environment interface alongside whatever Databank's own
   variant already defines.
-- **UI:** **Kendo UI for Angular (v23, licensed)** as the base primitive set — Grid, Form, Scheduler, and
-  input components fit this domain's history-search screens, template/schedule configuration, and
-  shift-based work views directly. Theme via Kendo's theming system (`styles/themes/<name>.scss` +
-  `styles/variables/_colors.scss`, mirroring Databank.WebApp's real structure) rather than overriding
-  component internals; extend a Kendo component before hand-rolling an equivalent. Kendo's
-  accessible-by-default components are the starting point for the WCAG AA bar (charter §5), not a
-  substitute for verifying it per screen.
+- **UI:** **Zard UI (shadcn-style Angular primitives) on Tailwind CSS v4** as the base primitive set
+  *(amended 2026-08-26, charter §3b/A1; was Kendo UI v23)*. Components are generated into the repo via the
+  Zard CLI (`npx zard-cli add <component>`) and **owned as project source** under
+  `shared/components/<name>/` — extend or restyle the generated component in place before hand-rolling a
+  new equivalent. The set covers this domain directly: **Table** (history search, template/schedule/work
+  lists — replaces the Kendo Grid), **Select / Dropdown / Date Picker / Input / Textarea / Button /
+  Dialog** for capture and configuration forms, plus **Badge / Card / Tabs** for status and shift-based
+  work views. Theme via the Tailwind v4 CSS-variable token layer in `src/styles.css` (a single design
+  system — semantic colour/spacing/typography tokens, light + dark), never by editing a component's
+  internals ad hoc. Zard components are accessible-by-default (built on Angular CDK) — the starting point
+  for the WCAG AA bar (charter §5), not a substitute for verifying it per screen (axe-core, shape.md C12).
+  Runtime deps the CLI adds: `@angular/cdk`, `class-variance-authority`, `clsx`, `tailwind-merge`,
+  `@ng-icons/core`, `@ng-icons/lucide`; dev: `tailwindcss`, `@tailwindcss/postcss`, `postcss`,
+  `tailwindcss-animate`.
 - **Forms:** Angular Reactive Forms (`FormBuilder`, `FormGroup`), validation rules mirroring the
   backend's — client-side validation is a UX convenience, never the authorization or business-rule
   boundary; the server always re-checks.
@@ -109,15 +120,14 @@
   (exception review, unlock/amend, ad-hoc scheduling), automated a11y linting in CI.
 - **Testing runner: Vitest** (via `@angular/build:unit-test`), not Jasmine/Karma — matching
   Databank.WebApp's actual `package.json`/`angular.json` configuration for Angular 21.
-- **Kendo license activation:** the license key (constitution — gitignored, supplied as a secret) is
-  activated the same way Databank.WebApp does it — via the `@progress/kendo-licensing` package reading an
-  environment variable at build/CI time, never a key committed to or hardcoded in source.
 
 ## 0. Licensed dependency handling
-- **Kendo UI for Angular license key** (`docs/telerik-license.txt`, a signed Telerik license JWT) is a
-  credential, not a config value — it is **never committed to source**. It is added to `.gitignore` and
-  supplied to build/CI environments the same way any other secret is (environment variable or secret
-  store), per the constitution's "no committed secrets" rule.
+- **None for the frontend UI library** *(amended 2026-08-26, charter §3b/A1)*. The move from Kendo UI to
+  **Zard UI + Tailwind CSS v4** removes the only proprietary, per-environment-licensed dependency — Zard's
+  components are MIT-licensed source copied into the repo, and Tailwind is open source. There is no license
+  key to gitignore, no secret to provision to developer/CI/deploy environments, and `docs/telerik-license.txt`
+  is removed. The constitution's "no committed secrets" rule still governs the backend (JWT signing secret,
+  `cane-db` connection string) exactly as before.
 
 ## 1. Mechanical enforcement *(exists before build starts — charter §2a)*
 - **Backend:** analyzers enabled (`EnableNETAnalyzers`, `AnalysisLevel=latest-recommended`),
@@ -222,7 +232,7 @@ shape · server-side RBAC (role + site) in lockstep with the UI · paged if it l
 where §3 applies · concurrency-safe if it touches a locked/derived value · structured logging + audit
 entries.
 **Frontend:** feature-scoped, standalone components (no `Component` suffix / `.component.` infix,
-consistent `lims-` selector prefix) · built on Kendo UI primitives (no hand-rolled equivalents) ·
+consistent `lims-` selector prefix) · built on Zard UI primitives + Tailwind v4 (extend the generated Zard component before hand-rolling an equivalent) ·
 reactive forms mirroring backend validation · API access only via a `LimsApiService`-derived service
 using `httpResource`/`rxResource` for reads (no raw `HttpClient`, no `fetch`, no `Promise`-returning API
 calls) · error/loading/empty/permission states handled · WCAG AA.
