@@ -16,6 +16,7 @@ public sealed record ReadingDto
     public required string Unit { get; init; }
     public required DateTimeOffset CapturedAtUtc { get; init; }
     public required string CapturedBy { get; init; }
+    public required string CapturedByUsername { get; init; }
     public required ReadingValidationDto ValidationResult { get; init; }
     public decimal? CalibratedValue { get; init; }
 }

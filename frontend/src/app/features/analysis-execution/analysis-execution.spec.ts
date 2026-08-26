@@ -28,6 +28,7 @@ describe('AnalysisExecutionComponent', () => {
         unit: 'mg/L',
         capturedAtUtc: '2026-08-26T10:00:00Z',
         capturedBy: 'analyst-001',
+        capturedByUsername: 'invicta_analyst',
         validationResult: {
           isValid: true,
           expectedRange: '20-30',
@@ -196,6 +197,7 @@ describe('AnalysisExecutionComponent', () => {
         unit: 'mg/L',
         capturedAtUtc: '2026-08-26T11:00:00Z',
         capturedBy: 'analyst-001',
+        capturedByUsername: 'invicta_analyst',
         validationResult: { isValid: true },
       };
 
@@ -286,6 +288,7 @@ describe('AnalysisExecutionComponent', () => {
         unit: 'mg/L',
         capturedAtUtc: '2026-08-26T11:00:00Z',
         capturedBy: 'analyst-001',
+        capturedByUsername: 'invicta_analyst',
         validationResult: { isValid: true, actualValue: '25' },
       });
       addReading$.complete();

@@ -23,6 +23,7 @@ export interface ReadingDto {
   unit: string;
   capturedAtUtc: string;
   capturedBy: string;
+  capturedByUsername: string;
   validationResult: {
     isValid: boolean;
     expectedRange?: string;

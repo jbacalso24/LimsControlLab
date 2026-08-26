@@ -15,19 +15,22 @@ public sealed class AnalysisExecutionService
     private readonly IAuditLogger _auditLogger;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _timeProvider;
+    private readonly IUserRepository _userRepository;
 
     public AnalysisExecutionService(
         IAnalysisRepository repository,
         ICalibrationCurveRepository calibrationRepository,
         IAuditLogger auditLogger,
         ICurrentUser currentUser,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IUserRepository userRepository)
     {
         _repository = repository;
         _calibrationRepository = calibrationRepository;
         _auditLogger = auditLogger;
         _currentUser = currentUser;
         _timeProvider = timeProvider;
+        _userRepository = userRepository;
     }
 
     public async Task<Outcome<ReadingCaptureResult>> CaptureReadingAsync(int analysisId, CaptureReadingRequest request, CancellationToken ct)
@@ -120,6 +123,7 @@ public sealed class AnalysisExecutionService
             Unit = reading.Unit,
             CapturedAtUtc = reading.CapturedAtUtc,
             CapturedByUserId = _currentUser.UserId,
+            CapturedByUsername = _currentUser.Username,
             ValidationResult = validationDetail,
             CalibratedValue = reading.CalibratedValue,
         };
@@ -202,6 +206,14 @@ public sealed class AnalysisExecutionService
         if (analysis == null)
             return new Outcome<AnalysisDetailResult>.NotFound($"Analysis {analysisId} not found.");
 
+        var usernamesById = new Dictionary<int, string>();
+        foreach (var capturerId in analysis.Readings.Select(r => r.CapturedByUserId).Distinct())
+        {
+            var user = await _userRepository.GetByIdAsync(capturerId, ct);
+            if (user != null)
+                usernamesById[capturerId] = user.Username;
+        }
+
         var readings = analysis.Readings.Select(r => new ReadingInfo
         {
             Id = r.Id,
@@ -210,6 +222,9 @@ public sealed class AnalysisExecutionService
             Unit = r.Unit,
             CapturedAtUtc = r.CapturedAtUtc,
             CapturedByUserId = r.CapturedByUserId,
+            CapturedByUsername = usernamesById.TryGetValue(r.CapturedByUserId, out var username)
+                ? username
+                : r.CapturedByUserId.ToString(System.Globalization.CultureInfo.InvariantCulture),
             ValidationResult = RecomputeValidationDetail(r.Value, r.ValidationResult, analysis.TemplateVersion),
             CalibratedValue = r.CalibratedValue,
         }).ToList();
@@ -430,6 +445,7 @@ public sealed record ReadingCaptureResult
     public required string Unit { get; init; }
     public required DateTimeOffset CapturedAtUtc { get; init; }
     public required int CapturedByUserId { get; init; }
+    public required string CapturedByUsername { get; init; }
     public required ReadingValidationDetail ValidationResult { get; init; }
     public decimal? CalibratedValue { get; init; }
 }
@@ -472,6 +488,7 @@ public sealed record ReadingInfo
     public required string Unit { get; init; }
     public required DateTimeOffset CapturedAtUtc { get; init; }
     public required int CapturedByUserId { get; init; }
+    public required string CapturedByUsername { get; init; }
     public required ReadingValidationDetail ValidationResult { get; init; }
     public decimal? CalibratedValue { get; init; }
 }

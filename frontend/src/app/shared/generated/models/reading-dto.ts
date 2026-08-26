@@ -6,6 +6,7 @@ export interface ReadingDto {
   calibratedValue?: (number | string | null);
   capturedAtUtc: string;
   capturedBy: string;
+  capturedByUsername: string;
   id: (number | string);
   testId: (number | string);
   unit: string;

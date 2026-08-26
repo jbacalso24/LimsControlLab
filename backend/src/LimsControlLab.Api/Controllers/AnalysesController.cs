@@ -35,6 +35,7 @@ public sealed class AnalysesController : ControllerBase
                 Unit = r.Unit,
                 CapturedAtUtc = r.CapturedAtUtc,
                 CapturedBy = r.CapturedByUserId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                CapturedByUsername = r.CapturedByUsername,
                 ValidationResult = new ReadingValidationDto
                 {
                     IsValid = r.ValidationResult.IsValid,
@@ -100,6 +101,7 @@ public sealed class AnalysesController : ControllerBase
                     Unit = ok.Data.Unit,
                     CapturedAtUtc = ok.Data.CapturedAtUtc,
                     CapturedBy = ok.Data.CapturedByUserId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    CapturedByUsername = ok.Data.CapturedByUsername,
                     ValidationResult = new ReadingValidationDto
                     {
                         IsValid = ok.Data.ValidationResult.IsValid,

@@ -17,6 +17,8 @@ public sealed class AnalysisExecutionServiceTests
 {
     private static TimeProvider CreateTimeProvider() => TimeProvider.System;
 
+    private static IUserRepository CreateUserRepository() => new Mock<IUserRepository>().Object;
+
     [Fact]
     public async Task CaptureReadingAsync_WithInToleranceValue_ReturnsOk()
     {
@@ -58,7 +60,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new CaptureReadingRequest
         {
@@ -121,7 +124,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new CaptureReadingRequest
         {
@@ -158,7 +162,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new ExceptionDecisionRequest
         {
@@ -187,7 +192,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new ExceptionDecisionRequest
         {
@@ -258,7 +264,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new CaptureReadingRequest
         {
@@ -342,7 +349,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new CaptureReadingRequest
         {
@@ -400,7 +408,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var request = new StatusChangeRequest
         {
@@ -490,7 +499,8 @@ public sealed class AnalysisExecutionServiceTests
             mockCalibrationRepository.Object,
             mockAuditLogger.Object,
             mockCurrentUser.Object,
-            CreateTimeProvider());
+            CreateTimeProvider(),
+            CreateUserRepository());
 
         var result = await service.GetAnalysisDetailAsync(1, CancellationToken.None);
 
@@ -511,5 +521,95 @@ public sealed class AnalysisExecutionServiceTests
         Assert.Equal("98-99.5", validReading.ValidationResult.ExpectedRange);
         Assert.Equal("98.5", validReading.ValidationResult.ActualValue);
         Assert.Null(validReading.ValidationResult.Reason);
+    }
+
+    [Fact]
+    public async Task GetAnalysisDetailAsync_ResolvesCapturedByUsernameFromUserRepository()
+    {
+        var mockRepository = new Mock<IAnalysisRepository>();
+        var mockAuditLogger = new Mock<IAuditLogger>();
+        var mockCurrentUser = new Mock<ICurrentUser>();
+        var mockCalibrationRepository = new Mock<ICalibrationCurveRepository>();
+        var mockUserRepository = new Mock<IUserRepository>();
+
+        var templateVersion = new AnalysisTemplateVersion
+        {
+            Id = 1,
+            TemplateId = 1,
+            Version = 1,
+            MinTolerance = 1m,
+            MaxTolerance = 100m,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+        };
+
+        var analysis = new Analysis
+        {
+            Id = 1,
+            SampleId = 1,
+            TemplateId = 1,
+            TemplateVersionId = 1,
+            Status = LifecycleStatus.InProgress,
+            StartedAtUtc = DateTimeOffset.UtcNow,
+            StartedByUserId = 7,
+            IsLocked = false,
+            TemplateVersion = templateVersion,
+            Readings = new List<Reading>
+            {
+                new Reading
+                {
+                    Id = 1,
+                    AnalysisId = 1,
+                    TestId = 1,
+                    Value = 50m,
+                    Unit = "mg",
+                    CapturedAtUtc = DateTimeOffset.UtcNow,
+                    CapturedByUserId = 7,
+                    ValidationResult = "Valid",
+                },
+                new Reading
+                {
+                    Id = 2,
+                    AnalysisId = 1,
+                    TestId = 2,
+                    Value = 60m,
+                    Unit = "mg",
+                    CapturedAtUtc = DateTimeOffset.UtcNow,
+                    CapturedByUserId = 999,
+                    ValidationResult = "Valid",
+                },
+            },
+            Exceptions = new List<ExceptionRecord>(),
+        };
+
+        mockRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(analysis);
+        mockUserRepository
+            .Setup(u => u.GetByIdAsync(7, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new User
+            {
+                Id = 7,
+                Username = "invicta_analyst",
+                PasswordHash = "hash",
+                Role = Role.ControlLabAnalyst,
+                Site = Site.Invicta,
+            });
+        // User 999 is intentionally unknown to verify the id fallback.
+        mockUserRepository
+            .Setup(u => u.GetByIdAsync(999, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((User?)null);
+
+        var service = new AnalysisExecutionService(
+            mockRepository.Object,
+            mockCalibrationRepository.Object,
+            mockAuditLogger.Object,
+            mockCurrentUser.Object,
+            CreateTimeProvider(),
+            mockUserRepository.Object);
+
+        var result = await service.GetAnalysisDetailAsync(1, CancellationToken.None);
+
+        var ok = Assert.IsType<Outcome<AnalysisDetailResult>.Ok>(result);
+        Assert.Equal("invicta_analyst", ok.Data.Readings.First(r => r.Id == 1).CapturedByUsername);
+        // Falls back to the raw id string when the user cannot be resolved.
+        Assert.Equal("999", ok.Data.Readings.First(r => r.Id == 2).CapturedByUsername);
     }
 }
