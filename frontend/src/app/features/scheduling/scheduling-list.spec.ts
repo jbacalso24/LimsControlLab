@@ -4,6 +4,7 @@ import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { SchedulingListComponent } from './scheduling-list.component';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
+import { ZardDialogService } from '../../shared/components/dialog/dialog.service';
 import { of, throwError } from 'rxjs';
 import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
 import { provideRouter } from '@angular/router';
@@ -13,13 +14,16 @@ describe('SchedulingListComponent', () => {
   let fixture: ComponentFixture<SchedulingListComponent>;
   let apiService: SchedulingApiService;
   let currentUserService: CurrentUserService;
+  let dialogMock: { create: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
+    dialogMock = { create: vi.fn() };
     await TestBed.configureTestingModule({
       imports: [SchedulingListComponent, HttpClientTestingModule],
       providers: [
         SchedulingApiService,
         CurrentUserService,
+        { provide: ZardDialogService, useValue: dialogMock },
         provideRouter([]),
       ],
     }).compileComponents();
@@ -109,14 +113,18 @@ describe('SchedulingListComponent', () => {
     });
     vi.spyOn(apiService, 'listSchedules').mockReturnValue(of([mockSchedule]));
     const deleteSpy = vi.spyOn(apiService, 'deleteSchedule').mockReturnValue(of(void 0));
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    // Simulate the user confirming in the dialog by invoking the zOnOk callback.
+    dialogMock.create.mockImplementation((config: { zOnOk?: () => void }) => {
+      config.zOnOk?.();
+      return {} as unknown;
+    });
 
     component.delete(mockSchedule);
 
     expect(deleteSpy).toHaveBeenCalledWith(1);
   });
 
-  it('should not delete if confirm is cancelled', () => {
+  it('should not delete if the dialog is cancelled', () => {
     const mockSchedule: ScheduleDto = {
       id: 1,
       name: 'Schedule 1',
@@ -126,7 +134,8 @@ describe('SchedulingListComponent', () => {
       rowVersion: 'v1',
     };
     const deleteSpy = vi.spyOn(apiService, 'deleteSchedule').mockReturnValue(of(void 0));
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    // User cancels: the dialog opens but zOnOk is never invoked.
+    dialogMock.create.mockImplementation(() => ({}) as unknown);
 
     component.delete(mockSchedule);
 
