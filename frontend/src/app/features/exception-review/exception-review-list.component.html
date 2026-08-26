@@ -151,24 +151,22 @@
 
             <!-- Unlock Error Alert -->
             @if (unlockError()) {
-              <z-alert class="border-destructive/50 bg-destructive/10">
-                <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-destructive"></ng-icon>
-                <div class="ml-3 flex-1">
-                  <p class="text-sm font-medium text-destructive">Unlock failed</p>
-                  <p class="text-xs text-destructive/90 mt-0.5">{{ unlockError() }}</p>
-                </div>
-              </z-alert>
+              <z-alert
+                zType="destructive"
+                class="border-destructive/50 bg-destructive/10"
+                zTitle="Unlock failed"
+                [zDescription]="unlockError()"
+              />
             }
 
             <!-- Stale Row Version Alert -->
             @if (staleRowVersionError()) {
-              <z-alert class="border-warning/50 bg-warning/10">
-                <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-warning-foreground dark:text-warning"></ng-icon>
-                <div class="ml-3 flex-1">
-                  <p class="text-sm font-medium text-warning-foreground dark:text-warning">Result Changed</p>
-                  <p class="text-xs text-warning-foreground/90 dark:text-warning/90 mt-0.5">This result was modified by another user. Please reload to see the latest changes.</p>
-                </div>
-              </z-alert>
+              <z-alert
+                class="border-warning/50 bg-warning/10 text-warning-foreground dark:text-warning"
+                zIcon="lucideCircleAlert"
+                zTitle="Result Changed"
+                zDescription="This result was modified by another user. Please reload to see the latest changes."
+              />
             }
 
             <!-- Dialog Actions -->

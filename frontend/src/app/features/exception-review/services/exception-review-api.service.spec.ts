@@ -12,7 +12,10 @@ describe('ExceptionReviewApiService', () => {
   const mockResultReviewDto: ResultReviewDto = {
     id: 1,
     sampleId: 100,
+    sampleIdentifier: 'SMP-100',
     templateId: 50,
+    templateName: 'Brix Control',
+    site: 'Invicta',
     status: 'Completed',
     startedAtUtc: '2026-08-20T10:00:00Z',
     completedAtUtc: '2026-08-20T11:00:00Z',

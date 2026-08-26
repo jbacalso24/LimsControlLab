@@ -151,13 +151,12 @@
 
         <!-- Error Alert -->
         @if (submitError()) {
-          <z-alert class="border-destructive/50 bg-destructive/10">
-            <ng-icon name="lucideAlertCircle" class="h-4 w-4 text-destructive" />
-            <div class="ml-3 flex-1">
-              <p class="text-sm font-medium text-destructive">Submission failed</p>
-              <p class="text-xs text-destructive/90 mt-0.5">{{ submitError() }}</p>
-            </div>
-          </z-alert>
+          <z-alert
+            zType="destructive"
+            class="border-destructive/50 bg-destructive/10"
+            zTitle="Submission failed"
+            [zDescription]="submitError()"
+          />
         }
 
         <!-- Form Actions -->
