@@ -22,6 +22,7 @@ describe('AnalysisExecutionComponent - Accessibility', () => {
 
     const apiServiceSpy = {
       getAnalysis: vi.fn().mockReturnValue(of(null)),
+      getInstruments: vi.fn().mockReturnValue(of([])),
       addReading: vi.fn(),
       resolveException: vi.fn(),
       changeStatus: vi.fn(),

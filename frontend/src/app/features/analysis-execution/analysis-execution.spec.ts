@@ -470,7 +470,7 @@ describe('AnalysisExecutionComponent', () => {
       fixture.detectChanges();
       const badges = fixture.nativeElement.querySelectorAll('z-badge');
       // Should have an "Invalid" badge in the status column
-      const invalidBadge = Array.from(badges).find((b: Element) => b.textContent?.includes('Invalid'));
+      const invalidBadge = Array.from(badges).find((b) => (b as Element).textContent?.includes('Invalid'));
 
       expect(invalidBadge).toBeTruthy();
     });
