@@ -29,6 +29,12 @@ test-results/
 playwright-report/
 **/playwright/.cache/
 
+# --- Scratch / logs / local artifacts ---
+*.log
+serve*.log
+_sweep_temp.js
+cookies.txt
+
 # --- Editors / OS ---
 .vs/
 .idea/

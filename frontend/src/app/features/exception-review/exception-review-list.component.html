@@ -1,0 +1,123 @@
+<div class="lims-exception-review-list">
+  <div class="page-header">
+    <h1>Exception Review</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state" role="status" aria-live="polite">
+      <p>Loading exception analyses...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state" role="alert" aria-live="assertive">
+      <h2>Error Loading Exceptions</h2>
+      <p>{{ error() }}</p>
+      <button kendoButton (click)="reload()">Retry</button>
+    </div>
+  } @else if (!analyses().length) {
+    <div class="empty-state">
+      <p>No exception analyses to review</p>
+    </div>
+  } @else {
+    <kendo-grid [data]="analyses()" [skip]="0" [pageSize]="10">
+      <kendo-grid-column field="sampleId" title="Sample ID" [width]="100"></kendo-grid-column>
+      <kendo-grid-column field="templateId" title="Template ID" [width]="100"></kendo-grid-column>
+      <kendo-grid-column field="status" title="Status" [width]="100"></kendo-grid-column>
+      <kendo-grid-column field="startedAtUtc" title="Started" [width]="180">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          {{ dataItem.startedAtUtc | date: 'short' }}
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column field="completedAtUtc" title="Completed" [width]="180">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          {{ dataItem.completedAtUtc | date: 'short' }}
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column title="Actions" [width]="150">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="action-buttons">
+            @if (dataItem.isLocked && isLabCoordinator()) {
+              <button
+                kendoButton
+                look="flat"
+                size="small"
+                (click)="openUnlockDialog(dataItem)"
+                [disabled]="unlocking()"
+                aria-label="Unlock result"
+              >
+                Unlock
+              </button>
+            }
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+    </kendo-grid>
+  }
+
+  @if (showUnlockDialog()) {
+    <kendo-dialog [title]="'Unlock Result'" (close)="closeUnlockDialog()">
+      <div class="unlock-dialog-content">
+        <form [formGroup]="unlockForm" (ngSubmit)="submitUnlock()">
+          <div class="form-group">
+            <label for="justification">Justification (Required)</label>
+            <textarea
+              id="justification"
+              formControlName="justification"
+              placeholder="Enter justification for unlocking"
+              [disabled]="unlocking()"
+              aria-describedby="justification-error"
+              rows="5"
+            ></textarea>
+            @if (
+              unlockForm.get('justification')?.invalid &&
+              unlockForm.get('justification')?.touched
+            ) {
+              <span id="justification-error" class="error-message">
+                Justification is required
+              </span>
+            }
+          </div>
+
+          @if (unlockError()) {
+            <div class="error-alert" role="alert" aria-live="polite">
+              <strong>Unlock failed</strong>
+              <p>{{ unlockError() }}</p>
+            </div>
+          }
+
+          @if (staleRowVersionError()) {
+            <div class="stale-version-alert" role="alert" aria-live="assertive">
+              <h3>Result Changed</h3>
+              <p>
+                This result was modified by another user. Please reload to see the latest
+                changes.
+              </p>
+            </div>
+          }
+
+          <div class="dialog-buttons">
+            <button
+              type="button"
+              kendoButton
+              (click)="closeUnlockDialog()"
+              [disabled]="unlocking()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              kendoButton
+              themeColor="primary"
+              [disabled]="unlockForm.invalid || unlocking()"
+            >
+              @if (unlocking()) {
+                Unlocking...
+              } @else {
+                Unlock
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </kendo-dialog>
+  }
+</div>

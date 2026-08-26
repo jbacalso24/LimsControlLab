@@ -1,0 +1,136 @@
+.lims-exception-review-list {
+  padding: 1rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.loading-state,
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.error-state {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+  padding: 2rem;
+  color: #c62828;
+}
+
+.error-state h2 {
+  margin-top: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.unlock-dialog-content {
+  padding: 1.5rem;
+  min-width: 400px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.8rem;
+}
+
+.error-alert {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-radius: 4px;
+  padding: 1rem;
+  color: #c62828;
+  margin-bottom: 1rem;
+}
+
+.error-alert strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.error-alert p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.stale-version-alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 1.5rem;
+  color: #856404;
+  margin-bottom: 1rem;
+}
+
+.stale-version-alert h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.stale-version-alert p {
+  margin: 0;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+::ng-deep .k-grid {
+  width: 100%;
+  border-radius: 4px;
+}
+
+::ng-deep .k-dialog {
+  border-radius: 4px;
+}

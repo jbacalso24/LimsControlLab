@@ -1,0 +1,6 @@
+{
+  "spec": {
+    "url": "http://localhost:5299/openapi/v1.json"
+  },
+  "output": "src/app/shared/generated"
+}

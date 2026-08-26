@@ -1,0 +1,506 @@
+❯ Building...
+✔ Building...
+Initial chunk files                                                         | Names                                                                    |  Raw size
+styles.css                                                                  | styles                                                                   | 867.70 kB | 
+chunk-OCQTVXLB.js                                                           | -                                                                        |  56.57 kB | 
+chunk-6PO57N2H.js                                                           | -                                                                        |  29.09 kB | 
+chunk-7EODASSS.js                                                           | -                                                                        |  26.92 kB | 
+spec-app-features-scheduling-scheduling-form.a11y.js                        | spec-app-features-scheduling-scheduling-form.a11y                        |  26.19 kB | 
+chunk-JXEHFZU3.js                                                           | -                                                                        |  25.71 kB | 
+spec-app-features-templates-templates-form.a11y.js                          | spec-app-features-templates-templates-form.a11y                          |  25.07 kB | 
+chunk-JKZP7C52.js                                                           | -                                                                        |  18.25 kB | 
+chunk-5TNP7N2Y.js                                                           | -                                                                        |  16.38 kB | 
+chunk-ZCMROBZE.js                                                           | -                                                                        |  16.10 kB | 
+chunk-S2B3VN4Q.js                                                           | -                                                                        |  15.04 kB | 
+spec-app-features-analysis-execution-analysis-execution.js                  | spec-app-features-analysis-execution-analysis-execution                  |  13.70 kB | 
+spec-app-features-sample-transfer-sample-transfer.js                        | spec-app-features-sample-transfer-sample-transfer                        |  10.62 kB | 
+spec-app-features-exception-review-exception-review-list.js                 | spec-app-features-exception-review-exception-review-list                 |  10.34 kB | 
+spec-app-shared-layouts-authenticated-layout-authenticated-layout.a11y.js   | spec-app-shared-layouts-authenticated-layout-authenticated-layout.a11y   |  10.01 kB | 
+spec-app-features-history-search-history-search.js                          | spec-app-features-history-search-history-search                          |   5.95 kB | 
+spec-app-features-auth-login-login.js                                       | spec-app-features-auth-login-login                                       |   4.81 kB | 
+chunk-RSTWSNOR.js                                                           | -                                                                        |   4.75 kB | 
+spec-app-features-scheduling-work-queue.js                                  | spec-app-features-scheduling-work-queue                                  |   4.66 kB | 
+spec-app-features-sample-transfer-services-sample-transfer-api.service.js   | spec-app-features-sample-transfer-services-sample-transfer-api.service   |   4.04 kB | 
+spec-app-features-exception-review-services-exception-review-api.service.js | spec-app-features-exception-review-services-exception-review-api.service |   3.94 kB | 
+spec-app-features-scheduling-scheduling-list.js                             | spec-app-features-scheduling-scheduling-list                             |   3.91 kB | 
+spec-app-features-templates-templates-list.js                               | spec-app-features-templates-templates-list                               |   3.88 kB | 
+spec-app-features-scheduling-services-scheduling-api.service.js             | spec-app-features-scheduling-services-scheduling-api.service             |   3.82 kB | 
+chunk-QYGB2WIA.js                                                           | -                                                                        |   3.74 kB | 
+spec-app-features-templates-services-templates-api.service.js               | spec-app-features-templates-services-templates-api.service               |   3.26 kB | 
+spec-app-shared-error-handler.js                                            | spec-app-shared-error-handler                                            |   2.74 kB | 
+spec-app-shared-guards-auth.guard.js                                        | spec-app-shared-guards-auth.guard                                        |   2.29 kB | 
+spec-app-features-history-search-services-history-search-api.service.js     | spec-app-features-history-search-services-history-search-api.service     |   2.28 kB | 
+spec-app-shared-services-auth-current-user.service.js                       | spec-app-shared-services-auth-current-user.service                       |   1.84 kB | 
+spec-app-app.js                                                             | spec-app-app                                                             |   1.79 kB | 
+spec-app-features-analysis-execution-analysis-execution.a11y.js             | spec-app-features-analysis-execution-analysis-execution.a11y             |   1.78 kB | 
+chunk-ULSH6IBN.js                                                           | -                                                                        |   1.62 kB | 
+chunk-TWYHQ7IM.js                                                           | -                                                                        |   1.57 kB | 
+chunk-S633N4IH.js                                                           | -                                                                        |   1.52 kB | 
+chunk-EVUPRGZU.js                                                           | -                                                                        |   1.38 kB | 
+chunk-IIVR6I7V.js                                                           | -                                                                        |   1.36 kB | 
+chunk-EL2FQPDH.js                                                           | -                                                                        |   1.31 kB | 
+spec-app-features-sample-transfer-sample-transfer.a11y.js                   | spec-app-features-sample-transfer-sample-transfer.a11y                   |   1.29 kB | 
+init-testbed.js                                                             | init-testbed                                                             |   1.21 kB | 
+spec-app-features-exception-review-exception-review-list.a11y.js            | spec-app-features-exception-review-exception-review-list.a11y            |   1.06 kB | 
+spec-app-features-auth-login-login.a11y.js                                  | spec-app-features-auth-login-login.a11y                                  |   1.05 kB | 
+spec-app-features-scheduling-scheduling-list.a11y.js                        | spec-app-features-scheduling-scheduling-list.a11y                        |   1.02 kB | 
+spec-app-features-templates-templates-list.a11y.js                          | spec-app-features-templates-templates-list.a11y                          |   1.01 kB | 
+spec-app-features-history-search-history-search.a11y.js                     | spec-app-features-history-search-history-search.a11y                     | 992 bytes | 
+vitest-mock-patch.js                                                        | vitest-mock-patch                                                        | 974 bytes | 
+spec-app-features-scheduling-work-queue.a11y.js                             | spec-app-features-scheduling-work-queue.a11y                             | 930 bytes | 
+polyfills.js                                                                | polyfills                                                                | 110 bytes | 
+
+                                                                            | Initial total                                                            |   1.25 MB
+
+Application bundle generation complete. [4.195 seconds] - 2026-08-26T00:02:38.268Z
+
+
+ RUN  v4.1.11 C:/Users/j.bacalso/Documents/LIMS/frontend
+
+stdout | src/app/features/templates/templates-form.a11y.spec.ts > TemplatesFormComponent - Accessibility > should not have any a11y violations
+[WARN][Telerik and Kendo UI Licensing] Kendo UI for Angular
+
+stderr | src/app/features/templates/templates-form.a11y.spec.ts > TemplatesFormComponent - Accessibility > should not have any a11y violations
+  No Telerik and Kendo UI License found.
+    To download a license key file, visit https://prgress.co/3PwQMKZ
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/features/templates/templates-form.a11y.spec.ts (1 test | 1 failed) 1124ms
+     × should not have any a11y violations 1122ms
+stdout | src/app/features/scheduling/scheduling-form.a11y.spec.ts > SchedulingFormComponent - Accessibility > should not have any a11y violations
+[WARN][Telerik and Kendo UI Licensing] Kendo UI for Angular
+stderr | src/app/features/scheduling/scheduling-form.a11y.spec.ts > SchedulingFormComponent - Accessibility > should not have any a11y violations
+  No Telerik and Kendo UI License found.
+    To download a license key file, visit https://prgress.co/3PwQMKZ
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+  It looks like you're using the disabled attribute with a reactive form directive. If you set disabled to true
+  when you set up this control in your component class, the disabled attribute will actually be set in the DOM for
+  you. We recommend using this approach to avoid 'changed after checked' errors.
+
+  Example:
+  // Specify the `disabled` property at control creation time:
+  form = new FormGroup({
+    first: new FormControl({value: 'Nancy', disabled: true}, Validators.required),
+    last: new FormControl('Drew', Validators.required)
+  });
+
+  // Controls can also be enabled/disabled after creation:
+  form.get('first')?.enable();
+  form.get('last')?.disable();
+
+
+ ❯ |frontend| src/app/features/scheduling/scheduling-form.a11y.spec.ts (1 test | 1 failed) 1227ms
+     × should not have any a11y violations 1225ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |frontend| src/app/features/templates/templates-form.a11y.spec.ts > TemplatesFormComponent - Accessibility > should not have any a11y violations
+AssertionError: expected [ { …(7) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "description": "Ensure every ARIA input field has an accessible name",
++     "help": "ARIA input fields must have an accessible name",
++     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-input-field-name?application=axeAPI",
++     "id": "aria-input-field-name",
++     "impact": "serious",
++     "nodes": [
++       {
++         "all": [],
++         "any": [
++           CheckResult {
++             "data": null,
++             "id": "aria-label",
++             "impact": "serious",
++             "message": "aria-label attribute does not exist or is empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": null,
++             "id": "aria-labelledby",
++             "impact": "serious",
++             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": {
++               "messageKey": "noAttr",
++             },
++             "id": "non-empty-title",
++             "impact": "serious",
++             "message": "Element has no title attribute",
++             "relatedNodes": [],
++           },
++         ],
++         "failureSummary": "Fix any of the following:
++   aria-label attribute does not exist or is empty
++   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
++   Element has no title attribute",
++         "html": "<kendo-dropdownlist _ngcontent-a-c133501...=\"\" id=\"site\" formcontrolname=\"site\" aria-describedby=\"k-8360c3d3-17a8-4bf9...\" aria-expanded=\"false\" dir=\"ltr\" tabindex=\"0\" role=\"combobox\" aria-haspopup=\"listbox\" aria-invalid=\"true\" class=\"k-dropdownlist k-pic...\">",
++         "impact": "serious",
++         "none": [],
++         "target": [
++           "#site",
++         ],
++       },
++     ],
++     "tags": [
++       "cat.aria",
++       "wcag2a",
++       "wcag412",
++       "TTv5",
++       "TT5.c",
++       "EN-301-549",
++       "EN-9.4.1.2",
++       "ACT",
++       "RGAAv4",
++       "RGAA-11.1.1",
++     ],
++   },
++ ]
+
+ ❯ src/app/features/templates/templates-form.a11y.spec.ts:38:32
+     36|     });
+     37|
+     38|     expect(results.violations).toEqual([]);
+       |                                ^
+     39|   });
+     40| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |frontend| src/app/features/scheduling/scheduling-form.a11y.spec.ts > SchedulingFormComponent - Accessibility > should not have any a11y violations
+AssertionError: expected [ { …(7) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "description": "Ensure every ARIA input field has an accessible name",
++     "help": "ARIA input fields must have an accessible name",
++     "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-input-field-name?application=axeAPI",
++     "id": "aria-input-field-name",
++     "impact": "serious",
++     "nodes": [
++       {
++         "all": [],
++         "any": [
++           CheckResult {
++             "data": null,
++             "id": "aria-label",
++             "impact": "serious",
++             "message": "aria-label attribute does not exist or is empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": null,
++             "id": "aria-labelledby",
++             "impact": "serious",
++             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": {
++               "messageKey": "noAttr",
++             },
++             "id": "non-empty-title",
++             "impact": "serious",
++             "message": "Element has no title attribute",
++             "relatedNodes": [],
++           },
++         ],
++         "failureSummary": "Fix any of the following:
++   aria-label attribute does not exist or is empty
++   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
++   Element has no title attribute",
++         "html": "<kendo-dropdownlist _ngcontent-a-c690772...=\"\" id=\"site\" formcontrolname=\"site\" aria-describedby=\"k-f606011e-6f30-4da8...\" aria-expanded=\"false\" dir=\"ltr\" tabindex=\"0\" role=\"combobox\" aria-haspopup=\"listbox\" aria-invalid=\"true\" class=\"k-dropdownlist k-pic...\">",
++         "impact": "serious",
++         "none": [],
++         "target": [
++           "#site",
++         ],
++       },
++       {
++         "all": [],
++         "any": [
++           CheckResult {
++             "data": null,
++             "id": "aria-label",
++             "impact": "serious",
++             "message": "aria-label attribute does not exist or is empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": null,
++             "id": "aria-labelledby",
++             "impact": "serious",
++             "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
++             "relatedNodes": [],
++           },
++           CheckResult {
++             "data": {
++               "messageKey": "noAttr",
++             },
++             "id": "non-empty-title",
++             "impact": "serious",
++             "message": "Element has no title attribute",
++             "relatedNodes": [],
++           },
++         ],
++         "failureSummary": "Fix any of the following:
++   aria-label attribute does not exist or is empty
++   aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty
++   Element has no title attribute",
++         "html": "<kendo-dropdownlist _ngcontent-a-c690772...=\"\" id=\"shiftPattern\" formcontrolname=\"shiftPattern\" aria-describedby=\"k-e8927637-f849-47ac...\" aria-expanded=\"false\" dir=\"ltr\" tabindex=\"0\" role=\"combobox\" aria-haspopup=\"listbox\" aria-invalid=\"true\" class=\"k-dropdownlist k-pic...\">",
++         "impact": "serious",
++         "none": [],
++         "target": [
++           "#shiftPattern",
++         ],
++       },
++     ],
++     "tags": [
++       "cat.aria",
++       "wcag2a",
++       "wcag412",
++       "TTv5",
++       "TT5.c",
++       "EN-301-549",
++       "EN-9.4.1.2",
++       "ACT",
++       "RGAAv4",
++       "RGAA-11.1.1",
++     ],
++   },
++ ]
+
+ ❯ src/app/features/scheduling/scheduling-form.a11y.spec.ts:38:32
+     36|     });
+     37|
+     38|     expect(results.violations).toEqual([]);
+       |                                ^
+     39|   });
+     40| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 26 passed (28)
+      Tests  2 failed | 167 passed (169)
+   Start at  10:02:38
+   Duration  16.96s (transform 5.90s, setup 37.34s, import 97.39s, tests 14.08s, environment 172.83s)
+

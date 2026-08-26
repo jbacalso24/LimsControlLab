@@ -1,0 +1,96 @@
+<div class="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+  <z-card class="w-full max-w-sm">
+    <z-card-content class="space-y-6">
+      <!-- Logo -->
+      <div class="flex items-center justify-center">
+        <img
+          src="/branding/wilmar-logo.png"
+          alt="Wilmar Sugar Australia"
+          class="h-8 w-auto"
+        />
+      </div>
+
+      <!-- Title & Subtitle -->
+      <div class="space-y-2 text-center">
+        <h1 class="text-2xl font-semibold tracking-tight">LIMS Control Lab</h1>
+        <p class="text-sm text-muted-foreground">Sign in to continue</p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Username Field -->
+        <div class="space-y-1.5">
+          <label for="username" class="text-sm font-medium">Username</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            z-input
+            placeholder="Enter your username"
+            [disabled]="isLoading()"
+            aria-describedby="username-error"
+          />
+          @if (usernameControl.invalid && usernameControl.touched) {
+            <span
+              id="username-error"
+              class="text-xs text-destructive"
+              role="alert"
+            >
+              Username is required
+            </span>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="space-y-1.5">
+          <label for="password" class="text-sm font-medium">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            z-input
+            placeholder="Enter your password"
+            [disabled]="isLoading()"
+            aria-describedby="password-error"
+          />
+          @if (passwordControl.invalid && passwordControl.touched) {
+            <span
+              id="password-error"
+              class="text-xs text-destructive"
+              role="alert"
+            >
+              Password is required
+            </span>
+          }
+        </div>
+
+        <!-- Error Alert -->
+        @if (errorMessage()) {
+          <div
+            class="rounded-md bg-destructive/12 p-3 text-sm text-destructive"
+            role="alert"
+            aria-live="polite"
+          >
+            <strong>Login failed</strong>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          z-button
+          [zLoading]="isLoading()"
+          [zDisabled]="loginForm.invalid || isLoading()"
+          class="w-full"
+        >
+          @if (isLoading()) {
+            Signing in...
+          } @else {
+            Sign In
+          }
+        </button>
+      </form>
+    </z-card-content>
+  </z-card>
+</div>

@@ -1,0 +1,217 @@
+@layer ng-icon, theme, base, components, utilities;
+
+/* Inter — modern, highly legible UI face; degrades to a strong system stack offline. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import './app/shared/core/css/tailwind.css';
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =============================================================================
+   LIMS Control Lab — design system (single source of truth)
+   -----------------------------------------------------------------------------
+   Established as shape.md C18's Tailwind v4 token layer (charter §3b/A1, the
+   Kendo -> Zard reversal). Every feature and the shell consume THESE semantic
+   tokens — never a raw hex/oklch in a component. Two audiences:
+     • shadcn/Zard base tokens (background, primary, muted, border, ...) drive
+       every generated Zard primitive.
+     • Lab status tokens (--success / --warning / --info + the destructive base)
+       give the domain a consistent language for analysis state and tolerance:
+         completed / in-tolerance   -> success (green)
+         on-hold / overdue / due    -> warning (amber)
+         exception / out-of-tolerance / cancelled -> destructive (red)
+         informational / in-progress-> info (blue)  · primary = brand action
+   ============================================================================= */
+
+:root {
+  --radius: 0.625rem;
+
+  /* Neutrals — cool slate, reads as professional software rather than flat gray */
+  --background: oklch(0.985 0.003 247);
+  --foreground: oklch(0.23 0.02 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.23 0.02 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.23 0.02 258);
+
+  /* Brand action colour — deep, trustworthy indigo-blue (distinct from status blue) */
+  --primary: oklch(0.505 0.17 264);
+  --primary-foreground: oklch(0.985 0.002 247);
+
+  --secondary: oklch(0.965 0.006 250);
+  --secondary-foreground: oklch(0.3 0.02 260);
+  --muted: oklch(0.965 0.006 250);
+  --muted-foreground: oklch(0.53 0.02 257);
+  --accent: oklch(0.955 0.014 258);
+  --accent-foreground: oklch(0.3 0.03 264);
+
+  /* Destructive / exception / out-of-tolerance */
+  --destructive: oklch(0.585 0.22 27);
+  --destructive-foreground: oklch(0.985 0.002 247);
+
+  /* Lab status semantics */
+  --success: oklch(0.62 0.15 152);
+  --success-foreground: oklch(0.985 0.002 247);
+  --warning: oklch(0.78 0.15 78);
+  --warning-foreground: oklch(0.32 0.05 70);
+  --info: oklch(0.6 0.13 245);
+  --info-foreground: oklch(0.985 0.002 247);
+
+  --border: oklch(0.915 0.008 255);
+  --input: oklch(0.915 0.008 255);
+  --ring: oklch(0.505 0.17 264);
+
+  /* Charts / data-viz series (BRD §6.8 comparisons) */
+  --chart-1: oklch(0.505 0.17 264);
+  --chart-2: oklch(0.62 0.15 152);
+  --chart-3: oklch(0.78 0.15 78);
+  --chart-4: oklch(0.6 0.13 245);
+  --chart-5: oklch(0.585 0.22 27);
+
+  /* Sidebar / nav chrome */
+  --sidebar: oklch(0.985 0.003 247);
+  --sidebar-foreground: oklch(0.23 0.02 258);
+  --sidebar-primary: oklch(0.505 0.17 264);
+  --sidebar-primary-foreground: oklch(0.985 0.002 247);
+  --sidebar-accent: oklch(0.955 0.014 258);
+  --sidebar-accent-foreground: oklch(0.3 0.03 264);
+  --sidebar-border: oklch(0.915 0.008 255);
+  --sidebar-ring: oklch(0.505 0.17 264);
+}
+
+.dark {
+  --background: oklch(0.2 0.02 260);
+  --foreground: oklch(0.97 0.005 247);
+  --card: oklch(0.245 0.02 260);
+  --card-foreground: oklch(0.97 0.005 247);
+  --popover: oklch(0.245 0.02 260);
+  --popover-foreground: oklch(0.97 0.005 247);
+
+  --primary: oklch(0.68 0.15 264);
+  --primary-foreground: oklch(0.18 0.02 260);
+
+  --secondary: oklch(0.3 0.02 260);
+  --secondary-foreground: oklch(0.97 0.005 247);
+  --muted: oklch(0.3 0.02 260);
+  --muted-foreground: oklch(0.72 0.02 257);
+  --accent: oklch(0.33 0.03 262);
+  --accent-foreground: oklch(0.97 0.005 247);
+
+  --destructive: oklch(0.7 0.19 25);
+  --destructive-foreground: oklch(0.98 0.005 247);
+
+  --success: oklch(0.72 0.15 152);
+  --success-foreground: oklch(0.18 0.03 152);
+  --warning: oklch(0.82 0.15 82);
+  --warning-foreground: oklch(0.28 0.05 70);
+  --info: oklch(0.7 0.13 245);
+  --info-foreground: oklch(0.18 0.03 245);
+
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.68 0.15 264);
+
+  --chart-1: oklch(0.68 0.15 264);
+  --chart-2: oklch(0.72 0.15 152);
+  --chart-3: oklch(0.82 0.15 82);
+  --chart-4: oklch(0.7 0.13 245);
+  --chart-5: oklch(0.7 0.19 25);
+
+  --sidebar: oklch(0.245 0.02 260);
+  --sidebar-foreground: oklch(0.97 0.005 247);
+  --sidebar-primary: oklch(0.68 0.15 264);
+  --sidebar-primary-foreground: oklch(0.18 0.02 260);
+  --sidebar-accent: oklch(0.33 0.03 262);
+  --sidebar-accent-foreground: oklch(0.97 0.005 247);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.68 0.15 264);
+}
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  opacity: 0.4;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: var(--muted);
+}

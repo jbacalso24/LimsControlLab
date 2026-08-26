@@ -1,0 +1,22 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Running pre-commit checks..."
+
+# Run ESLint on staged TypeScript files
+echo "Checking TypeScript files with ESLint..."
+npx eslint --config eslint.config.mjs "src/**/*.ts" --max-warnings 0
+if [ $? -ne 0 ]; then
+  echo "ESLint check failed"
+  exit 1
+fi
+
+# Run TypeScript compiler in check-only mode
+echo "Running TypeScript type check..."
+npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "TypeScript check failed"
+  exit 1
+fi
+
+echo "Pre-commit checks passed!"

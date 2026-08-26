@@ -1,0 +1,114 @@
+<div class="flex h-screen bg-background text-foreground dark:bg-background dark:text-foreground">
+  <!-- Left Sidebar -->
+  <aside
+    class="fixed left-0 top-0 z-30 h-screen w-60 overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:relative lg:translate-x-0"
+    [class.translate-x-0]="isSidebarOpen()"
+    [class.-translate-x-full]="!isSidebarOpen()"
+  >
+    <!-- Brand Block -->
+    <div class="flex items-center gap-3 border-b border-sidebar-border px-6 py-6">
+      <img
+        src="/branding/wilmar-logo.png"
+        alt="Wilmar Sugar Australia"
+        class="h-8 w-auto"
+      />
+      <span class="text-sm font-semibold">LIMS Control Lab</span>
+    </div>
+
+    <!-- Navigation Items -->
+    <nav class="space-y-1 p-4">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-sidebar-accent text-sidebar-primary font-semibold has-left-bar"
+          (click)="closeSidebar()"
+          class="group relative flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium transition-colors hover:bg-sidebar-accent/50"
+        >
+          <span class="absolute left-0 top-0 h-full w-0 bg-primary transition-all group-[.has-left-bar]:w-0.5"></span>
+          <ng-icon [name]="item.icon" class="h-5 w-5 flex-shrink-0" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- Sidebar Overlay Close Button (Mobile) -->
+    <div class="absolute inset-0 lg:hidden" *ngIf="isSidebarOpen()" (click)="closeSidebar()"></div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex flex-1 flex-col overflow-hidden">
+    <!-- Top Bar -->
+    <header
+      class="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md h-14 flex items-center justify-between px-6"
+    >
+      <!-- Left: Mobile Menu Toggle -->
+      <div class="flex items-center gap-4">
+        <button
+          z-button
+          zType="ghost"
+          zSize="sm"
+          (click)="toggleSidebar()"
+          class="lg:hidden"
+          aria-label="Toggle sidebar"
+        >
+          @if (isSidebarOpen()) {
+            <ng-icon name="lucideX" class="h-5 w-5" />
+          } @else {
+            <ng-icon name="lucideMenu" class="h-5 w-5" />
+          }
+        </button>
+      </div>
+
+      <!-- Right: Controls -->
+      <div class="flex items-center gap-4">
+        <!-- Site Chip -->
+        @if (currentUser) {
+          <z-badge zType="secondary" class="inline-flex items-center gap-1">
+            <span>{{ currentUser.site }}</span>
+          </z-badge>
+        }
+
+        <!-- Dark Mode Toggle -->
+        <button
+          z-button
+          zType="ghost"
+          zSize="sm"
+          (click)="toggleDarkMode()"
+          aria-label="Toggle dark mode"
+        >
+          @if (isDarkMode()) {
+            <ng-icon name="lucideSun" class="h-5 w-5" />
+          } @else {
+            <ng-icon name="lucideMoon" class="h-5 w-5" />
+          }
+        </button>
+
+        <!-- User Menu -->
+        @if (currentUser) {
+          <div class="flex items-center gap-2">
+            <div class="text-right">
+              <div class="text-sm font-medium">{{ currentUser.username }}</div>
+              <div class="text-xs text-muted-foreground">{{ currentUser.role }}</div>
+            </div>
+            <button
+              z-button
+              zType="ghost"
+              zSize="sm"
+              (click)="logout()"
+              class="text-destructive hover:bg-destructive/10"
+            >
+              Logout
+            </button>
+          </div>
+        }
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-auto">
+      <div class="mx-auto max-w-screen-2xl px-6 py-6">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
+</div>

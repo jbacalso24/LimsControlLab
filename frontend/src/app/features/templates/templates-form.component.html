@@ -1,0 +1,145 @@
+<div class="lims-templates-form">
+  <h1>{{ isEdit() ? 'Edit Template' : 'Create Template' }}</h1>
+
+  @if (loading()) {
+    <div class="loading-state" role="status" aria-live="polite">
+      <p>Loading template...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state" role="alert" aria-live="assertive">
+      <h2>Error</h2>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label for="name">Name *</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          kendoTextBox
+          placeholder="Enter template name"
+          [disabled]="submitting()"
+          aria-describedby="name-error"
+        />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <span id="name-error" class="error-message">
+            Name is required
+          </span>
+        }
+      </div>
+
+      @if (!isEdit()) {
+        <div class="form-group">
+          <label for="site">Site *</label>
+          <kendo-dropdownlist
+            id="site"
+            formControlName="site"
+            [data]="sites"
+            [valuePrimitive]="true"
+            [defaultItem]="'Select a site'"
+            [disabled]="submitting()"
+            aria-label="Site"
+            aria-describedby="site-error"
+          ></kendo-dropdownlist>
+          @if (form.get('site')?.invalid && form.get('site')?.touched) {
+            <span id="site-error" class="error-message">
+              Site is required
+            </span>
+          }
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="minTolerance">Min Tolerance</label>
+        <input
+          id="minTolerance"
+          type="number"
+          formControlName="minTolerance"
+          kendoTextBox
+          placeholder="Enter minimum tolerance"
+          step="0.01"
+          [disabled]="submitting()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="maxTolerance">Max Tolerance</label>
+        <input
+          id="maxTolerance"
+          type="number"
+          formControlName="maxTolerance"
+          kendoTextBox
+          placeholder="Enter maximum tolerance"
+          step="0.01"
+          [disabled]="submitting()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="testConfiguration">Test Configuration</label>
+        <textarea
+          id="testConfiguration"
+          formControlName="testConfiguration"
+          placeholder="Enter test configuration (JSON)"
+          [disabled]="submitting()"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="validationRules">Validation Rules</label>
+        <textarea
+          id="validationRules"
+          formControlName="validationRules"
+          placeholder="Enter validation rules (JSON)"
+          [disabled]="submitting()"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="calculationDefinitions">Calculation Definitions</label>
+        <textarea
+          id="calculationDefinitions"
+          formControlName="calculationDefinitions"
+          placeholder="Enter calculation definitions (JSON)"
+          [disabled]="submitting()"
+          rows="4"
+        ></textarea>
+      </div>
+
+      @if (submitError()) {
+        <div class="error-alert" role="alert" aria-live="polite">
+          <strong>Submission failed</strong>
+          <p>{{ submitError() }}</p>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          kendoButton
+          themeColor="primary"
+          [disabled]="form.invalid || submitting()"
+        >
+          @if (submitting()) {
+            Saving...
+          } @else {
+            Save Template
+          }
+        </button>
+        <button
+          type="button"
+          kendoButton
+          look="flat"
+          (click)="cancel()"
+          [disabled]="submitting()"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+</div>
