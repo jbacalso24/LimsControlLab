@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
+import { ViewToggleComponent, ViewMode } from '@/shared/ui/view-toggle/view-toggle.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 } from '@ng-icons/lucide';
@@ -33,6 +34,7 @@ import { lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 } from '@ng-ico
     ZardPaginationComponent,
     ...ZardTableImports,
     DetailDialogComponent,
+    ViewToggleComponent,
     NgIcon,
   ],
   templateUrl: './scheduling-list.component.html',
@@ -59,6 +61,23 @@ export class SchedulingListComponent {
     const start = (this.pageIndex() - 1) * this.pageSize;
     return this.schedules().slice(start, start + this.pageSize);
   });
+
+  /** List vs card view, remembered per browser. */
+  viewMode = signal<ViewMode>(this.loadViewMode());
+  private persistViewMode = effect(() => {
+    try {
+      localStorage.setItem('lims-schedules-view', this.viewMode());
+    } catch {
+      // storage unavailable; keep the in-memory choice
+    }
+  });
+  private loadViewMode(): ViewMode {
+    try {
+      return localStorage.getItem('lims-schedules-view') === 'card' ? 'card' : 'list';
+    } catch {
+      return 'list';
+    }
+  }
 
   /** Row selected for the details modal. */
   selectedSchedule = signal<ScheduleDto | null>(null);

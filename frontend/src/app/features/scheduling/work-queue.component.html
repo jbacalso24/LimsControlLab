@@ -34,15 +34,17 @@
       </z-card-content>
     </z-card>
   } @else {
-    @if (isAnalyst()) {
-      <div class="flex justify-end">
+    <div class="flex items-center justify-end gap-3">
+      <lims-view-toggle [(mode)]="viewMode" />
+      @if (isAnalyst()) {
         <a routerLink="/analysis/new-analysis" z-button class="flex-shrink-0">
           <ng-icon name="lucidePlus" class="mr-1 h-4 w-4" />
           New analysis
         </a>
-      </div>
-    }
+      }
+    </div>
 
+    @if (viewMode() === 'card') {
     <div class="grid gap-4 lg:grid-cols-3">
       @for (column of columns(); track column.title) {
         <div class="space-y-3">
@@ -62,7 +64,7 @@
               @for (item of column.items; track item.analysisId) {
                 <a
                   [routerLink]="['/analysis/analysis', item.analysisId]"
-                  class="block rounded-lg border border-border bg-card p-4 transition-[background-color,border-color,box-shadow,transform] duration-150 ease-out hover:border-primary/40 hover:shadow-sm active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  class="interactive-card block rounded-lg border border-border bg-card p-4 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div class="flex items-start justify-between gap-2 mb-2">
                     <div class="flex-1 min-w-0">
@@ -103,5 +105,45 @@
         </div>
       }
     </div>
+    } @else {
+      <div class="overflow-x-auto rounded-lg border border-border">
+        <table z-table>
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Sample</th>
+              <th z-table-head>Template</th>
+              <th z-table-head>Site</th>
+              <th z-table-head>Status</th>
+              <th z-table-head>Started</th>
+              <th z-table-head>Reading</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (item of items(); track item.analysisId) {
+              <tr
+                z-table-row
+                class="interactive-row cursor-pointer hover:bg-muted/50"
+                [routerLink]="['/analysis/analysis', item.analysisId]"
+              >
+                <td z-table-cell>{{ item.sampleIdentifier }}</td>
+                <td z-table-cell>{{ item.templateName }}</td>
+                <td z-table-cell>{{ item.site }}</td>
+                <td z-table-cell>
+                  <lims-status-badge [status]="item.status"></lims-status-badge>
+                </td>
+                <td z-table-cell>{{ item.startedAtUtc | date: 'short' }}</td>
+                <td z-table-cell>
+                  @if (item.readingValue !== null && item.readingValue !== undefined) {
+                    {{ item.readingValue }}{{ item.readingUnit ? ' ' + item.readingUnit : '' }}
+                  } @else {
+                    -
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
 </div>

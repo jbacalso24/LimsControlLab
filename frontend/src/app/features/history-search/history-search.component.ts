@@ -21,6 +21,7 @@ import {
 } from '@/shared/components/table/table.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
+import { ViewToggleComponent, ViewMode } from '@/shared/ui/view-toggle/view-toggle.component';
 import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw } from '@ng-icons/lucide';
@@ -49,6 +50,7 @@ import { lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw } from '@ng-i
     ZardTableCellComponent,
     StatusBadgeComponent,
     DetailDialogComponent,
+    ViewToggleComponent,
     NgIcon,
   ],
   viewProviders: [provideIcons({ lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw })],
@@ -81,6 +83,23 @@ export class HistorySearchComponent {
   /** Row selected for the details modal. */
   selectedItem = signal<SearchResultItemDto | null>(null);
   private datePipe = new DatePipe('en-US');
+
+  /** List vs card view, remembered per browser. */
+  viewMode = signal<ViewMode>(this.loadViewMode());
+  private persistViewMode = effect(() => {
+    try {
+      localStorage.setItem('lims-history-view', this.viewMode());
+    } catch {
+      // storage unavailable; keep the in-memory choice
+    }
+  });
+  private loadViewMode(): ViewMode {
+    try {
+      return localStorage.getItem('lims-history-view') === 'card' ? 'card' : 'list';
+    } catch {
+      return 'list';
+    }
+  }
 
   detailRows(item: SearchResultItemDto): DetailRow[] {
     return [

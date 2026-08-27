@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   CalibrationCurveDto,
@@ -17,6 +17,7 @@ import {
 } from '@/shared/components/card/card.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
+import { ViewToggleComponent, ViewMode } from '@/shared/ui/view-toggle/view-toggle.component';
 import { CalibrationChartComponent } from './calibration-chart.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChartSpline, lucideLock, lucideRefreshCw } from '@ng-icons/lucide';
@@ -37,6 +38,7 @@ import { lucideChartSpline, lucideLock, lucideRefreshCw } from '@ng-icons/lucide
     ZardCardContentComponent,
     ZardButtonComponent,
     ZardPaginationComponent,
+    ViewToggleComponent,
     CalibrationChartComponent,
     NgIcon,
   ],
@@ -45,6 +47,23 @@ import { lucideChartSpline, lucideLock, lucideRefreshCw } from '@ng-icons/lucide
 })
 export class CalibrationCurvesComponent {
   private apiService = inject(CalibrationCurvesApiService);
+
+  /** List (table+chart) vs card grid, remembered per browser. List is the default. */
+  viewMode = signal<ViewMode>(this.loadViewMode());
+  private persistViewMode = effect(() => {
+    try {
+      localStorage.setItem('lims-calibration-view', this.viewMode());
+    } catch {
+      // storage unavailable; keep the in-memory choice
+    }
+  });
+  private loadViewMode(): ViewMode {
+    try {
+      return localStorage.getItem('lims-calibration-view') === 'card' ? 'card' : 'list';
+    } catch {
+      return 'list';
+    }
+  }
 
   loading = signal(false);
   error = signal('');

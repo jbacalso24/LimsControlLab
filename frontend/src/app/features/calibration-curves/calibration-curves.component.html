@@ -65,6 +65,11 @@
 
   <!-- Curves + Chart -->
   @if (!loading() && !forbidden() && !error() && curves().length) {
+    <div class="flex items-center justify-end">
+      <lims-view-toggle [(mode)]="viewMode" />
+    </div>
+
+    @if (viewMode() === 'list') {
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
       <!-- Curve list -->
       <z-card class="lg:col-span-5">
@@ -140,5 +145,49 @@
         }
       </z-card>
     </div>
+    } @else {
+      <!-- Card grid view -->
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        @for (curve of pagedCurves(); track curve.id) {
+          <z-card class="interactive-card cursor-pointer" (click)="selectCurve(curve)">
+            <z-card-content class="space-y-2 py-4">
+              <div class="flex items-start justify-between gap-2">
+                <p class="font-medium">{{ curve.name }}</p>
+                @if (curve.isActive) {
+                  <span class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
+                    <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                    <span>Active</span>
+                  </span>
+                } @else {
+                  <span class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground border border-border">
+                    <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                    <span>Inactive</span>
+                  </span>
+                }
+              </div>
+              <p class="text-xs text-muted-foreground">{{ curve.templateName }} &middot; {{ curve.site }}</p>
+              <p class="text-xs text-muted-foreground">{{ curve.points.length }} points</p>
+            </z-card-content>
+          </z-card>
+        }
+      </div>
+      @if (totalPages() > 1) {
+        <div class="flex justify-end">
+          <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Curves pagination"></z-pagination>
+        </div>
+      }
+
+      @if (selectedCurve(); as curve) {
+        <z-card>
+          <z-card-header>
+            <z-card-title>{{ curve.name }}</z-card-title>
+            <z-card-description>{{ curve.templateName }} &middot; {{ curve.site }} &middot; {{ curve.points.length }} points</z-card-description>
+          </z-card-header>
+          <z-card-content>
+            <lims-calibration-chart [points]="curve.points" [name]="curve.name" />
+          </z-card-content>
+        </z-card>
+      }
+    }
   }
 </div>

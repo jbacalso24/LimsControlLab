@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,6 +11,7 @@ import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
+import { ViewToggleComponent, ViewMode } from '@/shared/ui/view-toggle/view-toggle.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
@@ -41,6 +42,7 @@ import { lucideRefreshCw, lucidePlus, lucidePencil, lucideArchive, lucideAlertCi
     ZardBadgeComponent,
     ZardPaginationComponent,
     DetailDialogComponent,
+    ViewToggleComponent,
     NgIcon,
   ],
   templateUrl: './templates-list.component.html',
@@ -67,6 +69,23 @@ export class TemplatesListComponent {
     const start = (this.pageIndex() - 1) * this.pageSize;
     return this.templates().slice(start, start + this.pageSize);
   });
+
+  /** List vs card view, remembered per browser. */
+  viewMode = signal<ViewMode>(this.loadViewMode());
+  private persistViewMode = effect(() => {
+    try {
+      localStorage.setItem('lims-templates-view', this.viewMode());
+    } catch {
+      // storage unavailable; keep the in-memory choice
+    }
+  });
+  private loadViewMode(): ViewMode {
+    try {
+      return localStorage.getItem('lims-templates-view') === 'card' ? 'card' : 'list';
+    } catch {
+      return 'list';
+    }
+  }
 
   /** Row selected for the details modal. */
   selectedTemplate = signal<AnalysisTemplateDto | null>(null);

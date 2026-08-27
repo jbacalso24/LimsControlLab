@@ -129,79 +129,119 @@
       </z-card-content>
     </z-card>
   } @else if (items().length) {
-    <!-- Results Table -->
+    <!-- Results -->
     <z-card>
       <z-card-header>
-        <z-card-title>Results ({{ totalCount() }})</z-card-title>
+        <div class="flex items-center justify-between gap-3">
+          <z-card-title>Results ({{ totalCount() }})</z-card-title>
+          <lims-view-toggle [(mode)]="viewMode" />
+        </div>
       </z-card-header>
       <z-card-content>
-        <div class="overflow-x-auto">
-          <table z-table>
-            <thead z-table-header>
-              <tr z-table-row>
-                <th z-table-head>Sample Identifier</th>
-                <th z-table-head>Template</th>
-                <th z-table-head>Site</th>
-                <th z-table-head>Test ID</th>
-                <th z-table-head class="text-right">Reading Value</th>
-                <th z-table-head class="text-right">Calibrated</th>
-                <th z-table-head>Captured At</th>
-                <th z-table-head>Status</th>
-                <th z-table-head>Locked</th>
-              </tr>
-            </thead>
-            <tbody z-table-body>
-              @for (item of items(); track item.analysisId) {
-                <tr
-                  z-table-row
-                  class="cursor-pointer hover:bg-muted/50"
-                  (click)="selectedItem.set(item)"
-                  tabindex="0"
-                  role="button"
-                  (keydown.enter)="selectedItem.set(item)"
-                >
-                  <td z-table-cell class="font-medium">{{ item.sampleIdentifier }}</td>
-                  <td z-table-cell>{{ item.templateName }}</td>
-                  <td z-table-cell>{{ item.site }}</td>
-                  <td z-table-cell>{{ item.testId || '-' }}</td>
-                  <td z-table-cell class="text-right tabular-nums">
-                    @if (item.readingValue !== null && item.readingValue !== undefined) {
-                      <span>{{ item.readingValue }} {{ item.readingUnit || '' }}</span>
-                    } @else {
-                      <span class="text-muted-foreground">-</span>
-                    }
-                  </td>
-                  <td z-table-cell class="text-right tabular-nums">
-                    @if (item.calibratedValue !== null && item.calibratedValue !== undefined) {
-                      <span>{{ item.calibratedValue }}</span>
-                    } @else {
-                      <span class="text-muted-foreground">-</span>
-                    }
-                  </td>
-                  <td z-table-cell class="text-sm text-muted-foreground">
-                    {{ item.capturedAtUtc ? (item.capturedAtUtc | date: 'short') : '-' }}
-                  </td>
-                  <td z-table-cell>
-                    <lims-status-badge [status]="item.status" />
-                  </td>
-                  <td z-table-cell>
-                    @if (item.isLocked) {
-                      <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/12 text-destructive border border-destructive/25">
-                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
-                        <span>Yes</span>
-                      </span>
-                    } @else {
-                      <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
-                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
-                        <span>No</span>
-                      </span>
-                    }
-                  </td>
+        @if (viewMode() === 'list') {
+          <!-- List (table) view -->
+          <div class="overflow-x-auto">
+            <table z-table>
+              <thead z-table-header>
+                <tr z-table-row>
+                  <th z-table-head>Sample Identifier</th>
+                  <th z-table-head>Template</th>
+                  <th z-table-head>Site</th>
+                  <th z-table-head>Test ID</th>
+                  <th z-table-head class="text-right">Reading Value</th>
+                  <th z-table-head class="text-right">Calibrated</th>
+                  <th z-table-head>Captured At</th>
+                  <th z-table-head>Status</th>
+                  <th z-table-head>Locked</th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody z-table-body>
+                @for (item of items(); track item.analysisId) {
+                  <tr
+                    z-table-row
+                    class="interactive-row cursor-pointer hover:bg-muted/50"
+                    (click)="selectedItem.set(item)"
+                    tabindex="0"
+                    role="button"
+                    (keydown.enter)="selectedItem.set(item)"
+                  >
+                    <td z-table-cell class="font-medium">{{ item.sampleIdentifier }}</td>
+                    <td z-table-cell>{{ item.templateName }}</td>
+                    <td z-table-cell>{{ item.site }}</td>
+                    <td z-table-cell>{{ item.testId || '-' }}</td>
+                    <td z-table-cell class="text-right tabular-nums">
+                      @if (item.readingValue !== null && item.readingValue !== undefined) {
+                        <span>{{ item.readingValue }} {{ item.readingUnit || '' }}</span>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td z-table-cell class="text-right tabular-nums">
+                      @if (item.calibratedValue !== null && item.calibratedValue !== undefined) {
+                        <span>{{ item.calibratedValue }}</span>
+                      } @else {
+                        <span class="text-muted-foreground">-</span>
+                      }
+                    </td>
+                    <td z-table-cell class="text-sm text-muted-foreground">
+                      {{ item.capturedAtUtc ? (item.capturedAtUtc | date: 'short') : '-' }}
+                    </td>
+                    <td z-table-cell>
+                      <lims-status-badge [status]="item.status" />
+                    </td>
+                    <td z-table-cell>
+                      @if (item.isLocked) {
+                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/12 text-destructive border border-destructive/25">
+                          <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                          <span>Yes</span>
+                        </span>
+                      } @else {
+                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
+                          <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                          <span>No</span>
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <!-- Card (grid) view -->
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            @for (item of items(); track item.analysisId) {
+              <z-card
+                class="interactive-card cursor-pointer"
+                (click)="selectedItem.set(item)"
+                tabindex="0"
+                role="button"
+                (keydown.enter)="selectedItem.set(item)"
+              >
+                <z-card-content class="space-y-2 py-4">
+                  <div class="flex items-start justify-between gap-2">
+                    <p class="font-medium text-foreground">{{ item.sampleIdentifier }}</p>
+                    <lims-status-badge [status]="item.status" />
+                  </div>
+                  <p class="text-xs text-muted-foreground">{{ item.templateName }} &middot; {{ item.site }}</p>
+                  <p class="text-xs text-muted-foreground tabular-nums">
+                    Reading:
+                    @if (item.readingValue !== null && item.readingValue !== undefined) {
+                      {{ item.readingValue }} {{ item.readingUnit || '' }}
+                    } @else {
+                      -
+                    }
+                  </p>
+                  <p class="text-xs text-muted-foreground">
+                    Started {{ item.startedAtUtc ? (item.startedAtUtc | date: 'short') : '-' }}
+                    &middot;
+                    Completed {{ item.completedAtUtc ? (item.completedAtUtc | date: 'short') : '-' }}
+                  </p>
+                </z-card-content>
+              </z-card>
+            }
+          </div>
+        }
 
         <!-- Pagination -->
         @if (totalPages() > 1) {
