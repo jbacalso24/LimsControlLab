@@ -76,7 +76,11 @@
             </thead>
             <tbody z-table-body>
               @for (analysis of pagedAnalyses(); track analysis.id) {
-                <tr z-table-row class="hover:bg-muted/50">
+                <tr
+                  z-table-row
+                  class="cursor-pointer hover:bg-muted/50"
+                  (click)="detailAnalysis.set(analysis)"
+                >
                   <td z-table-cell class="font-medium">{{ analysis.sampleIdentifier }}</td>
                   <td z-table-cell>{{ analysis.templateName }}</td>
                   <td z-table-cell>{{ analysis.site }}</td>
@@ -100,7 +104,7 @@
                   </td>
                   <td z-table-cell>
                     @if (analysis.isLocked && isLabCoordinator()) {
-                      <button z-button zType="outline" zSize="sm" (click)="openUnlockDialog(analysis)" [disabled]="unlocking()" aria-label="Unlock result for sample {{ analysis.sampleId }}">
+                      <button z-button zType="outline" zSize="sm" (click)="$event.stopPropagation(); openUnlockDialog(analysis)" [disabled]="unlocking()" aria-label="Unlock result for sample {{ analysis.sampleId }}">
                         <ng-icon name="lucideLockOpen" class="mr-1 h-3.5 w-3.5" />
                         Unlock
                       </button>
@@ -180,5 +184,26 @@
         </z-card-content>
       </z-card>
     </div>
+  }
+
+  <!-- Row details modal -->
+  @if (detailAnalysis(); as analysis) {
+    <lims-detail-dialog
+      title="Analysis details"
+      [rows]="detailRows(analysis)"
+      (closed)="detailAnalysis.set(null)"
+    >
+      @if (analysis.isLocked && isLabCoordinator()) {
+        <button
+          dialogFooter
+          z-button
+          zType="default"
+          (click)="openUnlockDialog(analysis); detailAnalysis.set(null)"
+        >
+          <ng-icon name="lucideLockOpen" class="h-4 w-4" />
+          Unlock
+        </button>
+      }
+    </lims-detail-dialog>
   }
 </div>

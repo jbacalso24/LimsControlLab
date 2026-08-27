@@ -252,7 +252,14 @@
                 </thead>
                 <tbody z-table-body>
                   @for (reading of pagedReadings(); track reading.id) {
-                    <tr z-table-row>
+                    <tr
+                      z-table-row
+                      class="cursor-pointer hover:bg-muted/50"
+                      (click)="selectedReading.set(reading)"
+                      tabindex="0"
+                      role="button"
+                      (keydown.enter)="selectedReading.set(reading)"
+                    >
                       <td z-table-cell>{{ testName(reading.testId) }}</td>
                       <td z-table-cell class="text-right tabular-nums">{{ reading.value }} {{ reading.unit }}</td>
                       <td z-table-cell class="text-sm text-muted-foreground">-</td>
@@ -411,6 +418,15 @@
             Reload
           </button>
         </ng-template>
+      }
+
+      <!-- Reading details modal -->
+      @if (selectedReading(); as reading) {
+        <lims-detail-dialog
+          title="Reading details"
+          [rows]="detailRows(reading)"
+          (closed)="selectedReading.set(null)"
+        />
       }
     </div>
   }

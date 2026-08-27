@@ -20,7 +20,9 @@ import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { ZardSelectImports } from '@/shared/components/select/select.imports';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideLock,
@@ -52,6 +54,7 @@ type StatusFilter = 'All' | 'Pending' | 'Success' | 'Failed';
     ZardCardContentComponent,
     ZardPaginationComponent,
     ZardSelectImports,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './integration-monitoring.component.html',
@@ -92,6 +95,22 @@ export class IntegrationMonitoringComponent {
   failedCount = computed(() => this.logs().filter((log) => log.status === 'Failed').length);
   pendingCount = computed(() => this.logs().filter((log) => log.status === 'Pending').length);
   successCount = computed(() => this.logs().filter((log) => log.status === 'Success').length);
+
+  /** Row selected for the details modal. */
+  selectedLog = signal<IntegrationLogDto | null>(null);
+  private datePipe = new DatePipe('en-US');
+
+  detailRows(log: IntegrationLogDto): DetailRow[] {
+    return [
+      { label: 'Target system', value: log.targetSystem },
+      { label: 'Analysis', value: '#' + log.analysisId },
+      { label: 'Status', value: log.status },
+      { label: 'Attempted', value: this.datePipe.transform(log.attemptedAtUtc, 'medium') },
+      { label: 'Completed', value: log.completedAtUtc ? this.datePipe.transform(log.completedAtUtc, 'medium') : '-' },
+      { label: 'Retries', value: log.retryCount },
+      { label: 'Error', value: log.errorMessage, full: true, pre: true },
+    ];
+  }
 
   ngOnInit(): void {
     this.loadLogs();

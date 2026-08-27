@@ -101,7 +101,14 @@
             </thead>
             <tbody z-table-body>
               @for (log of items(); track log.id) {
-                <tr z-table-row class="hover:bg-muted/50">
+                <tr
+                  z-table-row
+                  class="cursor-pointer hover:bg-muted/50"
+                  (click)="selectedEntry.set(log)"
+                  tabindex="0"
+                  role="button"
+                  (keydown.enter)="selectedEntry.set(log)"
+                >
                   <td z-table-cell class="text-sm whitespace-nowrap">{{ log.timestampUtc | date: 'medium' }}</td>
                   <td z-table-cell class="font-medium">{{ log.username }}</td>
                   <td z-table-cell class="text-sm">{{ log.role }}</td>
@@ -129,5 +136,14 @@
         }
       </z-card-content>
     </z-card>
+  }
+
+  <!-- Row details modal -->
+  @if (selectedEntry(); as log) {
+    <lims-detail-dialog
+      title="Audit entry"
+      [rows]="detailRows(log)"
+      (closed)="selectedEntry.set(null)"
+    />
   }
 </div>

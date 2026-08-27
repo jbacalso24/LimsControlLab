@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
@@ -12,6 +12,7 @@ import { SchedulingApiService } from './services/scheduling-api.service';
 import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 } from '@ng-icons/lucide';
@@ -31,6 +32,7 @@ import { lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 } from '@ng-ico
     ZardSpinnerComponent,
     ZardPaginationComponent,
     ...ZardTableImports,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './scheduling-list.component.html',
@@ -42,6 +44,8 @@ export class SchedulingListComponent {
   private currentUserService = inject(CurrentUserService);
   private dialog = inject(ZardDialogService);
   private toast = inject(ToastService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loading = signal(false);
   error = signal('');
@@ -55,6 +59,25 @@ export class SchedulingListComponent {
     const start = (this.pageIndex() - 1) * this.pageSize;
     return this.schedules().slice(start, start + this.pageSize);
   });
+
+  /** Row selected for the details modal. */
+  selectedSchedule = signal<ScheduleDto | null>(null);
+
+  detailRows(schedule: ScheduleDto): DetailRow[] {
+    return [
+      { label: 'Name', value: schedule.name },
+      { label: 'Site', value: schedule.site },
+      { label: 'Analysis Type', value: schedule.analysisType },
+      { label: 'Shift Pattern', value: schedule.shiftPattern },
+      { label: 'Recurrence', value: schedule.recurrencePattern },
+      { label: 'Exclusion rules', value: schedule.exclusionRules, full: true },
+      { label: 'Assigned', value: schedule.assignedToUserId ? 'User #' + schedule.assignedToUserId : 'Unassigned' },
+    ];
+  }
+
+  editSchedule(schedule: ScheduleDto): void {
+    this.router.navigate(['.', schedule.id, 'edit'], { relativeTo: this.route });
+  }
 
   ngOnInit(): void {
     this.loadSchedules();

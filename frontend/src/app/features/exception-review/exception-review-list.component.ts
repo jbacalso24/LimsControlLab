@@ -18,7 +18,9 @@ import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, ZardCardContentComponent } from '@/shared/components/card/card.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle, lucideLock, lucideCircleCheck, lucideRefreshCw, lucideLockOpen, lucideX } from '@ng-icons/lucide';
 
@@ -45,6 +47,7 @@ import { lucideAlertCircle, lucideLock, lucideCircleCheck, lucideRefreshCw, luci
     ZardCardContentComponent,
     ZardPaginationComponent,
     StatusBadgeComponent,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './exception-review-list.component.html',
@@ -75,7 +78,23 @@ export class ExceptionReviewListComponent {
   staleRowVersionError = signal(false);
   selectedAnalysis = signal<ResultReviewDto | null>(null);
 
+  /** Row selected for the read-only details modal (separate from the unlock flow's selectedAnalysis). */
+  detailAnalysis = signal<ResultReviewDto | null>(null);
+  private datePipe = new DatePipe('en-US');
+
   unlockForm = this.createUnlockForm();
+
+  detailRows(analysis: ResultReviewDto): DetailRow[] {
+    return [
+      { label: 'Sample', value: analysis.sampleIdentifier },
+      { label: 'Template', value: analysis.templateName },
+      { label: 'Site', value: analysis.site },
+      { label: 'Status', value: analysis.status },
+      { label: 'Started', value: this.datePipe.transform(analysis.startedAtUtc, 'medium') },
+      { label: 'Completed', value: this.datePipe.transform(analysis.completedAtUtc, 'medium') },
+      { label: 'Locked', value: analysis.isLocked ? 'Locked' : 'Unlocked' },
+    ];
+  }
 
   ngOnInit(): void {
     this.loadAnalyses();

@@ -83,7 +83,11 @@
             </thead>
             <tbody z-table-body>
               @for (schedule of pagedSchedules(); track schedule.id) {
-                <tr z-table-row>
+                <tr
+                  z-table-row
+                  class="cursor-pointer hover:bg-muted/50"
+                  (click)="selectedSchedule.set(schedule)"
+                >
                   <td z-table-cell class="font-medium">{{ schedule.name }}</td>
                   <td z-table-cell>{{ schedule.site }}</td>
                   <td z-table-cell>{{ schedule.analysisType || 'N/A' }}</td>
@@ -112,11 +116,11 @@
                   @if (isLabCoordinator()) {
                     <td z-table-cell>
                       <div class="flex items-center gap-2">
-                        <a [routerLink]="['.', schedule.id, 'edit']" z-button zType="outline" zSize="sm" aria-label="Edit schedule">
+                        <a [routerLink]="['.', schedule.id, 'edit']" (click)="$event.stopPropagation()" z-button zType="outline" zSize="sm" aria-label="Edit schedule">
                           <ng-icon name="lucidePencil" class="mr-1 h-3.5 w-3.5" />
                           Edit
                         </a>
-                        <button z-button zType="outline" zSize="sm" (click)="delete(schedule)" [disabled]="deleting()" aria-label="Delete schedule">
+                        <button z-button zType="outline" zSize="sm" (click)="$event.stopPropagation(); delete(schedule)" [disabled]="deleting()" aria-label="Delete schedule">
                           <ng-icon name="lucideTrash2" class="mr-1 h-3.5 w-3.5" />
                           Delete
                         </button>
@@ -137,5 +141,36 @@
         }
       </z-card-content>
     </z-card>
+  }
+
+  <!-- Row details modal -->
+  @if (selectedSchedule(); as schedule) {
+    <lims-detail-dialog
+      title="Schedule details"
+      [rows]="detailRows(schedule)"
+      (closed)="selectedSchedule.set(null)"
+    >
+      @if (isLabCoordinator()) {
+        <div dialogFooter class="contents">
+          <button
+            z-button
+            zType="outline"
+            (click)="editSchedule(schedule); selectedSchedule.set(null)"
+          >
+            <ng-icon name="lucidePencil" class="h-4 w-4" />
+            Edit
+          </button>
+          <button
+            z-button
+            zType="destructive"
+            [disabled]="deleting()"
+            (click)="delete(schedule); selectedSchedule.set(null)"
+          >
+            <ng-icon name="lucideTrash2" class="h-4 w-4" />
+            Delete
+          </button>
+        </div>
+      }
+    </lims-detail-dialog>
   }
 </div>

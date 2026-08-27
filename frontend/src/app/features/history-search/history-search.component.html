@@ -152,7 +152,14 @@
             </thead>
             <tbody z-table-body>
               @for (item of items(); track item.analysisId) {
-                <tr z-table-row class="hover:bg-muted/50">
+                <tr
+                  z-table-row
+                  class="cursor-pointer hover:bg-muted/50"
+                  (click)="selectedItem.set(item)"
+                  tabindex="0"
+                  role="button"
+                  (keydown.enter)="selectedItem.set(item)"
+                >
                   <td z-table-cell class="font-medium">{{ item.sampleIdentifier }}</td>
                   <td z-table-cell>{{ item.templateName }}</td>
                   <td z-table-cell>{{ item.site }}</td>
@@ -209,5 +216,14 @@
         }
       </z-card-content>
     </z-card>
+  }
+
+  <!-- Row details modal -->
+  @if (selectedItem(); as item) {
+    <lims-detail-dialog
+      title="Result details"
+      [rows]="detailRows(item)"
+      (closed)="selectedItem.set(null)"
+    />
   }
 </div>

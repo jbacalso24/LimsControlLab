@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto, TestDefinitionDto } from './services/analysis-execution-api.service';
+import { AnalysisExecutionApiService, AnalysisDetailDto, ExceptionDto, InstrumentDto, ReadingDto, TestDefinitionDto } from './services/analysis-execution-api.service';
 import { StatusChangeRequest } from '../../shared/generated/models/status-change-request';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -21,7 +21,9 @@ import { ZardAlertComponent } from '@/shared/components/alert';
 import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAlertCircle,
@@ -56,6 +58,7 @@ import {
     StatusBadgeComponent,
     ...ZardTableImports,
     ZardPaginationComponent,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './analysis-execution.component.html',
@@ -183,6 +186,24 @@ export class AnalysisExecutionComponent implements OnInit {
   testName(testId: string | number): string {
     const test = this.availableTests().find((t) => t.id.toString() === testId.toString());
     return test ? test.name : testId.toString();
+  }
+
+  /** Row selected for the readings details modal. */
+  selectedReading = signal<ReadingDto | null>(null);
+  private datePipe = new DatePipe('en-US');
+
+  detailRows(reading: ReadingDto): DetailRow[] {
+    return [
+      { label: 'Test', value: this.testName(reading.testId) },
+      { label: 'Value', value: reading.value },
+      { label: 'Unit', value: reading.unit },
+      { label: 'Calibrated', value: (reading as { calibratedValue?: number | string }).calibratedValue ?? null },
+      { label: 'Captured by', value: reading.capturedByUsername },
+      { label: 'Captured at', value: this.datePipe.transform(reading.capturedAtUtc, 'medium') },
+      { label: 'Status', value: reading.validationResult.isValid ? 'Valid' : 'Out of tolerance' },
+      { label: 'Expected range', value: reading.validationResult.expectedRange },
+      { label: 'Reason', value: reading.validationResult.reason, full: true },
+    ];
   }
 
   ngOnInit(): void {

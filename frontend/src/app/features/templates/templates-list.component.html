@@ -64,9 +64,13 @@
               </thead>
               <tbody z-table-body>
                 @for (template of pagedTemplates(); track template.id) {
-                  <tr z-table-row>
+                  <tr
+                    z-table-row
+                    class="cursor-pointer hover:bg-muted/50"
+                    (click)="selectedTemplate.set(template)"
+                  >
                     <td z-table-cell>
-                      <a [routerLink]="['.', template.id, 'edit']" class="text-primary hover:underline">
+                      <a [routerLink]="['.', template.id, 'edit']" (click)="$event.stopPropagation()" class="text-primary hover:underline">
                         {{ template.name }}
                       </a>
                     </td>
@@ -91,11 +95,11 @@
                       <td z-table-cell>
                         <div class="flex gap-2">
                           @if (!template.isRetired) {
-                            <a [routerLink]="['.', template.id, 'edit']" z-button zType="ghost" zSize="sm" aria-label="Edit template">
+                            <a [routerLink]="['.', template.id, 'edit']" (click)="$event.stopPropagation()" z-button zType="ghost" zSize="sm" aria-label="Edit template">
                               <ng-icon name="lucidePencil" class="mr-1 h-3.5 w-3.5" />
                               Edit
                             </a>
-                            <button z-button zType="ghost" zSize="sm" (click)="retire(template)" [disabled]="retiring()" aria-label="Retire template">
+                            <button z-button zType="ghost" zSize="sm" (click)="$event.stopPropagation(); retire(template)" [disabled]="retiring()" aria-label="Retire template">
                               <ng-icon name="lucideArchive" class="mr-1 h-3.5 w-3.5" />
                               Retire
                             </button>
@@ -116,5 +120,36 @@
         </z-card-content>
       </z-card>
     </div>
+  }
+
+  <!-- Row details modal -->
+  @if (selectedTemplate(); as template) {
+    <lims-detail-dialog
+      title="Template details"
+      [rows]="detailRows(template)"
+      (closed)="selectedTemplate.set(null)"
+    >
+      @if (isLabCoordinator() && !template.isRetired) {
+        <div dialogFooter class="contents">
+          <button
+            z-button
+            zType="outline"
+            (click)="editTemplate(template); selectedTemplate.set(null)"
+          >
+            <ng-icon name="lucidePencil" class="h-4 w-4" />
+            Edit
+          </button>
+          <button
+            z-button
+            zType="outline"
+            [disabled]="retiring()"
+            (click)="retire(template); selectedTemplate.set(null)"
+          >
+            <ng-icon name="lucideArchive" class="h-4 w-4" />
+            Retire
+          </button>
+        </div>
+      }
+    </lims-detail-dialog>
   }
 </div>

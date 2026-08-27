@@ -39,47 +39,47 @@
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <!-- Failed: needs attention -->
       <z-card [ngClass]="failedCount() > 0 ? 'ring-1 ring-destructive/30' : ''">
-        <z-card-content class="flex items-start gap-3 py-4">
-          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-destructive/12 text-destructive">
-            <ng-icon name="lucideCircleAlert" class="h-4 w-4" />
-          </span>
-          <div class="min-w-0">
-            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Failed</p>
-            <p class="text-2xl font-semibold tabular-nums text-destructive">{{ failedCount() }}</p>
-            <p class="mt-0.5 text-xs text-muted-foreground">
-              {{ failedCount() > 0 ? 'Need attention. Reprocess to retry the transmission.' : 'No failed transmissions.' }}
-            </p>
+        <z-card-content class="py-4">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Failed</span>
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-destructive/12 text-destructive">
+              <ng-icon name="lucideCircleAlert" class="h-4 w-4" />
+            </span>
           </div>
+          <p class="mt-3 text-3xl font-semibold tabular-nums leading-none text-destructive">{{ failedCount() }}</p>
+          <p class="mt-2 text-xs leading-snug text-muted-foreground">
+            {{ failedCount() > 0 ? 'Need attention. Reprocess to retry the transmission.' : 'No failed transmissions.' }}
+          </p>
         </z-card-content>
       </z-card>
 
       <!-- Pending: in flight -->
       <z-card>
-        <z-card-content class="flex items-start gap-3 py-4">
-          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-warning/15 text-warning-foreground dark:text-warning">
-            <ng-icon name="lucideClock" class="h-4 w-4" />
-          </span>
-          <div class="min-w-0">
-            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pending</p>
-            <p class="text-2xl font-semibold tabular-nums text-warning-foreground dark:text-warning">{{ pendingCount() }}</p>
-            <p class="mt-0.5 text-xs text-muted-foreground">
-              {{ pendingCount() > 0 ? 'In flight, awaiting confirmation from the target system.' : 'Nothing awaiting confirmation.' }}
-            </p>
+        <z-card-content class="py-4">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pending</span>
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-warning/15 text-warning-foreground dark:text-warning">
+              <ng-icon name="lucideClock" class="h-4 w-4" />
+            </span>
           </div>
+          <p class="mt-3 text-3xl font-semibold tabular-nums leading-none text-warning-foreground dark:text-warning">{{ pendingCount() }}</p>
+          <p class="mt-2 text-xs leading-snug text-muted-foreground">
+            {{ pendingCount() > 0 ? 'In flight, awaiting confirmation from the target system.' : 'Nothing awaiting confirmation.' }}
+          </p>
         </z-card-content>
       </z-card>
 
       <!-- Success: delivered -->
       <z-card>
-        <z-card-content class="flex items-start gap-3 py-4">
-          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success/12 text-success">
-            <ng-icon name="lucideCircleCheck" class="h-4 w-4" />
-          </span>
-          <div class="min-w-0">
-            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivered</p>
-            <p class="text-2xl font-semibold tabular-nums text-success">{{ successCount() }}</p>
-            <p class="mt-0.5 text-xs text-muted-foreground">Confirmed by Databank, SCADA or the Data Lakehouse.</p>
+        <z-card-content class="py-4">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivered</span>
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-success/12 text-success">
+              <ng-icon name="lucideCircleCheck" class="h-4 w-4" />
+            </span>
           </div>
+          <p class="mt-3 text-3xl font-semibold tabular-nums leading-none text-success">{{ successCount() }}</p>
+          <p class="mt-2 text-xs leading-snug text-muted-foreground">Confirmed by Databank, SCADA or the Data Lakehouse.</p>
         </z-card-content>
       </z-card>
     </div>
@@ -148,7 +148,11 @@
             </thead>
             <tbody z-table-body>
               @for (log of pagedLogs(); track log.id) {
-                <tr z-table-row class="hover:bg-muted/50">
+                <tr
+                  z-table-row
+                  class="cursor-pointer hover:bg-muted/50"
+                  (click)="selectedLog.set(log)"
+                >
                   <td z-table-cell class="font-medium">{{ log.targetSystem }}</td>
                   <td z-table-cell>#{{ log.analysisId }}</td>
                   <td z-table-cell>
@@ -182,7 +186,7 @@
                         zSize="sm"
                         [zLoading]="isReprocessing(log.id)"
                         [disabled]="isReprocessing(log.id)"
-                        (click)="reprocess(log)"
+                        (click)="$event.stopPropagation(); reprocess(log)"
                         aria-label="Reprocess integration attempt for analysis {{ log.analysisId }}"
                       >
                         <ng-icon name="lucideRefreshCw" class="h-3.5 w-3.5" />
@@ -202,5 +206,28 @@
         }
       </z-card-content>
     </z-card>
+  }
+
+  <!-- Row details modal -->
+  @if (selectedLog(); as log) {
+    <lims-detail-dialog
+      title="Integration attempt"
+      [rows]="detailRows(log)"
+      (closed)="selectedLog.set(null)"
+    >
+      @if (log.status === 'Failed' && isLabCoordinator()) {
+        <button
+          dialogFooter
+          z-button
+          zType="default"
+          [zLoading]="isReprocessing(log.id)"
+          [disabled]="isReprocessing(log.id)"
+          (click)="reprocess(log); selectedLog.set(null)"
+        >
+          <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+          Reprocess
+        </button>
+      }
+    </lims-detail-dialog>
   }
 </div>

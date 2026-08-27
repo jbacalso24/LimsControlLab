@@ -65,14 +65,12 @@
               >{{ currentUser.role }} · {{ currentUser.site }}</span
             >
           </span>
-          <ng-icon
-            name="lucideChevronsUpDown"
-            class="h-4 w-4 shrink-0 text-muted-foreground"
-            [ngClass]="{ 'lg:hidden': collapsed() }"
-          />
+          <span class="shrink-0" [ngClass]="{ 'lg:hidden': collapsed() }">
+            <ng-icon name="lucideChevronsUpDown" class="h-4 w-4 text-muted-foreground" />
+          </span>
         </button>
 
-        <z-dropdown-menu-content #accountMenu zSide="top" zAlign="start" class="w-56">
+        <z-dropdown-menu-content #accountMenu zSide="top" zAlign="start" class="w-(--z-dropdown-menu-trigger-width) min-w-52">
           <div class="px-2 py-1.5">
             <p class="truncate text-sm font-medium">{{ currentUser.username }}</p>
             <p class="truncate text-xs text-muted-foreground">{{ currentUser.role }} · {{ currentUser.site }}</p>
@@ -138,7 +136,7 @@
     </header>
 
     <main class="min-h-0 flex-1 overflow-auto">
-      <div class="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6">
+      <div class="mx-auto max-w-screen-2xl px-4 pt-4 pb-8 sm:px-6">
         <router-outlet />
       </div>
     </main>

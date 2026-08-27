@@ -10,10 +10,12 @@ import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideRefreshCw, lucidePlus, lucidePencil, lucideArchive, lucideAlertCircle } from '@ng-icons/lucide';
 
@@ -38,6 +40,7 @@ import { lucideRefreshCw, lucidePlus, lucidePencil, lucideArchive, lucideAlertCi
     ZardEmptyComponent,
     ZardBadgeComponent,
     ZardPaginationComponent,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './templates-list.component.html',
@@ -49,6 +52,8 @@ export class TemplatesListComponent {
   private currentUserService = inject(CurrentUserService);
   private dialog = inject(ZardDialogService);
   private toast = inject(ToastService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loading = signal(false);
   error = signal('');
@@ -62,6 +67,26 @@ export class TemplatesListComponent {
     const start = (this.pageIndex() - 1) * this.pageSize;
     return this.templates().slice(start, start + this.pageSize);
   });
+
+  /** Row selected for the details modal. */
+  selectedTemplate = signal<AnalysisTemplateDto | null>(null);
+
+  detailRows(template: AnalysisTemplateDto): DetailRow[] {
+    return [
+      { label: 'Name', value: template.name },
+      { label: 'Site', value: template.site },
+      { label: 'Version', value: template.version },
+      { label: 'Min Tolerance', value: template.minTolerance },
+      { label: 'Max Tolerance', value: template.maxTolerance },
+      { label: 'Status', value: template.isRetired ? 'Retired' : 'Active' },
+      { label: 'Validation rules', value: template.validationRules, full: true, pre: true },
+      { label: 'Calculation definitions', value: template.calculationDefinitions, full: true, pre: true },
+    ];
+  }
+
+  editTemplate(template: AnalysisTemplateDto): void {
+    this.router.navigate(['.', template.id, 'edit'], { relativeTo: this.route });
+  }
 
   ngOnInit(): void {
     this.loadTemplates();

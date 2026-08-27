@@ -20,6 +20,8 @@ import {
   ZardTableCellComponent,
 } from '@/shared/components/table/table.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
+import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw } from '@ng-icons/lucide';
 
@@ -46,6 +48,7 @@ import { lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw } from '@ng-i
     ZardTableHeadComponent,
     ZardTableCellComponent,
     StatusBadgeComponent,
+    DetailDialogComponent,
     NgIcon,
   ],
   viewProviders: [provideIcons({ lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw })],
@@ -74,6 +77,27 @@ export class HistorySearchComponent {
   currentPageIndex = signal(1);
 
   totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize));
+
+  /** Row selected for the details modal. */
+  selectedItem = signal<SearchResultItemDto | null>(null);
+  private datePipe = new DatePipe('en-US');
+
+  detailRows(item: SearchResultItemDto): DetailRow[] {
+    return [
+      { label: 'Sample', value: item.sampleIdentifier },
+      { label: 'Template', value: item.templateName },
+      { label: 'Site', value: item.site },
+      { label: 'Test ID', value: item.testId },
+      { label: 'Status', value: item.status },
+      { label: 'Reading value', value: item.readingValue != null ? `${item.readingValue} ${item.readingUnit || ''}`.trim() : null },
+      { label: 'Calibrated', value: item.calibratedValue },
+      { label: 'Locked', value: item.isLocked ? 'Yes' : 'No' },
+      { label: 'Started', value: this.datePipe.transform(item.startedAtUtc, 'medium') },
+      { label: 'Completed', value: this.datePipe.transform(item.completedAtUtc, 'medium') },
+      { label: 'Captured at', value: this.datePipe.transform(item.capturedAtUtc, 'medium') },
+      { label: 'Validation', value: item.validationResult, full: true, pre: true },
+    ];
+  }
 
   private isInitialized = signal(false);
   private skipPageChangeEffect = signal(false);

@@ -47,13 +47,17 @@
                   </thead>
                   <tbody z-table-body>
                     @for (row of pagedPickerSamples(); track row.sampleId) {
-                      <tr z-table-row class="hover:bg-muted/50">
+                      <tr
+                        z-table-row
+                        class="cursor-pointer hover:bg-muted/50"
+                        (click)="selectedPickerSample.set(row)"
+                      >
                         <td z-table-cell class="font-medium">{{ row.identifier }}</td>
                         <td z-table-cell>{{ row.templateName }}</td>
                         <td z-table-cell>{{ row.site }}</td>
                         <td z-table-cell><lims-status-badge [status]="row.status" /></td>
                         <td z-table-cell class="text-right">
-                          <button z-button zType="outline" zSize="sm" (click)="openSample(row.sampleId)" [attr.aria-label]="'Transfer sample ' + row.identifier">
+                          <button z-button zType="outline" zSize="sm" (click)="$event.stopPropagation(); openSample(row.sampleId)" [attr.aria-label]="'Transfer sample ' + row.identifier">
                             <ng-icon name="lucideArrowLeftRight" class="h-4 w-4" />
                             Transfer
                           </button>
@@ -77,6 +81,25 @@
             }
           </z-card-content>
         </z-card>
+      }
+
+      <!-- Row details modal -->
+      @if (selectedPickerSample(); as row) {
+        <lims-detail-dialog
+          title="Sample details"
+          [rows]="detailRows(row)"
+          (closed)="selectedPickerSample.set(null)"
+        >
+          <button
+            dialogFooter
+            z-button
+            zType="default"
+            (click)="openSample(row.sampleId); selectedPickerSample.set(null)"
+          >
+            <ng-icon name="lucideArrowLeftRight" class="h-4 w-4" />
+            Transfer
+          </button>
+        </lims-detail-dialog>
       }
     </div>
   } @else {

@@ -16,6 +16,8 @@ import { ZardPaginationComponent } from '@/shared/components/pagination/paginati
 import { ZardSelectComponent } from '@/shared/components/select/select.component';
 import { ZardSelectItemComponent } from '@/shared/components/select/select-item.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
+import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideAlertCircle, lucideLock, lucideHistory, lucideRefreshCw } from '@ng-icons/lucide';
 
@@ -37,6 +39,7 @@ const ACTIONS = ['Create', 'Update', 'Delete', 'Unlock', 'Login'];
     ZardSelectComponent,
     ZardSelectItemComponent,
     ZardButtonComponent,
+    DetailDialogComponent,
     NgIcon,
   ],
   templateUrl: './audit-trail.component.html',
@@ -60,6 +63,23 @@ export class AuditTrailComponent {
 
   entityTypeFilter = signal('');
   actionFilter = signal('');
+
+  /** Row selected for the details modal. */
+  selectedEntry = signal<AuditLogDto | null>(null);
+  private datePipe = new DatePipe('en-US');
+
+  detailRows(log: AuditLogDto): DetailRow[] {
+    return [
+      { label: 'When', value: this.datePipe.transform(log.timestampUtc, 'medium') },
+      { label: 'User', value: log.username },
+      { label: 'Role', value: log.role },
+      { label: 'Action', value: log.action },
+      { label: 'Entity', value: this.entityLabel(log) },
+      { label: 'Correlation ID', value: log.correlationId },
+      { label: 'Before', value: log.beforeValues, full: true, pre: true },
+      { label: 'After', value: log.afterValues, full: true, pre: true },
+    ];
+  }
 
   ngOnInit(): void {
     this.loadAuditLogs();

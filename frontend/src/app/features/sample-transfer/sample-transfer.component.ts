@@ -19,6 +19,7 @@ import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
+import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { SampleTransferApiService } from './services/sample-transfer-api.service';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
@@ -55,6 +56,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
     StatusBadgeComponent,
     ...ZardTableImports,
     ZardPaginationComponent,
+    DetailDialogComponent,
   ],
   templateUrl: './sample-transfer.component.html',
   styleUrl: './sample-transfer.component.scss',
@@ -159,6 +161,18 @@ export class SampleTransferComponent implements OnInit {
 
   openSample(sampleId: number): void {
     this.router.navigate(['/analysis/sample-transfer', sampleId]);
+  }
+
+  /** Row selected for the picker details modal. */
+  selectedPickerSample = signal<PickerSample | null>(null);
+
+  detailRows(row: PickerSample): DetailRow[] {
+    return [
+      { label: 'Sample', value: row.identifier },
+      { label: 'Template', value: row.templateName },
+      { label: 'Site', value: row.site },
+      { label: 'Status', value: row.status },
+    ];
   }
 
   onPickerFilter(value: string): void {
