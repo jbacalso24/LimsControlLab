@@ -18,6 +18,8 @@ import {
   lucideUserRound,
   lucideDatabase,
   lucideChartSpline,
+  lucideScrollText,
+  lucideRadioTower,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
@@ -59,6 +61,8 @@ import { environment } from '../../../../environments/environment';
       lucideUserRound,
       lucideDatabase,
       lucideChartSpline,
+      lucideScrollText,
+      lucideRadioTower,
     }),
   ],
 })
@@ -103,6 +107,16 @@ export class AuthenticatedLayout {
       label: 'Sample Transfer',
       route: '/analysis/sample-transfer',
       icon: 'lucideArrowLeftRight',
+    },
+    {
+      label: 'Integration Monitoring',
+      route: '/analysis/integration-monitoring',
+      icon: 'lucideRadioTower',
+    },
+    {
+      label: 'Audit Trail',
+      route: '/analysis/audit-trail',
+      icon: 'lucideScrollText',
     },
   ];
 

@@ -1,0 +1,138 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Audit Trail</h1>
+      <p class="text-sm text-muted-foreground">Review the recorded history of changes</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
+    <div class="space-y-1.5 sm:w-56">
+      <label for="entityType" class="text-sm font-medium">Entity type</label>
+      <z-select
+        id="entityType"
+        zPlaceholder="All entity types"
+        [zValue]="entityTypeFilter()"
+        (zSelectionChange)="onEntityTypeChange($event)"
+      >
+        <z-select-item [zValue]="''">All entity types</z-select-item>
+        @for (entityType of entityTypes; track entityType) {
+          <z-select-item [zValue]="entityType">{{ entityType }}</z-select-item>
+        }
+      </z-select>
+    </div>
+    <div class="space-y-1.5 sm:w-56">
+      <label for="action" class="text-sm font-medium">Action</label>
+      <z-select
+        id="action"
+        zPlaceholder="All actions"
+        [zValue]="actionFilter()"
+        (zSelectionChange)="onActionChange($event)"
+      >
+        <z-select-item [zValue]="''">All actions</z-select-item>
+        @for (action of actions; track action) {
+          <z-select-item [zValue]="action">{{ action }}</z-select-item>
+        }
+      </z-select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
+    </div>
+  }
+
+  <!-- Coordinator-only access state (403) -->
+  @if (!loading() && forbidden()) {
+    <z-card>
+      <z-card-content class="py-12">
+        <div class="mx-auto flex max-w-md flex-col items-center text-center">
+          <div class="mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
+            <ng-icon name="lucideLock" class="h-6 w-6" />
+          </div>
+          <h2 class="mb-1 text-base font-semibold">Coordinator access required</h2>
+          <p class="text-sm text-muted-foreground">
+            Viewing the audit trail is a Lab Coordinator task. Sign in with a coordinator account
+            to review the recorded history of changes.
+          </p>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Error State -->
+  @if (!loading() && !forbidden() && error()) {
+    <z-alert
+      zType="destructive"
+      class="border-destructive/50 bg-destructive/10"
+      zTitle="Error loading audit trail"
+      [zDescription]="error()"
+    />
+    <button z-button zType="outline" (click)="reload()">Retry</button>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !forbidden() && !error() && !items().length) {
+    <z-card>
+      <z-card-content class="py-12">
+        <z-empty
+          zIcon="lucideHistory"
+          [zTitle]="'No audit entries'"
+          [zDescription]="'No audit entries match your filters.'"
+        />
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Audit Log Table -->
+  @if (!loading() && !forbidden() && !error() && items().length) {
+    <z-card>
+      <z-card-content>
+        <div class="overflow-x-auto">
+          <table z-table>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>When</th>
+                <th z-table-head>User</th>
+                <th z-table-head>Role</th>
+                <th z-table-head>Action</th>
+                <th z-table-head>Entity</th>
+                <th z-table-head>Changes</th>
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @for (log of items(); track log.id) {
+                <tr z-table-row class="hover:bg-muted/50">
+                  <td z-table-cell class="text-sm whitespace-nowrap">{{ log.timestampUtc | date: 'medium' }}</td>
+                  <td z-table-cell class="font-medium">{{ log.username }}</td>
+                  <td z-table-cell class="text-sm">{{ log.role }}</td>
+                  <td z-table-cell class="text-sm">{{ log.action }}</td>
+                  <td z-table-cell class="text-sm whitespace-nowrap">{{ entityLabel(log) }}</td>
+                  <td z-table-cell class="max-w-xs">
+                    <span class="block truncate text-xs text-muted-foreground" [title]="changesSummary(log)">
+                      {{ changesSummary(log) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPages() > 1) {
+          <div class="flex justify-center pt-6">
+            <z-pagination
+              [zPageIndex]="page()"
+              (zPageIndexChange)="onPageChange($event)"
+              [zTotal]="totalPages()"
+              aria-label="Audit trail pagination"
+            ></z-pagination>
+          </div>
+        }
+      </z-card-content>
+    </z-card>
+  }
+</div>

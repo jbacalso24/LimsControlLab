@@ -37,4 +37,20 @@ public sealed class IntegrationLogRepository : IIntegrationLogRepository
             .OrderBy(x => x.AttemptedAtUtc)
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<IntegrationLogEntry>> ListAsync(string? status, string? targetSystem, CancellationToken ct = default)
+    {
+        var query = _context.IntegrationLogs.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+            query = query.Where(x => x.Status == status);
+
+        if (!string.IsNullOrWhiteSpace(targetSystem))
+            query = query.Where(x => x.TargetSystem == targetSystem);
+
+        return await query
+            .OrderByDescending(x => x.AttemptedAtUtc)
+            .ThenByDescending(x => x.Id)
+            .ToListAsync(ct);
+    }
 }

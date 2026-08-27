@@ -629,6 +629,26 @@ public static class SeedData
         };
         await db.IntegrationLogs.AddRangeAsync(integrationLogs, ct);
 
+        // ---- AuditLogs: illustrative recorded history so the audit trail viewer has content (R3) ----
+        const string analystRole = "ControlLabAnalyst";
+        const string coordRole = "LabCoordinator";
+        var auditLogs = new[]
+        {
+            new AuditLogEntry { UserId = InkAnalyst, Role = analystRole, TimestampUtc = baseDate.AddDays(-2).AddHours(1).AddMinutes(10), Action = "ReadingCaptured", EntityType = "Reading", EntityId = analyses[1].Id, AfterValues = "Value: 99.4, Status: Valid" },
+            new AuditLogEntry { UserId = InkAnalyst, Role = analystRole, TimestampUtc = baseDate.AddDays(-2).AddHours(1).AddMinutes(40), Action = "ExceptionCreated", EntityType = "ExceptionRecord", EntityId = analyses[3].Id, AfterValues = "Reason: Reading 97.2 is below minimum tolerance of 98.0." },
+            new AuditLogEntry { UserId = InkCoord, Role = coordRole, TimestampUtc = baseDate.AddDays(-2).AddHours(2), Action = "ExceptionDecided", EntityType = "ExceptionRecord", EntityId = analyses[3].Id, BeforeValues = "Decision: , Comment: ", AfterValues = "Decision: AcceptWithComment, Comment: Confirmed against retained sample." },
+            new AuditLogEntry { UserId = InkAnalyst, Role = analystRole, TimestampUtc = baseDate.AddDays(-1).AddHours(3), Action = "StatusChanged", EntityType = "Analysis", EntityId = analyses[1].Id, BeforeValues = "Status: InProgress", AfterValues = "Status: Completed, IsLocked: True" },
+            new AuditLogEntry { UserId = InkCoord, Role = coordRole, TimestampUtc = baseDate.AddDays(-1).AddHours(5), Action = "ResultUnlocked", EntityType = "Analysis", EntityId = analyses[3].Id, BeforeValues = "IsLocked: True", AfterValues = "IsLocked: False, Justification: Re-test required after instrument recalibration." },
+            new AuditLogEntry { UserId = InvCoord, Role = coordRole, TimestampUtc = baseDate.AddDays(-1).AddHours(1), Action = "CalibrationCurveCreated", EntityType = "CalibrationCurve", EntityId = curveList[2].Id, AfterValues = "Name: Polarimeter Standard - Invicta, Points: 3" },
+            new AuditLogEntry { UserId = InvCoord, Role = coordRole, TimestampUtc = baseDate.AddDays(-1).AddHours(6), Action = "TemplateUpdated", EntityType = "AnalysisTemplate", EntityId = tpl[6].Id, BeforeValues = "Version: 1", AfterValues = "Version: 2" },
+            new AuditLogEntry { UserId = KalAnalyst, Role = analystRole, TimestampUtc = baseDate.AddHours(-4), Action = "ReadingCaptured", EntityType = "Reading", EntityId = analyses[10].Id, AfterValues = "Value: 2.1, Status: Valid" },
+            new AuditLogEntry { UserId = PioCoord, Role = coordRole, TimestampUtc = baseDate.AddHours(-2), Action = "CalibrationCurveDeactivated", EntityType = "CalibrationCurve", EntityId = curveList[5].Id, AfterValues = "IsActive: false" },
+            new AuditLogEntry { UserId = VicAnalyst, Role = analystRole, TimestampUtc = baseDate.AddMinutes(-90), Action = "StatusChanged", EntityType = "Analysis", EntityId = analyses[15].Id, BeforeValues = "Status: NotStarted", AfterValues = "Status: InProgress" },
+            new AuditLogEntry { UserId = MacCoord, Role = coordRole, TimestampUtc = baseDate.AddMinutes(-30), Action = "SampleTransferred", EntityType = "Sample", EntityId = sampleList[51].Id, AfterValues = "FromSite: Macknade, ToSite: Inkerman" },
+            new AuditLogEntry { UserId = InkCoord, Role = coordRole, TimestampUtc = baseDate.AddMinutes(-5), Action = "ReadingCaptured", EntityType = "Reading", EntityId = analyses[0].Id, AfterValues = "Value: 99.1, Status: Valid" },
+        };
+        await db.AuditLogs.AddRangeAsync(auditLogs, ct);
+
         await db.SaveChangesAsync(ct);
     }
 }

@@ -7,6 +7,8 @@ import { exceptionReviewRoutes } from './exception-review/exception-review.route
 import { historySearchRoutes } from './history-search/history-search.routes';
 import { sampleTransferRoutes } from './sample-transfer/sample-transfer.routes';
 import { calibrationCurvesRoutes } from './calibration-curves/calibration-curves.routes';
+import { auditTrailRoutes } from './audit-trail/audit-trail.routes';
+import { integrationMonitoringRoutes } from './integration-monitoring/integration-monitoring.routes';
 
 export const featuresRoutes: Routes = [
   {
@@ -21,6 +23,8 @@ export const featuresRoutes: Routes = [
       ...historySearchRoutes,
       ...sampleTransferRoutes,
       ...calibrationCurvesRoutes,
+      ...auditTrailRoutes,
+      ...integrationMonitoringRoutes,
     ],
   },
 ];

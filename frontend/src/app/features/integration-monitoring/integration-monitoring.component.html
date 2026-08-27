@@ -1,0 +1,188 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Integration Monitoring</h1>
+      <p class="text-sm text-muted-foreground">Monitor and reprocess result transmissions</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
+    </div>
+  }
+
+  <!-- Coordinator-only access state (403) -->
+  @if (!loading() && forbidden()) {
+    <z-card>
+      <z-card-content class="py-12">
+        <div class="mx-auto flex max-w-md flex-col items-center text-center">
+          <div class="mb-4 grid h-12 w-12 place-items-center rounded-full bg-muted text-muted-foreground">
+            <ng-icon name="lucideLock" class="h-6 w-6" />
+          </div>
+          <h2 class="mb-1 text-base font-semibold">Coordinator access required</h2>
+          <p class="text-sm text-muted-foreground">
+            Monitoring and reprocessing integration attempts is a Lab Coordinator task. Sign in
+            with a coordinator account to view integration logs for your site.
+          </p>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Error State -->
+  @if (!loading() && !forbidden() && error()) {
+    <z-alert
+      zType="destructive"
+      class="border-destructive/50 bg-destructive/10"
+      zTitle="Error loading integration logs"
+      [zDescription]="error()"
+    />
+  }
+
+  <!-- Filters + Summary -->
+  @if (!loading() && !forbidden() && !error()) {
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <z-card>
+        <z-card-content class="py-4">
+          <p class="text-xs text-muted-foreground">Failed</p>
+          <p class="text-xl font-semibold text-destructive">{{ failedCount() }}</p>
+        </z-card-content>
+      </z-card>
+      <z-card>
+        <z-card-content class="py-4">
+          <p class="text-xs text-muted-foreground">Pending</p>
+          <p class="text-xl font-semibold text-warning-foreground dark:text-warning">{{ pendingCount() }}</p>
+        </z-card-content>
+      </z-card>
+      <z-card>
+        <z-card-content class="py-4">
+          <p class="text-xs text-muted-foreground">Success</p>
+          <p class="text-xl font-semibold text-success">{{ successCount() }}</p>
+        </z-card-content>
+      </z-card>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+      <div class="space-y-1.5">
+        <label for="status-filter" class="text-sm font-medium">Status</label>
+        <z-select
+          id="status-filter"
+          zPlaceholder="All"
+          [zValue]="statusFilter()"
+          (zSelectionChange)="onStatusFilterChange($event)"
+        >
+          <z-select-item zValue="All">All</z-select-item>
+          <z-select-item zValue="Pending">Pending</z-select-item>
+          <z-select-item zValue="Success">Success</z-select-item>
+          <z-select-item zValue="Failed">Failed</z-select-item>
+        </z-select>
+      </div>
+      <div class="space-y-1.5">
+        <label for="target-system-filter" class="text-sm font-medium">Target system</label>
+        <z-select
+          id="target-system-filter"
+          zPlaceholder="All systems"
+          [zValue]="targetSystemFilter()"
+          (zSelectionChange)="onTargetSystemFilterChange($event)"
+        >
+          <z-select-item zValue="">All systems</z-select-item>
+          <z-select-item zValue="Databank">Databank</z-select-item>
+          <z-select-item zValue="SCADA">SCADA</z-select-item>
+          <z-select-item zValue="DataLakehouse">DataLakehouse</z-select-item>
+        </z-select>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !forbidden() && !error() && !logs().length) {
+    <z-card>
+      <z-card-content class="py-12">
+        <z-empty
+          zIcon="lucidePlugZap"
+          zTitle="No integration attempts match your filters"
+          zDescription="Outbound transmissions to Databank, SCADA and the Data Lakehouse will appear here."
+        />
+      </z-card-content>
+    </z-card>
+  }
+
+  <!-- Logs Table -->
+  @if (!loading() && !forbidden() && !error() && logs().length) {
+    <z-card>
+      <z-card-content>
+        <div class="overflow-x-auto">
+          <table z-table>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Target system</th>
+                <th z-table-head>Analysis</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Attempted</th>
+                <th z-table-head>Completed</th>
+                <th z-table-head>Retries</th>
+                <th z-table-head>Error</th>
+                <th z-table-head class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @for (log of pagedLogs(); track log.id) {
+                <tr z-table-row class="hover:bg-muted/50">
+                  <td z-table-cell class="font-medium">{{ log.targetSystem }}</td>
+                  <td z-table-cell>#{{ log.analysisId }}</td>
+                  <td z-table-cell>
+                    @if (log.status === 'Success') {
+                      <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Success</span>
+                      </span>
+                    } @else if (log.status === 'Failed') {
+                      <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/12 text-destructive border border-destructive/25">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Failed</span>
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-warning/15 text-warning-foreground dark:text-warning border border-warning/30">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Pending</span>
+                      </span>
+                    }
+                  </td>
+                  <td z-table-cell class="text-sm">{{ log.attemptedAtUtc | date: 'short' }}</td>
+                  <td z-table-cell class="whitespace-nowrap text-sm">{{ log.completedAtUtc ? (log.completedAtUtc | date: 'short') : '-' }}</td>
+                  <td z-table-cell>{{ log.retryCount }}</td>
+                  <td z-table-cell class="max-w-[9rem] truncate text-sm text-muted-foreground" [title]="log.errorMessage || ''">
+                    {{ log.errorMessage || '-' }}
+                  </td>
+                  <td z-table-cell class="text-right">
+                    @if (log.status === 'Failed' && isLabCoordinator()) {
+                      <button
+                        z-button
+                        zType="outline"
+                        zSize="sm"
+                        [zLoading]="isReprocessing(log.id)"
+                        [disabled]="isReprocessing(log.id)"
+                        (click)="reprocess(log)"
+                        aria-label="Reprocess integration attempt for analysis {{ log.analysisId }}"
+                      >
+                        Reprocess
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPages() > 1) {
+          <div class="mt-4 flex justify-end">
+            <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Integration logs pagination"></z-pagination>
+          </div>
+        }
+      </z-card-content>
+    </z-card>
+  }
+</div>

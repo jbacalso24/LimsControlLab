@@ -72,6 +72,7 @@ builder.Services.AddScoped<IInstrumentRepository, InstrumentRepository>();
 builder.Services.AddScoped<ICalibrationCurveRepository, CalibrationCurveRepository>();
 builder.Services.AddScoped<ISearchRepository, SearchRepository>();
 builder.Services.AddScoped<IIntegrationLogRepository, IntegrationLogRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<AnalysisExecutionService>();
 builder.Services.AddScoped<SearchService>();
 builder.Services.AddScoped<AnalysisTemplateService>();
@@ -84,6 +85,8 @@ builder.Services.AddScoped<IDatabankSink, IllustrativeDatabankSink>();
 builder.Services.AddScoped<ISCADASink, IllustrativeSCADASink>();
 builder.Services.AddScoped<DatabankIntegrationService>();
 builder.Services.AddScoped<ScadaPushService>();
+builder.Services.AddScoped<AuditTrailService>();
+builder.Services.AddScoped<IntegrationMonitoringService>();
 
 var jwtSecret = builder.Configuration["Jwt:SigningKey"] ?? throw new InvalidOperationException("Jwt:SigningKey not configured");
 var key = Encoding.UTF8.GetBytes(jwtSecret);

@@ -8,4 +8,9 @@ public interface IIntegrationLogRepository
     Task AddAsync(IntegrationLogEntry entry, CancellationToken ct = default);
     Task UpdateAsync(IntegrationLogEntry entry, CancellationToken ct = default);
     Task<IEnumerable<IntegrationLogEntry>> GetFailedEntriesAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns integration attempts (newest first), optionally filtered by status and/or target system.
+    /// </summary>
+    Task<IReadOnlyList<IntegrationLogEntry>> ListAsync(string? status, string? targetSystem, CancellationToken ct = default);
 }
