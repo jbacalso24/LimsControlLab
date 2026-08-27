@@ -48,7 +48,7 @@
                     </tr>
                   </thead>
                   <tbody z-table-body>
-                    @for (row of filteredPickerSamples(); track row.sampleId) {
+                    @for (row of pagedPickerSamples(); track row.sampleId) {
                       <tr z-table-row class="hover:bg-muted/50">
                         <td z-table-cell class="font-medium">{{ row.identifier }}</td>
                         <td z-table-cell>{{ row.templateName }}</td>
@@ -65,6 +65,11 @@
                   </tbody>
                 </table>
               </div>
+              @if (totalPages() > 1) {
+                <div class="mt-4 flex justify-end">
+                  <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Samples pagination"></z-pagination>
+                </div>
+              }
             } @else {
               <z-empty
                 zIcon="lucideArrowLeftRight"

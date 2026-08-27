@@ -17,6 +17,7 @@ import { ZardAlertComponent } from '@/shared/components/alert';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { SampleTransferApiService } from './services/sample-transfer-api.service';
@@ -53,6 +54,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
     ZardEmptyComponent,
     StatusBadgeComponent,
     ...ZardTableImports,
+    ZardPaginationComponent,
   ],
   templateUrl: './sample-transfer.component.html',
   styleUrl: './sample-transfer.component.scss',
@@ -79,6 +81,16 @@ export class SampleTransferComponent implements OnInit {
     return rows.filter(
       (s) => s.identifier.toLowerCase().includes(q) || s.templateName.toLowerCase().includes(q),
     );
+  });
+
+  pageSize = 10;
+  pageIndex = signal(1);
+  totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredPickerSamples().length / this.pageSize)),
+  );
+  pagedPickerSamples = computed(() => {
+    const start = (this.pageIndex() - 1) * this.pageSize;
+    return this.filteredPickerSamples().slice(start, start + this.pageSize);
   });
 
   loading = signal(false);
@@ -131,6 +143,7 @@ export class SampleTransferComponent implements OnInit {
         }
         rows.sort((a, b) => a.identifier.localeCompare(b.identifier));
         this.pickerSamples.set(rows);
+        this.pageIndex.set(1);
         this.pickerLoading.set(false);
       },
       error: () => {
@@ -150,6 +163,7 @@ export class SampleTransferComponent implements OnInit {
 
   onPickerFilter(value: string): void {
     this.pickerFilter.set(value);
+    this.pageIndex.set(1);
   }
 
   private createTransferForm(): FormGroup {

@@ -87,7 +87,7 @@
                 </tr>
               </thead>
               <tbody z-table-body>
-                @for (curve of curves(); track curve.id) {
+                @for (curve of pagedCurves(); track curve.id) {
                   <tr
                     z-table-row
                     class="cursor-pointer hover:bg-muted/50"
@@ -120,6 +120,11 @@
               </tbody>
             </table>
           </div>
+          @if (totalPages() > 1) {
+            <div class="mt-4 flex justify-end">
+              <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Curves pagination"></z-pagination>
+            </div>
+          }
         </z-card-content>
       </z-card>
 

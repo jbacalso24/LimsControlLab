@@ -16,6 +16,7 @@ import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, Zar
 import { ZardTextareaComponent } from '@/shared/components/textarea';
 import { ZardBadgeComponent } from '@/shared/components/badge';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { ZardAlertComponent } from '@/shared/components/alert';
 import { ZardEmptyComponent } from '@/shared/components/empty';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
@@ -45,6 +46,7 @@ import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
     ZardSpinnerComponent,
     StatusBadgeComponent,
     ...ZardTableImports,
+    ZardPaginationComponent,
     NgIcon,
   ],
   templateUrl: './analysis-execution.component.html',
@@ -91,6 +93,15 @@ export class AnalysisExecutionComponent implements OnInit {
 
   availableTests = computed<TestDefinitionDto[]>(() => {
     return this.analysis()?.availableTests ?? [];
+  });
+
+  readings = computed(() => this.analysis()?.readings ?? []);
+  pageSize = 10;
+  pageIndex = signal(1);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.readings().length / this.pageSize)));
+  pagedReadings = computed(() => {
+    const start = (this.pageIndex() - 1) * this.pageSize;
+    return this.readings().slice(start, start + this.pageSize);
   });
 
   // Valid lifecycle actions for the current status (BRD R20). Server re-checks.
@@ -153,6 +164,7 @@ export class AnalysisExecutionComponent implements OnInit {
     this.apiService.getAnalysis(analysisId).subscribe({
       next: (data) => {
         this.analysis.set(data);
+        this.pageIndex.set(1);
         this.loading.set(false);
         const tests = data?.availableTests ?? [];
         if (tests.length === 1) {

@@ -16,6 +16,7 @@ import {
   ZardCardContentComponent,
 } from '@/shared/components/card/card.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { CalibrationChartComponent } from './calibration-chart.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChartSpline, lucideLock } from '@ng-icons/lucide';
@@ -35,6 +36,7 @@ import { lucideChartSpline, lucideLock } from '@ng-icons/lucide';
     ZardCardDescriptionComponent,
     ZardCardContentComponent,
     ZardButtonComponent,
+    ZardPaginationComponent,
     CalibrationChartComponent,
     NgIcon,
   ],
@@ -54,6 +56,14 @@ export class CalibrationCurvesComponent {
     () => this.curves().find((c) => Number(c.id) === Number(this.selectedCurveId())) ?? null,
   );
 
+  pageSize = 8;
+  pageIndex = signal(1);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.curves().length / this.pageSize)));
+  pagedCurves = computed(() => {
+    const start = (this.pageIndex() - 1) * this.pageSize;
+    return this.curves().slice(start, start + this.pageSize);
+  });
+
   ngOnInit(): void {
     this.loadCurves();
   }
@@ -66,6 +76,7 @@ export class CalibrationCurvesComponent {
       next: (data) => {
         this.curves.set(data);
         this.selectedCurveId.set(data.length ? data[0].id : null);
+        this.pageIndex.set(1);
         this.loading.set(false);
       },
       error: (err) => {

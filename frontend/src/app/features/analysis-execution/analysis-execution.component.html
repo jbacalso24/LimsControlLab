@@ -261,7 +261,7 @@
                   </tr>
                 </thead>
                 <tbody z-table-body>
-                  @for (reading of analysis()!.readings; track reading.id) {
+                  @for (reading of pagedReadings(); track reading.id) {
                     <tr z-table-row>
                       <td z-table-cell>{{ testName(reading.testId) }}</td>
                       <td z-table-cell class="text-right tabular-nums">{{ reading.value }} {{ reading.unit }}</td>
@@ -296,6 +296,11 @@
                 </tbody>
               </table>
             </div>
+            @if (totalPages() > 1) {
+              <div class="mt-4 flex justify-end">
+                <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Readings pagination"></z-pagination>
+              </div>
+            }
           </z-card-content>
         </z-card>
       } @else if (!isLocked()) {
