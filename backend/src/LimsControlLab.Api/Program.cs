@@ -47,11 +47,16 @@ builder.Services.AddCors(options =>
             policy.WithOrigins(corsAllowedOrigins);
         }
     }));
+// Accept either an Npgsql keyword string or a postgres:// URL (Neon hands out URLs).
+var limsDbConnectionString = NormalizePostgresConnectionString(
+        builder.Configuration.GetConnectionString("LimsDb"))
+    ?? throw new InvalidOperationException("LimsDb connection string not configured");
+
 builder.Services.AddDbContext<LimsDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("LimsDb")));
+    options.UseNpgsql(limsDbConnectionString));
 
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("LimsDb") ?? throw new InvalidOperationException("LimsDb connection string not configured"), name: "cane-db");
+    .AddNpgSql(limsDbConnectionString, name: "cane-db");
 
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtTokenService>();
@@ -141,16 +146,16 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<LimsDbContext>();
     db.Database.Migrate();
 
-    if (app.Environment.IsDevelopment())
-    {
-        var connectionString = db.Database.GetConnectionString() ?? "";
-        var isTestDatabase = connectionString.Contains("test", StringComparison.OrdinalIgnoreCase);
+    // Seed demo data on first boot in any non-test environment (idempotent - only
+    // seeds when the database is empty). Integration tests use "*test*" databases
+    // and provide their own data, so they are skipped.
+    var connectionString = db.Database.GetConnectionString() ?? "";
+    var isTestDatabase = connectionString.Contains("test", StringComparison.OrdinalIgnoreCase);
 
-        if (!isTestDatabase)
-        {
-            var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
-            await SeedData.SeedIfEmptyAsync(db, passwordHasher: pwd => hasher.HashPassword(null, pwd), ct: CancellationToken.None);
-        }
+    if (!isTestDatabase)
+    {
+        var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
+        await SeedData.SeedIfEmptyAsync(db, passwordHasher: pwd => hasher.HashPassword(null, pwd), ct: CancellationToken.None);
     }
 }
 
@@ -164,3 +169,31 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+// Neon (and most managed Postgres) hand out a postgres:// URL, but Npgsql wants a
+// keyword connection string. Convert a URL to keyword form and require SSL; pass a
+// string that is already keyword form through unchanged.
+static string? NormalizePostgresConnectionString(string? raw)
+{
+    if (string.IsNullOrWhiteSpace(raw))
+        return raw;
+
+    if (!raw.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
+        && !raw.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        return raw;
+
+    var uri = new Uri(raw);
+    var userInfo = uri.UserInfo.Split(':', 2);
+
+    var builder = new Npgsql.NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.Port > 0 ? uri.Port : 5432,
+        Database = Uri.UnescapeDataString(uri.AbsolutePath.TrimStart('/')),
+        Username = Uri.UnescapeDataString(userInfo[0]),
+        Password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty,
+        SslMode = Npgsql.SslMode.Require,
+    };
+
+    return builder.ConnectionString;
+}
