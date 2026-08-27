@@ -58,9 +58,7 @@
 
   <!-- Analyses Table -->
   @if (!loading() && !forbidden() && !error() && analyses().length) {
-    <z-card>
-      <z-card-content>
-        <div class="overflow-x-auto">
+    <div class="overflow-x-auto">
           <table z-table>
             <thead z-table-header>
               <tr z-table-row>
@@ -120,8 +118,6 @@
             <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Exceptions pagination"></z-pagination>
           </div>
         }
-      </z-card-content>
-    </z-card>
   }
 
   <!-- Unlock Modal Overlay -->

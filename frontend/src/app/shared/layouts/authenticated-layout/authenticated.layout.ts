@@ -83,48 +83,32 @@ export class AuthenticatedLayout {
   isSidebarOpen = signal(false);
   collapsed = signal(false);
 
-  navItems = [
+  /** Sidebar nav grouped into labelled sections (group headers hidden when collapsed). */
+  navGroups = [
     {
-      label: 'Work Queue',
-      route: '/analysis/work-queue',
-      icon: 'lucideListChecks',
-    },
-    { label: 'Schedules', route: '/analysis/schedules', icon: 'lucideCalendarClock' },
-    { label: 'Templates', route: '/analysis/templates', icon: 'lucideFileText' },
-    {
-      label: 'Calibration Curves',
-      route: '/analysis/calibration-curves',
-      icon: 'lucideChartSpline',
-    },
-    {
-      label: 'Exception Review',
-      route: '/analysis/exception-review',
-      icon: 'lucideTriangleAlert',
+      label: 'Work',
+      items: [
+        { label: 'Work Queue', route: '/analysis/work-queue', icon: 'lucideListChecks' },
+        { label: 'Schedules', route: '/analysis/schedules', icon: 'lucideCalendarClock' },
+        { label: 'Templates', route: '/analysis/templates', icon: 'lucideFileText' },
+        { label: 'Sample Transfer', route: '/analysis/sample-transfer', icon: 'lucideArrowLeftRight' },
+        { label: 'Calibration Curves', route: '/analysis/calibration-curves', icon: 'lucideChartSpline' },
+      ],
     },
     {
-      label: 'History Search',
-      route: '/analysis/history-search',
-      icon: 'lucideSearch',
+      label: 'Data',
+      items: [
+        { label: 'History Search', route: '/analysis/history-search', icon: 'lucideSearch' },
+        { label: 'Result Comparison', route: '/analysis/result-comparison', icon: 'lucideChartLine' },
+      ],
     },
     {
-      label: 'Result Comparison',
-      route: '/analysis/result-comparison',
-      icon: 'lucideChartLine',
-    },
-    {
-      label: 'Sample Transfer',
-      route: '/analysis/sample-transfer',
-      icon: 'lucideArrowLeftRight',
-    },
-    {
-      label: 'Integration Monitoring',
-      route: '/analysis/integration-monitoring',
-      icon: 'lucideRadioTower',
-    },
-    {
-      label: 'Audit Trail',
-      route: '/analysis/audit-trail',
-      icon: 'lucideScrollText',
+      label: 'Oversight',
+      items: [
+        { label: 'Exception Review', route: '/analysis/exception-review', icon: 'lucideTriangleAlert' },
+        { label: 'Integration Monitoring', route: '/analysis/integration-monitoring', icon: 'lucideRadioTower' },
+        { label: 'Audit Trail', route: '/analysis/audit-trail', icon: 'lucideScrollText' },
+      ],
     },
   ];
 

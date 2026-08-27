@@ -130,14 +130,11 @@
     </z-card>
   } @else if (items().length) {
     <!-- Results -->
-    <z-card>
-      <z-card-header>
-        <div class="flex items-center justify-between gap-3">
-          <z-card-title>Results ({{ totalCount() }})</z-card-title>
-          <lims-view-toggle [(mode)]="viewMode" />
-        </div>
-      </z-card-header>
-      <z-card-content>
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <h2 class="text-sm font-semibold text-foreground">Results ({{ totalCount() }})</h2>
+      <lims-view-toggle [(mode)]="viewMode" />
+    </div>
+    <div>
         @if (viewMode() === 'list') {
           <!-- List (table) view -->
           <div class="overflow-x-auto">
@@ -165,7 +162,7 @@
                     role="button"
                     (keydown.enter)="selectedItem.set(item)"
                   >
-                    <td z-table-cell class="font-medium">{{ item.sampleIdentifier }}</td>
+                    <td z-table-cell class="font-mono font-medium">{{ item.sampleIdentifier }}</td>
                     <td z-table-cell>{{ item.templateName }}</td>
                     <td z-table-cell>{{ item.site }}</td>
                     <td z-table-cell>{{ item.testId || '-' }}</td>
@@ -183,7 +180,7 @@
                         <span class="text-muted-foreground">-</span>
                       }
                     </td>
-                    <td z-table-cell class="text-sm text-muted-foreground">
+                    <td z-table-cell class="font-mono tabular-nums text-sm text-muted-foreground">
                       {{ item.capturedAtUtc ? (item.capturedAtUtc | date: 'short') : '-' }}
                     </td>
                     <td z-table-cell>
@@ -254,8 +251,7 @@
             ></z-pagination>
           </div>
         }
-      </z-card-content>
-    </z-card>
+    </div>
   }
 
   <!-- Row details modal -->

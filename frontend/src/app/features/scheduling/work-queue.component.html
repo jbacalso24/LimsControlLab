@@ -250,7 +250,7 @@
       }
     </div>
     } @else {
-      <div class="overflow-x-auto rounded-lg border border-border">
+      <div class="overflow-x-auto">
         <table z-table>
           <thead z-table-header>
             <tr z-table-row>
@@ -269,13 +269,13 @@
                 class="interactive-row cursor-pointer hover:bg-muted/50"
                 [routerLink]="['/analysis/analysis', item.analysisId]"
               >
-                <td z-table-cell>{{ item.sampleIdentifier }}</td>
+                <td z-table-cell class="font-mono font-medium">{{ item.sampleIdentifier }}</td>
                 <td z-table-cell>{{ item.templateName }}</td>
                 <td z-table-cell>{{ item.site }}</td>
                 <td z-table-cell>
                   <lims-status-badge [status]="item.status"></lims-status-badge>
                 </td>
-                <td z-table-cell>{{ item.startedAtUtc | date: 'short' }}</td>
+                <td z-table-cell class="font-mono tabular-nums text-muted-foreground">{{ item.startedAtUtc | date: 'short' }}</td>
                 <td z-table-cell>
                   @if (item.readingValue !== null && item.readingValue !== undefined) {
                     {{ item.readingValue }}{{ item.readingUnit ? ' ' + item.readingUnit : '' }}

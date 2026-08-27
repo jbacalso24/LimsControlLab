@@ -85,9 +85,7 @@
 
   <!-- Audit Log Table -->
   @if (!loading() && !forbidden() && !error() && items().length) {
-    <z-card>
-      <z-card-content>
-        <div class="overflow-x-auto">
+    <div class="overflow-x-auto">
           <table z-table>
             <thead z-table-header>
               <tr z-table-row>
@@ -134,8 +132,6 @@
             ></z-pagination>
           </div>
         }
-      </z-card-content>
-    </z-card>
   }
 
   <!-- Row details modal -->
