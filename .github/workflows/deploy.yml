@@ -39,7 +39,7 @@ jobs:
           node-version: '22'
 
       - name: Install deps
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         working-directory: frontend
 
       - name: Build Angular (production)
