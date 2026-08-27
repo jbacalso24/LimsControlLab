@@ -1,11 +1,6 @@
 <div class="space-y-6">
   @if (pickerMode()) {
     <div class="space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
-        <p class="text-sm text-muted-foreground">Select a sample to transfer between sites</p>
-      </div>
-
       @if (pickerLoading()) {
         <div class="flex items-center justify-center min-h-[300px]" role="status" aria-live="polite">
           <z-spinner />
@@ -18,7 +13,10 @@
               <div class="flex-1">
                 <h2 class="font-semibold text-destructive mb-1">Could not load samples</h2>
                 <p class="text-sm text-muted-foreground">{{ pickerError() }}</p>
-                <button z-button zType="outline" (click)="reloadPicker()" class="mt-4">Retry</button>
+                <button z-button zType="outline" (click)="reloadPicker()" class="mt-4">
+                  <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+                  Retry
+                </button>
               </div>
             </div>
           </z-card-content>
@@ -91,10 +89,6 @@
     </div>
   } @else if (error404()) {
     <div class="space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
-        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
-      </div>
       <z-card>
         <z-card-content>
           <div class="flex items-start gap-4">
@@ -102,7 +96,10 @@
             <div class="flex-1">
               <h2 class="font-semibold text-destructive mb-1">Sample Not Found</h2>
               <p class="text-sm text-muted-foreground">The sample you are looking for does not exist.</p>
-              <button z-button zType="outline" (click)="goBack()" class="mt-4">Go Back</button>
+              <button z-button zType="outline" (click)="goBack()" class="mt-4">
+                <ng-icon name="lucideArrowLeft" class="h-4 w-4" />
+                Go Back
+              </button>
             </div>
           </div>
         </z-card-content>
@@ -110,10 +107,6 @@
     </div>
   } @else if (error403()) {
     <div class="space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
-        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
-      </div>
       <z-card>
         <z-card-content>
           <div class="flex items-start gap-4">
@@ -121,7 +114,10 @@
             <div class="flex-1">
               <h2 class="font-semibold text-destructive mb-1">Access Denied</h2>
               <p class="text-sm text-muted-foreground">You do not have access to this sample. Only the transferring and receiving sites can view samples in transit.</p>
-              <button z-button zType="outline" (click)="goBack()" class="mt-4">Go Back</button>
+              <button z-button zType="outline" (click)="goBack()" class="mt-4">
+                <ng-icon name="lucideArrowLeft" class="h-4 w-4" />
+                Go Back
+              </button>
             </div>
           </div>
         </z-card-content>
@@ -129,10 +125,6 @@
     </div>
   } @else if (errorOther()) {
     <div class="space-y-6">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
-        <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
-      </div>
       <z-card>
         <z-card-content>
           <div class="flex items-start gap-4">
@@ -140,7 +132,10 @@
             <div class="flex-1">
               <h2 class="font-semibold text-destructive mb-1">Error Loading Sample</h2>
               <p class="text-sm text-muted-foreground">{{ errorOther() }}</p>
-              <button z-button zType="outline" (click)="retry()" class="mt-4">Retry</button>
+              <button z-button zType="outline" (click)="retry()" class="mt-4">
+                <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+                Retry
+              </button>
             </div>
           </div>
         </z-card-content>
@@ -148,14 +143,6 @@
     </div>
   } @else if (sample()) {
     <div class="space-y-6">
-      <!-- Page Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Sample Transfer</h1>
-          <p class="text-sm text-muted-foreground">Transfer sample between sites</p>
-        </div>
-      </div>
-
       <!-- Sample Detail Card -->
       <z-card>
         <z-card-header>
@@ -212,6 +199,7 @@
             [zLoading]="transferring()"
             aria-label="Transfer sample to another site"
           >
+            <ng-icon name="lucideArrowLeftRight" class="h-4 w-4" />
             Transfer to Site
           </button>
         </div>
@@ -275,6 +263,7 @@
                     (click)="closeTransferDialog()"
                     [zDisabled]="transferring()"
                   >
+                    <ng-icon name="lucideX" class="mr-1 h-4 w-4" />
                     Cancel
                   </button>
                   <button
@@ -283,6 +272,7 @@
                     [zDisabled]="transferForm.invalid || transferring()"
                     [zLoading]="transferring()"
                   >
+                    <ng-icon name="lucideArrowLeftRight" class="mr-1 h-4 w-4" />
                     Transfer
                   </button>
                 </div>

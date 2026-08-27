@@ -23,7 +23,16 @@ import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
+import {
+  lucideAlertCircle,
+  lucideChevronDown,
+  lucideRefreshCw,
+  lucideCheck,
+  lucidePlay,
+  lucidePause,
+  lucideCircleCheck,
+  lucideX,
+} from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-analysis-execution',
@@ -51,7 +60,18 @@ import { lucideAlertCircle, lucideChevronDown } from '@ng-icons/lucide';
   ],
   templateUrl: './analysis-execution.component.html',
   styleUrl: './analysis-execution.component.scss',
-  viewProviders: [provideIcons({ lucideAlertCircle, lucideChevronDown })],
+  viewProviders: [
+    provideIcons({
+      lucideAlertCircle,
+      lucideChevronDown,
+      lucideRefreshCw,
+      lucideCheck,
+      lucidePlay,
+      lucidePause,
+      lucideCircleCheck,
+      lucideX,
+    }),
+  ],
 })
 export class AnalysisExecutionComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -82,6 +102,19 @@ export class AnalysisExecutionComponent implements OnInit {
   statusError = signal('');
 
   decisionOptions: string[] = ['Modify', 'Retest', 'AcceptWithComment'];
+
+  /** Leading icon for a lifecycle action button (BRD R20). */
+  private static readonly ACTION_ICONS: Record<string, string> = {
+    Start: 'lucidePlay',
+    Resume: 'lucidePlay',
+    Pause: 'lucidePause',
+    Complete: 'lucideCircleCheck',
+    Cancel: 'lucideX',
+  };
+
+  lifecycleIcon(action: string): string {
+    return AnalysisExecutionComponent.ACTION_ICONS[action] ?? 'lucideCheck';
+  }
 
   isLocked = computed(() => {
     return this.analysis()?.isLocked ?? false;

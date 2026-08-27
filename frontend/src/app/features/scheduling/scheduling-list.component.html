@@ -1,16 +1,12 @@
 <div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Schedules</h1>
-      <p class="text-sm text-muted-foreground">Manage recurring analysis schedules across sites</p>
-    </div>
-    @if (isLabCoordinator()) {
+  @if (isLabCoordinator()) {
+    <div class="flex justify-end">
       <a routerLink="./create" z-button>
+        <ng-icon name="lucidePlus" class="mr-1 h-4 w-4" />
         New schedule
       </a>
-    }
-  </div>
+    </div>
+  }
 
   <!-- Loading State -->
   @if (loading()) {
@@ -32,7 +28,10 @@
           <div class="flex-1">
             <h2 class="font-semibold text-destructive mb-1">Error Loading Schedules</h2>
             <p class="text-sm text-muted-foreground">{{ error() }}</p>
-            <button z-button zType="outline" (click)="reload()" class="mt-4">Retry</button>
+            <button z-button zType="outline" (click)="reload()" class="mt-4">
+              <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+              Retry
+            </button>
           </div>
         </div>
       </z-card-content>
@@ -53,6 +52,7 @@
           <p class="text-sm text-muted-foreground mb-4">No schedules found</p>
           @if (isLabCoordinator()) {
             <a routerLink="./create" z-button>
+              <ng-icon name="lucidePlus" class="mr-1 h-4 w-4" />
               Create the first schedule
             </a>
           }
@@ -113,9 +113,11 @@
                     <td z-table-cell>
                       <div class="flex items-center gap-2">
                         <a [routerLink]="['.', schedule.id, 'edit']" z-button zType="outline" zSize="sm" aria-label="Edit schedule">
+                          <ng-icon name="lucidePencil" class="mr-1 h-3.5 w-3.5" />
                           Edit
                         </a>
                         <button z-button zType="outline" zSize="sm" (click)="delete(schedule)" [disabled]="deleting()" aria-label="Delete schedule">
+                          <ng-icon name="lucideTrash2" class="mr-1 h-3.5 w-3.5" />
                           Delete
                         </button>
                       </div>

@@ -21,7 +21,7 @@ import {
 } from '@/shared/components/table/table.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-history-search',
@@ -48,7 +48,7 @@ import { lucideAlertCircle } from '@ng-icons/lucide';
     StatusBadgeComponent,
     NgIcon,
   ],
-  viewProviders: [provideIcons({ lucideAlertCircle })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideX, lucideSearch, lucideRefreshCw })],
   templateUrl: './history-search.component.html',
   styleUrl: './history-search.component.scss',
 })

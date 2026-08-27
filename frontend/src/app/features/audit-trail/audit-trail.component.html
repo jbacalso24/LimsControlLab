@@ -1,12 +1,4 @@
 <div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Audit Trail</h1>
-      <p class="text-sm text-muted-foreground">Review the recorded history of changes</p>
-    </div>
-  </div>
-
   <!-- Filters -->
   <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
     <div class="space-y-1.5 sm:w-56">
@@ -72,7 +64,10 @@
       zTitle="Error loading audit trail"
       [zDescription]="error()"
     />
-    <button z-button zType="outline" (click)="reload()">Retry</button>
+    <button z-button zType="outline" (click)="reload()">
+      <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+      Retry
+    </button>
   }
 
   <!-- Empty State -->

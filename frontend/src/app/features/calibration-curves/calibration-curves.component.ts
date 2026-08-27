@@ -19,7 +19,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { CalibrationChartComponent } from './calibration-chart.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideChartSpline, lucideLock } from '@ng-icons/lucide';
+import { lucideChartSpline, lucideLock, lucideRefreshCw } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-calibration-curves',
@@ -41,7 +41,7 @@ import { lucideChartSpline, lucideLock } from '@ng-icons/lucide';
     NgIcon,
   ],
   templateUrl: './calibration-curves.component.html',
-  viewProviders: [provideIcons({ lucideChartSpline, lucideLock })],
+  viewProviders: [provideIcons({ lucideChartSpline, lucideLock, lucideRefreshCw })],
 })
 export class CalibrationCurvesComponent {
   private apiService = inject(CalibrationCurvesApiService);

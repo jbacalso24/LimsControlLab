@@ -17,7 +17,7 @@ import { ZardSelectComponent } from '@/shared/components/select/select.component
 import { ZardSelectItemComponent } from '@/shared/components/select/select-item.component';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle, lucideLock, lucideHistory } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideLock, lucideHistory, lucideRefreshCw } from '@ng-icons/lucide';
 
 const ENTITY_TYPES = ['Sample', 'Analysis', 'Result', 'Schedule', 'Instrument', 'Template', 'User'];
 const ACTIONS = ['Create', 'Update', 'Delete', 'Unlock', 'Login'];
@@ -40,7 +40,7 @@ const ACTIONS = ['Create', 'Update', 'Delete', 'Unlock', 'Login'];
     NgIcon,
   ],
   templateUrl: './audit-trail.component.html',
-  viewProviders: [provideIcons({ lucideAlertCircle, lucideLock, lucideHistory })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideLock, lucideHistory, lucideRefreshCw })],
 })
 export class AuditTrailComponent {
   private apiService = inject(AuditTrailApiService);

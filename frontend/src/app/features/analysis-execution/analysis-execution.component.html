@@ -5,12 +5,6 @@
     </div>
   } @else if (error()) {
     <div class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Analysis Execution</h1>
-          <p class="text-sm text-muted-foreground">Review and capture analysis data</p>
-        </div>
-      </div>
       <z-card role="alert" aria-live="assertive">
         <z-card-content>
           <div class="flex items-start gap-4">
@@ -18,7 +12,10 @@
             <div class="flex-1">
               <h2 class="font-semibold text-destructive mb-1">Error Loading Analysis</h2>
               <p class="text-sm text-muted-foreground">{{ error() }}</p>
-              <button z-button zType="outline" (click)="reload()" class="mt-4">Retry</button>
+              <button z-button zType="outline" (click)="reload()" class="mt-4">
+                <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+                Retry
+              </button>
             </div>
           </div>
         </z-card-content>
@@ -26,26 +23,15 @@
     </div>
   } @else if (!analysis()) {
     <div class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Analysis Execution</h1>
-          <p class="text-sm text-muted-foreground">Review and capture analysis data</p>
-        </div>
-      </div>
       <z-empty />
     </div>
   } @else {
     <div class="space-y-6">
-      <!-- Page Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight">Analysis Execution</h1>
-          <p class="text-sm text-muted-foreground">Review and capture analysis data</p>
-        </div>
-        @if (analysis()) {
+      @if (analysis()) {
+        <div class="flex justify-end">
           <lims-status-badge [status]="analysis()!.status" />
-        }
-      </div>
+        </div>
+      }
 
       <!-- Analysis Summary Card -->
       <z-card>
@@ -87,7 +73,10 @@
                   zSize="sm"
                   [disabled]="changingStatus()"
                   (click)="changeStatus(action)"
-                >{{ action }}</button>
+                >
+                  <ng-icon [name]="lifecycleIcon(action)" class="mr-1 h-3.5 w-3.5" />
+                  {{ action }}
+                </button>
               }
             </div>
             @if (statusError()) {
@@ -234,6 +223,7 @@
                   [disabled]="readingForm.invalid || submittingReading()"
                   [zLoading]="submittingReading()"
                 >
+                  <ng-icon name="lucideCheck" class="mr-1 h-4 w-4" />
                   Submit Reading
                 </button>
               </div>
@@ -383,6 +373,7 @@
                         [disabled]="getExceptionForm(exception.id).invalid || submittingException()"
                         [zLoading]="submittingException()"
                       >
+                        <ng-icon name="lucideCheck" class="mr-1 h-4 w-4" />
                         Resolve Exception
                       </button>
                     </div>
@@ -415,7 +406,10 @@
         />
         <ng-template #analysisChangedDesc>
           <p class="text-warning-foreground/90 dark:text-warning/90">This analysis was modified by another user. Please reload to see the latest changes.</p>
-          <button z-button zType="outline" (click)="reload()" class="mt-3 text-xs">Reload</button>
+          <button z-button zType="outline" (click)="reload()" class="mt-3 text-xs">
+            <ng-icon name="lucideRefreshCw" class="mr-1 h-3.5 w-3.5" />
+            Reload
+          </button>
         </ng-template>
       }
     </div>

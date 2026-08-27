@@ -1,12 +1,4 @@
 <div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Integration Monitoring</h1>
-      <p class="text-sm text-muted-foreground">Monitor and reprocess result transmissions</p>
-    </div>
-  </div>
-
   <!-- Loading State -->
   @if (loading()) {
     <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
@@ -44,23 +36,50 @@
 
   <!-- Filters + Summary -->
   @if (!loading() && !forbidden() && !error()) {
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <z-card>
-        <z-card-content class="py-4">
-          <p class="text-xs text-muted-foreground">Failed</p>
-          <p class="text-xl font-semibold text-destructive">{{ failedCount() }}</p>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <!-- Failed: needs attention -->
+      <z-card [ngClass]="failedCount() > 0 ? 'ring-1 ring-destructive/30' : ''">
+        <z-card-content class="flex items-start gap-3 py-4">
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-destructive/12 text-destructive">
+            <ng-icon name="lucideCircleAlert" class="h-4 w-4" />
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Failed</p>
+            <p class="text-2xl font-semibold tabular-nums text-destructive">{{ failedCount() }}</p>
+            <p class="mt-0.5 text-xs text-muted-foreground">
+              {{ failedCount() > 0 ? 'Need attention. Reprocess to retry the transmission.' : 'No failed transmissions.' }}
+            </p>
+          </div>
         </z-card-content>
       </z-card>
+
+      <!-- Pending: in flight -->
       <z-card>
-        <z-card-content class="py-4">
-          <p class="text-xs text-muted-foreground">Pending</p>
-          <p class="text-xl font-semibold text-warning-foreground dark:text-warning">{{ pendingCount() }}</p>
+        <z-card-content class="flex items-start gap-3 py-4">
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-warning/15 text-warning-foreground dark:text-warning">
+            <ng-icon name="lucideClock" class="h-4 w-4" />
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pending</p>
+            <p class="text-2xl font-semibold tabular-nums text-warning-foreground dark:text-warning">{{ pendingCount() }}</p>
+            <p class="mt-0.5 text-xs text-muted-foreground">
+              {{ pendingCount() > 0 ? 'In flight, awaiting confirmation from the target system.' : 'Nothing awaiting confirmation.' }}
+            </p>
+          </div>
         </z-card-content>
       </z-card>
+
+      <!-- Success: delivered -->
       <z-card>
-        <z-card-content class="py-4">
-          <p class="text-xs text-muted-foreground">Success</p>
-          <p class="text-xl font-semibold text-success">{{ successCount() }}</p>
+        <z-card-content class="flex items-start gap-3 py-4">
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success/12 text-success">
+            <ng-icon name="lucideCircleCheck" class="h-4 w-4" />
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivered</p>
+            <p class="text-2xl font-semibold tabular-nums text-success">{{ successCount() }}</p>
+            <p class="mt-0.5 text-xs text-muted-foreground">Confirmed by Databank, SCADA or the Data Lakehouse.</p>
+          </div>
         </z-card-content>
       </z-card>
     </div>
@@ -123,7 +142,6 @@
                 <th z-table-head>Status</th>
                 <th z-table-head>Attempted</th>
                 <th z-table-head>Completed</th>
-                <th z-table-head>Retries</th>
                 <th z-table-head>Error</th>
                 <th z-table-head class="text-right">Actions</th>
               </tr>
@@ -151,10 +169,9 @@
                       </span>
                     }
                   </td>
-                  <td z-table-cell class="text-sm">{{ log.attemptedAtUtc | date: 'short' }}</td>
-                  <td z-table-cell class="whitespace-nowrap text-sm">{{ log.completedAtUtc ? (log.completedAtUtc | date: 'short') : '-' }}</td>
-                  <td z-table-cell>{{ log.retryCount }}</td>
-                  <td z-table-cell class="max-w-[9rem] truncate text-sm text-muted-foreground" [title]="log.errorMessage || ''">
+                  <td z-table-cell class="whitespace-nowrap text-sm">{{ log.attemptedAtUtc | date: 'MMM d, HH:mm' }}</td>
+                  <td z-table-cell class="whitespace-nowrap text-sm">{{ log.completedAtUtc ? (log.completedAtUtc | date: 'MMM d, HH:mm') : '-' }}</td>
+                  <td z-table-cell class="max-w-[9rem] truncate text-sm text-muted-foreground" [title]="log.errorMessage ? log.errorMessage + (log.retryCount ? ' (' + log.retryCount + ' retries)' : '') : ''">
                     {{ log.errorMessage || '-' }}
                   </td>
                   <td z-table-cell class="text-right">
@@ -168,6 +185,7 @@
                         (click)="reprocess(log)"
                         aria-label="Reprocess integration attempt for analysis {{ log.analysisId }}"
                       >
+                        <ng-icon name="lucideRefreshCw" class="h-3.5 w-3.5" />
                         Reprocess
                       </button>
                     }

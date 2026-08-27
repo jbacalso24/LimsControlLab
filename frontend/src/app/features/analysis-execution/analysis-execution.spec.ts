@@ -542,13 +542,12 @@ describe('AnalysisExecutionComponent', () => {
       expect(alert).toBeTruthy();
     });
 
-    it('should have semantic heading hierarchy', () => {
+    it('should render section headings and defer the page title to the app shell', () => {
       fixture.detectChanges();
-      const h1 = fixture.nativeElement.querySelector('h1');
-      const h2 = fixture.nativeElement.querySelector('h2');
-
-      expect(h1).toBeTruthy();
-      expect(h2).toBeTruthy();
+      // The page title now lives in the app-shell top bar, so the feature no longer renders its own <h1>.
+      expect(fixture.nativeElement.querySelector('h1')).toBeNull();
+      // Section-level headings are still present for structure.
+      expect(fixture.nativeElement.querySelectorAll('z-card-title').length).toBeGreaterThan(0);
     });
   });
 });

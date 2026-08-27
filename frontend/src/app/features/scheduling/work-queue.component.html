@@ -1,11 +1,4 @@
 <div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Work Queue</h1>
-      <p class="text-sm text-muted-foreground">View your assigned analyses split by status</p>
-    </div>
-  </div>
-
   @if (loading()) {
     <div class="grid gap-4 lg:grid-cols-3 animate-pulse" role="status" aria-live="polite">
       @for (i of [1, 2, 3]; track i) {
@@ -32,7 +25,10 @@
           <div class="flex-1">
             <h2 class="font-semibold text-destructive mb-1">Error Loading Work Queue</h2>
             <p class="text-sm text-muted-foreground mb-4">{{ error() }}</p>
-            <button z-button zType="outline" (click)="reload()">Retry</button>
+            <button z-button zType="outline" (click)="reload()">
+              <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+              Retry
+            </button>
           </div>
         </div>
       </z-card-content>

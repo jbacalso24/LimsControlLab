@@ -1,12 +1,4 @@
 <div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Search & History</h1>
-      <p class="text-sm text-muted-foreground">Find analysis results by product, test, site, and date</p>
-    </div>
-  </div>
-
   <!-- Filter Card -->
   <z-card>
     <z-card-header>
@@ -87,6 +79,7 @@
             type="button"
             (click)="clearFilters()"
           >
+            <ng-icon name="lucideX" class="mr-1 h-4 w-4" />
             Clear
           </button>
           <button
@@ -94,6 +87,7 @@
             type="submit"
             [zLoading]="loading()"
           >
+            <ng-icon name="lucideSearch" class="mr-1 h-4 w-4" />
             Search
           </button>
         </div>
@@ -116,6 +110,7 @@
             <h2 class="font-semibold text-destructive mb-1">Error Loading Results</h2>
             <p class="text-sm text-destructive/90">{{ error() }}</p>
             <button z-button zType="outline" (click)="search()" class="mt-4">
+              <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
               Retry
             </button>
           </div>

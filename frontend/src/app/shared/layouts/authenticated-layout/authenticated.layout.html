@@ -113,10 +113,11 @@
     <header
       class="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md sm:px-6"
     >
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
         <button z-button zType="ghost" zSize="sm" (click)="toggleSidebar()" aria-label="Toggle sidebar">
           <ng-icon name="lucideMenu" class="h-5 w-5" />
         </button>
+        <h1 class="truncate text-base font-semibold tracking-tight">{{ pageTitle() }}</h1>
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">

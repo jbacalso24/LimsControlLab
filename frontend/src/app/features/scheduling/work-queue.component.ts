@@ -6,6 +6,8 @@ import { ZardCardComponent, ZardCardHeaderComponent, ZardCardContentComponent, Z
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { WorkQueueApiService } from './services/work-queue-api.service';
 import { SearchResultItemDto } from '../../shared/generated/models/search-result-item-dto';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideRefreshCw } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-work-queue',
@@ -19,9 +21,11 @@ import { SearchResultItemDto } from '../../shared/generated/models/search-result
     ZardCardContentComponent,
     ZardCardTitleComponent,
     StatusBadgeComponent,
+    NgIcon,
   ],
   templateUrl: './work-queue.component.html',
   styleUrl: './work-queue.component.scss',
+  viewProviders: [provideIcons({ lucideRefreshCw })],
 })
 export class WorkQueueComponent {
   private apiService = inject(WorkQueueApiService);

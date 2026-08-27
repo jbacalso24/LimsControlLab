@@ -16,6 +16,8 @@ import { ToastService } from '@/shared/services/toast/toast.service';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { CreateScheduleRequest } from '../../shared/generated/models/create-schedule-request';
 import { UpdateScheduleRequest } from '../../shared/generated/models/update-schedule-request';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideX, lucideCheck } from '@ng-icons/lucide';
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
 const SHIFT_PATTERNS = ['Day', 'Shift', 'Weekly'];
@@ -33,9 +35,11 @@ const SHIFT_PATTERNS = ['Day', 'Shift', 'Weekly'];
     ZardCardComponent,
     ZardCardContentComponent,
     ZardSpinnerComponent,
+    NgIcon,
   ],
   templateUrl: './scheduling-form.component.html',
   styleUrl: './scheduling-form.component.scss',
+  viewProviders: [provideIcons({ lucideX, lucideCheck })],
 })
 export class SchedulingFormComponent implements OnInit {
   private fb = inject(FormBuilder);

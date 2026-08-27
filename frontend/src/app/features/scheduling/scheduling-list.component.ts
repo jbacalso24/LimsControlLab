@@ -13,6 +13,8 @@ import { ScheduleDto } from '../../shared/generated/models/schedule-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-scheduling-list',
@@ -29,9 +31,11 @@ import { ToastService } from '@/shared/services/toast/toast.service';
     ZardSpinnerComponent,
     ZardPaginationComponent,
     ...ZardTableImports,
+    NgIcon,
   ],
   templateUrl: './scheduling-list.component.html',
   styleUrl: './scheduling-list.component.scss',
+  viewProviders: [provideIcons({ lucidePlus, lucideRefreshCw, lucidePencil, lucideTrash2 })],
 })
 export class SchedulingListComponent {
   private apiService = inject(SchedulingApiService);

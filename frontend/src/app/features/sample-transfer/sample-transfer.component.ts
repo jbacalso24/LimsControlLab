@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle, lucideArrowLeftRight } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideArrowLeftRight, lucideRefreshCw, lucideArrowLeft, lucideX } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
@@ -58,7 +58,7 @@ const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proser
   ],
   templateUrl: './sample-transfer.component.html',
   styleUrl: './sample-transfer.component.scss',
-  viewProviders: [provideIcons({ lucideAlertCircle, lucideArrowLeftRight })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideArrowLeftRight, lucideRefreshCw, lucideArrowLeft, lucideX })],
 })
 export class SampleTransferComponent implements OnInit {
   private apiService = inject(SampleTransferApiService);

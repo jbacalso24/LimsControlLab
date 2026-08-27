@@ -22,7 +22,14 @@ import { ZardPaginationComponent } from '@/shared/components/pagination/paginati
 import { ZardSelectImports } from '@/shared/components/select/select.imports';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideLock, lucidePlugZap } from '@ng-icons/lucide';
+import {
+  lucideLock,
+  lucidePlugZap,
+  lucideCircleAlert,
+  lucideClock,
+  lucideCircleCheck,
+  lucideRefreshCw,
+} from '@ng-icons/lucide';
 
 type StatusFilter = 'All' | 'Pending' | 'Success' | 'Failed';
 
@@ -48,7 +55,16 @@ type StatusFilter = 'All' | 'Pending' | 'Success' | 'Failed';
     NgIcon,
   ],
   templateUrl: './integration-monitoring.component.html',
-  viewProviders: [provideIcons({ lucideLock, lucidePlugZap })],
+  viewProviders: [
+    provideIcons({
+      lucideLock,
+      lucidePlugZap,
+      lucideCircleAlert,
+      lucideClock,
+      lucideCircleCheck,
+      lucideRefreshCw,
+    }),
+  ],
 })
 export class IntegrationMonitoringComponent {
   private apiService = inject(IntegrationMonitoringApiService);

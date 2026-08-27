@@ -20,7 +20,7 @@ import { ZardPaginationComponent } from '@/shared/components/pagination/paginati
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideAlertCircle, lucideLock, lucideCircleCheck } from '@ng-icons/lucide';
+import { lucideAlertCircle, lucideLock, lucideCircleCheck, lucideRefreshCw, lucideLockOpen, lucideX } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-exception-review-list',
@@ -49,7 +49,7 @@ import { lucideAlertCircle, lucideLock, lucideCircleCheck } from '@ng-icons/luci
   ],
   templateUrl: './exception-review-list.component.html',
   styleUrl: './exception-review-list.component.scss',
-  viewProviders: [provideIcons({ lucideAlertCircle, lucideLock, lucideCircleCheck })],
+  viewProviders: [provideIcons({ lucideAlertCircle, lucideLock, lucideCircleCheck, lucideRefreshCw, lucideLockOpen, lucideX })],
 })
 export class ExceptionReviewListComponent {
   private apiService = inject(ExceptionReviewApiService);

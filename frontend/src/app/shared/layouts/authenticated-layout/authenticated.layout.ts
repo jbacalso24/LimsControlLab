@@ -1,6 +1,6 @@
 import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router } from '@angular/router';
+import { RouterLink, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideListChecks,
@@ -120,7 +120,35 @@ export class AuthenticatedLayout {
     },
   ];
 
+  /** Title of the active page, shown in the top bar beside the sidebar toggle. */
+  pageTitle = signal('');
+
+  private titleForUrl(url: string): string {
+    const u = url.split('?')[0].split('#')[0];
+    if (u.includes('/work-queue')) return 'Work Queue';
+    if (u.includes('/schedules')) return 'Schedules';
+    if (u.includes('/templates/create')) return 'Create template';
+    if (/\/templates\/\d+\/edit/.test(u)) return 'Edit template';
+    if (u.includes('/templates')) return 'Templates';
+    if (u.includes('/calibration-curves')) return 'Calibration Curves';
+    if (u.includes('/exception-review')) return 'Exception Review';
+    if (u.includes('/history-search')) return 'History Search';
+    if (u.includes('/sample-transfer')) return 'Sample Transfer';
+    if (u.includes('/integration-monitoring')) return 'Integration Monitoring';
+    if (u.includes('/audit-trail')) return 'Audit Trail';
+    if (u.includes('/analysis/analysis')) return 'Analysis Execution';
+    return 'LIMS Control Lab';
+  }
+
   constructor() {
+    // Keep the top-bar title in sync with the active route.
+    this.pageTitle.set(this.titleForUrl(this.router.url));
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        this.pageTitle.set(this.titleForUrl(e.urlAfterRedirects));
+      }
+    });
+
     // Initialize dark mode from localStorage or system preference
     if (typeof window !== 'undefined') {
       this.collapsed.set(localStorage.getItem('lims-sidebar-collapsed') === 'true');

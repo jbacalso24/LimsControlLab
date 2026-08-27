@@ -1,12 +1,4 @@
 <div class="space-y-6">
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight">Calibration Curves</h1>
-      <p class="text-sm text-muted-foreground">View calibration standards and plotted curves</p>
-    </div>
-  </div>
-
   <!-- Loading State -->
   @if (loading()) {
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-12" role="status" aria-live="polite" aria-label="Loading calibration curves">
@@ -52,7 +44,10 @@
       zTitle="Error loading calibration curves"
       [zDescription]="error()"
     />
-    <button z-button zType="outline" (click)="reload()">Retry</button>
+    <button z-button zType="outline" (click)="reload()">
+      <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+      Retry
+    </button>
   }
 
   <!-- Empty State -->

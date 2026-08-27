@@ -22,7 +22,7 @@ import { TemplatesApiService } from './services/templates-api.service';
 import { CreateAnalysisTemplateRequest } from '../../shared/generated/models/create-analysis-template-request';
 import { UpdateAnalysisTemplateRequest } from '../../shared/generated/models/update-analysis-template-request';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
+import { lucidePlus, lucideTrash2, lucideX, lucideCheck, lucideAlertCircle } from '@ng-icons/lucide';
 
 const SITES = ['Inkerman', 'Invicta', 'Kalamia', 'Victoria', 'Macknade', 'Proserpine', 'PlaneCreek', 'Pioneer'];
 const CURATED_UNITS = ['°Z', '°C', '°Bx', '%', 'ICUMS', 'g/L', 'pH', 'mL', 'ppm'];
@@ -60,7 +60,7 @@ function atLeastOneTest(control: AbstractControl): ValidationErrors | null {
   ],
   templateUrl: './templates-form.component.html',
   styleUrl: './templates-form.component.scss',
-  viewProviders: [provideIcons({ lucidePlus, lucideTrash2 })],
+  viewProviders: [provideIcons({ lucidePlus, lucideTrash2, lucideX, lucideCheck, lucideAlertCircle })],
 })
 export class TemplatesFormComponent implements OnInit {
   private fb = inject(FormBuilder);

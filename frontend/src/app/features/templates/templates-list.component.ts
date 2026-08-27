@@ -14,7 +14,8 @@ import { ToastService } from '@/shared/services/toast/toast.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { AnalysisTemplateDto } from '../../shared/generated/models/analysis-template-dto';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideRefreshCw, lucidePlus, lucidePencil, lucideArchive, lucideAlertCircle } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-templates-list',
@@ -41,6 +42,7 @@ import { NgIcon } from '@ng-icons/core';
   ],
   templateUrl: './templates-list.component.html',
   styleUrl: './templates-list.component.scss',
+  viewProviders: [provideIcons({ lucideRefreshCw, lucidePlus, lucidePencil, lucideArchive, lucideAlertCircle })],
 })
 export class TemplatesListComponent {
   private apiService = inject(TemplatesApiService);
