@@ -129,12 +129,8 @@
     </z-card>
 
     <!-- Table -->
-    <z-card>
-      <z-card-header>
-        <z-card-title>Comparison Table</z-card-title>
-      </z-card-header>
-      <z-card-content>
-        <div class="overflow-x-auto">
+    <h2 class="mb-3 text-sm font-semibold text-foreground">Comparison Table</h2>
+    <div class="overflow-x-auto">
           <table z-table>
             <thead z-table-header>
               <tr z-table-row>
@@ -148,8 +144,8 @@
             <tbody z-table-body>
               @for (point of tableRows(); track point.analysisId) {
                 <tr z-table-row class="interactive-row">
-                  <td z-table-cell class="font-medium">{{ point.sampleIdentifier }}</td>
-                  <td z-table-cell class="text-sm text-muted-foreground">{{ formatCapturedAt(point.capturedAtUtc) }}</td>
+                  <td z-table-cell class="font-mono font-medium">{{ point.sampleIdentifier }}</td>
+                  <td z-table-cell class="font-mono tabular-nums text-sm text-muted-foreground">{{ formatCapturedAt(point.capturedAtUtc) }}</td>
                   <td z-table-cell class="text-right tabular-nums">{{ point.value }} {{ point.unit }}</td>
                   <td z-table-cell class="text-right tabular-nums">{{ deltaFromMean(point.value) | number: '1.2-2' }}</td>
                   <td z-table-cell>
@@ -170,7 +166,5 @@
             </tbody>
           </table>
         </div>
-      </z-card-content>
-    </z-card>
   }
 </div>

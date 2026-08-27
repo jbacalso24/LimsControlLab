@@ -75,9 +75,7 @@
   @if (!loading() && !error() && schedules().length) {
     <!-- List (table) view -->
     @if (viewMode() === 'list') {
-      <z-card>
-        <z-card-content>
-          <div class="overflow-x-auto">
+      <div class="overflow-x-auto">
             <table z-table>
               <thead z-table-header>
                 <tr z-table-row>
@@ -144,8 +142,6 @@
               </tbody>
             </table>
           </div>
-        </z-card-content>
-      </z-card>
     } @else {
       <!-- Card (grid) view -->
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">

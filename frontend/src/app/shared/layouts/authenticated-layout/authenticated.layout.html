@@ -24,22 +24,34 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 space-y-1 overflow-y-auto p-3">
-      @for (item of navItems; track item.route) {
-        <a
-          [routerLink]="item.route"
-          routerLinkActive="bg-sidebar-accent text-sidebar-primary font-semibold has-left-bar"
-          (click)="closeSidebar()"
-          [attr.title]="collapsed() ? item.label : null"
-          class="group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground active:scale-[0.99]"
-          [ngClass]="{ 'lg:justify-center': collapsed() }"
-        >
-          <span
-            class="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r bg-primary opacity-0 transition-opacity group-[.has-left-bar]:opacity-100"
-          ></span>
-          <ng-icon [name]="item.icon" size="1.4rem" class="shrink-0" />
-          <span [ngClass]="{ 'lg:hidden': collapsed() }">{{ item.label }}</span>
-        </a>
+    <nav class="flex-1 overflow-y-auto p-3">
+      @for (group of navGroups; track group.label) {
+        <div class="mb-1 first:mt-0 mt-4">
+          <p
+            class="px-3 pb-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-sidebar-foreground/45"
+            [ngClass]="{ 'lg:hidden': collapsed() }"
+          >
+            {{ group.label }}
+          </p>
+          <div class="space-y-1">
+            @for (item of group.items; track item.route) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="bg-sidebar-accent text-sidebar-primary font-semibold has-left-bar"
+                (click)="closeSidebar()"
+                [attr.title]="collapsed() ? item.label : null"
+                class="group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground active:scale-[0.99]"
+                [ngClass]="{ 'lg:justify-center': collapsed() }"
+              >
+                <span
+                  class="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r bg-primary opacity-0 transition-opacity group-[.has-left-bar]:opacity-100"
+                ></span>
+                <ng-icon [name]="item.icon" size="1.4rem" class="shrink-0" />
+                <span [ngClass]="{ 'lg:hidden': collapsed() }">{{ item.label }}</span>
+              </a>
+            }
+          </div>
+        </div>
       }
     </nav>
 

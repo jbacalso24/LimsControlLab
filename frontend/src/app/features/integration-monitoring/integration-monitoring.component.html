@@ -39,9 +39,9 @@
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <!-- Failed: needs attention -->
       <z-card [ngClass]="failedCount() > 0 ? 'ring-1 ring-destructive/30' : ''">
-        <z-card-content class="py-4">
+        <z-card-content>
           <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Failed</span>
+            <span class="text-md font-medium uppercase tracking-wider text-muted-foreground">Failed</span>
             <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-destructive/12 text-destructive">
               <ng-icon name="lucideCircleAlert" class="h-4 w-4" />
             </span>
@@ -55,9 +55,9 @@
 
       <!-- Pending: in flight -->
       <z-card>
-        <z-card-content class="py-4">
+        <z-card-content>
           <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pending</span>
+            <span class="text-md font-medium uppercase tracking-wider text-muted-foreground">Pending</span>
             <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-warning/15 text-warning-foreground dark:text-warning">
               <ng-icon name="lucideClock" class="h-4 w-4" />
             </span>
@@ -71,9 +71,9 @@
 
       <!-- Success: delivered -->
       <z-card>
-        <z-card-content class="py-4">
+        <z-card-content>
           <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Delivered</span>
+            <span class="text-md font-medium uppercase tracking-wider text-muted-foreground">Delivered</span>
             <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-success/12 text-success">
               <ng-icon name="lucideCircleCheck" class="h-4 w-4" />
             </span>
@@ -131,9 +131,7 @@
 
   <!-- Logs Table -->
   @if (!loading() && !forbidden() && !error() && logs().length) {
-    <z-card>
-      <z-card-content>
-        <div class="overflow-x-auto">
+    <div class="overflow-x-auto">
           <table z-table>
             <thead z-table-header>
               <tr z-table-row>
@@ -204,8 +202,6 @@
             <z-pagination [(zPageIndex)]="pageIndex" [zTotal]="totalPages()" aria-label="Integration logs pagination"></z-pagination>
           </div>
         }
-      </z-card-content>
-    </z-card>
   }
 
   <!-- Row details modal -->
