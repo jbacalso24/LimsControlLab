@@ -6,37 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace LimsControlLab.Api.Controllers;
 
 /// <summary>
-/// Development-only endpoints for data management (reset and reseed).
-/// Only available in Development environment.
+/// Data-management endpoints for the illustrative demo (reset and reseed).
+/// Enabled in all environments because this is a demo deployment; any authenticated
+/// user can reset the shared demo dataset back to its seeded state.
 /// </summary>
 [ApiController]
 [Route("api/v1/admin")]
 [Authorize]
 public sealed class DevDataController : ControllerBase
 {
-    private readonly IHostEnvironment _environment;
     private readonly LimsDbContext _db;
     private readonly PasswordHasher _hasher;
 
-    public DevDataController(IHostEnvironment environment, LimsDbContext db, PasswordHasher hasher)
+    public DevDataController(LimsDbContext db, PasswordHasher hasher)
     {
-        _environment = environment;
         _db = db;
         _hasher = hasher;
     }
 
     /// <summary>
-    /// Reset and reseed the database with illustrative development data.
-    /// Only available in Development environment.
+    /// Reset and reseed the database with the illustrative demo dataset.
     /// </summary>
     [HttpPost("reset-data")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ResetData(CancellationToken ct)
     {
-        if (!_environment.IsDevelopment())
-            return NotFound();
-
         await SeedData.ResetAndReseedAsync(
             _db,
             pwd => _hasher.HashPassword(null, pwd),

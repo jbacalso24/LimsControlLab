@@ -21,6 +21,8 @@ import {
   lucideScrollText,
   lucideRadioTower,
   lucideChartLine,
+  lucideCheck,
+  lucideUsers,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
@@ -30,7 +32,7 @@ import { CurrentUserService } from '../../services/auth/current-user.service';
 import { BreadcrumbService, Crumb } from '../../services/breadcrumb/breadcrumb.service';
 import { AdminApiService } from '../../services/api/admin-api.service';
 import { ToastService } from '../../services/toast/toast.service';
-import { environment } from '../../../../environments/environment';
+import { AuthApiService } from '../../services/auth/auth-api.service';
 
 @Component({
   selector: 'lims-authenticated-layout',
@@ -66,6 +68,8 @@ import { environment } from '../../../../environments/environment';
       lucideScrollText,
       lucideRadioTower,
       lucideChartLine,
+      lucideCheck,
+      lucideUsers,
     }),
   ],
 })
@@ -75,9 +79,32 @@ export class AuthenticatedLayout {
   private dialog = inject(ZardDialogService);
   private admin = inject(AdminApiService);
   private toast = inject(ToastService);
+  private authApi = inject(AuthApiService);
 
-  /** Reset demo data is only meaningful against a Development API. */
-  readonly showResetData = !environment.production;
+  /** Shown in the footer for this illustrative demo so anyone can reset the shared dataset. */
+  readonly showResetData = true;
+
+  /** Demo accounts for one-click switching (analyst + coordinator for each seeded site). */
+  readonly demoAccounts = (
+    [
+      ['inkerman', 'Inkerman'],
+      ['invicta', 'Invicta'],
+      ['kalamia', 'Kalamia'],
+      ['pioneer', 'Pioneer'],
+      ['victoria', 'Victoria'],
+      ['macknade', 'Macknade'],
+    ] as const
+  ).flatMap(([site, siteLabel]) =>
+    (
+      [
+        ['analyst', 'Analyst'],
+        ['coord', 'Coordinator'],
+      ] as const
+    ).map(([role, roleLabel]) => {
+      const username = `${site}_${role}`;
+      return { username, password: `${username}_password`, label: `${siteLabel} · ${roleLabel}` };
+    }),
+  );
 
   isDarkMode = signal(false);
   isSidebarOpen = signal(false);
@@ -203,6 +230,18 @@ export class AuthenticatedLayout {
   logout() {
     this.currentUserService.clearToken();
     this.router.navigate(['/login']);
+  }
+
+  /** One-click demo account switch: sign in as the chosen account, then hard-reload so
+   *  every screen refetches for the new user's site. No-ops if it is the current account. */
+  switchAccount(acc: { username: string; password: string }): void {
+    if (acc.username === this.currentUser?.username) return;
+    this.authApi.login(acc.username, acc.password).subscribe({
+      next: () => {
+        window.location.href = '/analysis/work-queue';
+      },
+      error: () => this.toast.error(`Could not switch to ${acc.username}.`),
+    });
   }
 
   /** Dev-only: confirm, then wipe + reseed the illustrative dataset via the API. */

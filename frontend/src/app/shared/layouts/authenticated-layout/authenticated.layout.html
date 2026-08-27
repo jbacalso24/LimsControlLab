@@ -88,6 +88,20 @@
             <p class="truncate text-xs text-muted-foreground">{{ currentUser.role }} · {{ currentUser.site }}</p>
           </div>
           <div z-dropdown-menu-separator></div>
+          <p class="px-2 py-1 text-xs font-medium text-muted-foreground">Switch account</p>
+          <div class="max-h-56 overflow-y-auto">
+            @for (acc of demoAccounts; track acc.username) {
+              <button z-dropdown-menu-item (click)="switchAccount(acc)">
+                @if (acc.username === currentUser.username) {
+                  <ng-icon name="lucideCheck" class="h-4 w-4 text-primary" />
+                } @else {
+                  <ng-icon name="lucideUserRound" class="h-4 w-4" />
+                }
+                <span [ngClass]="{ 'font-medium text-primary': acc.username === currentUser.username }">{{ acc.label }}</span>
+              </button>
+            }
+          </div>
+          <div z-dropdown-menu-separator></div>
           <button z-dropdown-menu-item (click)="toggleDarkMode()">
             @if (isDarkMode()) {
               <ng-icon name="lucideSun" class="h-4 w-4" />
