@@ -17,4 +17,8 @@ public interface IAnalysisRepository
     Task<bool> TryUpdateExceptionWithConcurrencyCheckAsync(ExceptionRecord exception, byte[] expectedRowVersion, CancellationToken ct = default);
     Task<IEnumerable<Analysis>> GetAnalysesWithExceptionsAsync(CancellationToken ct = default);
     Task<IEnumerable<Analysis>> GetAnalysesWithExceptionsBySiteAsync(Site site, CancellationToken ct = default);
+    Task AddSampleAsync(Sample sample, CancellationToken ct = default);
+    Task AddAnalysisAsync(Analysis analysis, CancellationToken ct = default);
+    Task<bool> SampleIdentifierExistsAsync(string identifier, CancellationToken ct = default);
+    Task<int> CountSamplesBySiteAsync(Site site, CancellationToken ct = default);
 }

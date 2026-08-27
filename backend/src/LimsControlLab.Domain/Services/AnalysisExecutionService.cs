@@ -270,6 +270,101 @@ public sealed class AnalysisExecutionService
     }
 
     /// <summary>
+    /// Creates an ad-hoc (non-scheduled) sample + analysis for the current user's site (R7).
+    /// The sample identifier is generated when not supplied, and the analysis is bound to the
+    /// template's current version and started immediately so the analyst can capture readings.
+    /// </summary>
+    public async Task<Outcome<AdHocAnalysisResult>> CreateAdHocAnalysisAsync(int analysisTemplateId, string? sampleIdentifier, CancellationToken ct)
+    {
+        var template = await _repository.GetTemplateByIdAsync(analysisTemplateId, ct);
+        if (template == null)
+            return new Outcome<AdHocAnalysisResult>.Invalid("analysisTemplateId", $"Template {analysisTemplateId} not found.");
+
+        if (template.Site != _currentUser.Site)
+            return new Outcome<AdHocAnalysisResult>.Invalid("analysisTemplateId", "The template belongs to another site.");
+
+        if (template.IsRetired)
+            return new Outcome<AdHocAnalysisResult>.Invalid("analysisTemplateId", "The template is retired and cannot start new analyses.");
+
+        if (template.CurrentVersionId == null)
+            return new Outcome<AdHocAnalysisResult>.Invalid("analysisTemplateId", "The template has no active version.");
+
+        string identifier;
+        var provided = sampleIdentifier?.Trim();
+        if (!string.IsNullOrEmpty(provided))
+        {
+            if (await _repository.SampleIdentifierExistsAsync(provided, ct))
+                return new Outcome<AdHocAnalysisResult>.Invalid("sampleIdentifier", $"Sample identifier '{provided}' is already in use.");
+            identifier = provided;
+        }
+        else
+        {
+            identifier = await GenerateSampleIdentifierAsync(_currentUser.Site, ct);
+        }
+
+        var now = _timeProvider.GetUtcNow();
+
+        var sample = new Sample
+        {
+            Identifier = identifier,
+            AnalysisTemplateId = template.Id,
+            Status = LifecycleStatus.InProgress,
+            Site = _currentUser.Site,
+            CurrentSite = _currentUser.Site,
+        };
+        await _repository.AddSampleAsync(sample, ct);
+
+        var analysis = new Analysis
+        {
+            SampleId = sample.Id,
+            TemplateId = template.Id,
+            TemplateVersionId = template.CurrentVersionId.Value,
+            Status = LifecycleStatus.InProgress,
+            StartedAtUtc = now,
+            StartedByUserId = _currentUser.UserId,
+            IsLocked = false,
+        };
+        await _repository.AddAnalysisAsync(analysis, ct);
+
+        await _auditLogger.LogAsync(new AuditLogEntryRecord
+        {
+            UserId = _currentUser.UserId,
+            Role = _currentUser.Role.ToString(),
+            TimestampUtc = now,
+            Action = "AnalysisCreated",
+            EntityType = "Analysis",
+            EntityId = analysis.Id,
+            AfterValues = $"Sample: {identifier}, Template: {template.Name}",
+        }, ct);
+
+        return new Outcome<AdHocAnalysisResult>.Ok(new AdHocAnalysisResult
+        {
+            AnalysisId = analysis.Id,
+            SampleId = sample.Id,
+            SampleIdentifier = identifier,
+        });
+    }
+
+    private async Task<string> GenerateSampleIdentifierAsync(Site site, CancellationToken ct)
+    {
+        var code = site.ToString().Length >= 3
+            ? site.ToString()[..3].ToUpperInvariant()
+            : site.ToString().ToUpperInvariant();
+        var year = _timeProvider.GetUtcNow().Year;
+        var next = await _repository.CountSamplesBySiteAsync(site, ct) + 1;
+
+        string identifier;
+        do
+        {
+            identifier = $"{code}-{year}-{next:D4}";
+            next++;
+        }
+        while (await _repository.SampleIdentifierExistsAsync(identifier, ct));
+
+        return identifier;
+    }
+
+    /// <summary>
     /// Parses the tests defined by a template version's TestConfiguration JSON
     /// (shape: {"tests":[{"id":1,"name":"Pol","unit":"°Z","method":"BSES"}]}).
     /// Returns an empty list when the configuration is absent, empty, or malformed -
@@ -558,6 +653,13 @@ public sealed record TestDefinition
     public required string Name { get; init; }
     public required string Unit { get; init; }
     public string? Method { get; init; }
+}
+
+public sealed record AdHocAnalysisResult
+{
+    public required int AnalysisId { get; init; }
+    public required int SampleId { get; init; }
+    public required string SampleIdentifier { get; init; }
 }
 
 public sealed record ReadingInfo

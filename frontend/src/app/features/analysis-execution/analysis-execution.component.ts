@@ -24,6 +24,7 @@ import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.comp
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
 import { BreadcrumbService } from '@/shared/services/breadcrumb/breadcrumb.service';
+import { CurrentUserService } from '@/shared/services/auth/current-user.service';
 import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -35,6 +36,7 @@ import {
   lucidePause,
   lucideCircleCheck,
   lucideX,
+  lucideInfo,
 } from '@ng-icons/lucide';
 
 @Component({
@@ -74,6 +76,7 @@ import {
       lucidePause,
       lucideCircleCheck,
       lucideX,
+      lucideInfo,
     }),
   ],
 })
@@ -83,6 +86,10 @@ export class AnalysisExecutionComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
   private breadcrumb = inject(BreadcrumbService);
+  private currentUserService = inject(CurrentUserService);
+
+  /** Only Control Lab Analysts capture readings and drive the lifecycle (R20); coordinators review. */
+  isAnalyst = computed(() => this.currentUserService.user()?.role === 'ControlLabAnalyst');
 
   /** Past-tense confirmation copy per lifecycle action (matches the button that triggered it). */
   private static readonly STATUS_TOASTS: Record<string, string> = {

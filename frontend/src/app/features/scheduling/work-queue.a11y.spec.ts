@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import axe from 'axe-core';
+import { provideRouter } from '@angular/router';
 import { WorkQueueComponent } from './work-queue.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WorkQueueApiService } from './services/work-queue-api.service';
@@ -14,7 +15,7 @@ describe('WorkQueueComponent - Accessibility', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WorkQueueComponent, HttpClientTestingModule],
-      providers: [WorkQueueApiService],
+      providers: [WorkQueueApiService, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(WorkQueueComponent);

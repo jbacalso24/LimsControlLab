@@ -328,6 +328,26 @@ internal sealed class TestAnalysisRepository : IAnalysisRepository
         throw new NotImplementedException();
     }
 
+    public Task AddSampleAsync(Sample sample, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddAnalysisAsync(Analysis analysis, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> SampleIdentifierExistsAsync(string identifier, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<int> CountSamplesBySiteAsync(Site site, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task AddSampleTransferAsync(SampleTransfer transfer, CancellationToken ct = default)
     {
         throw new NotImplementedException();

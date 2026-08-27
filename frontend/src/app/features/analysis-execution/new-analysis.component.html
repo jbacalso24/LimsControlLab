@@ -1,0 +1,87 @@
+<div class="space-y-6">
+  @if (loading()) {
+    <div class="flex items-center justify-center min-h-[400px]" role="status" aria-live="polite">
+      <z-spinner />
+    </div>
+  } @else if (error()) {
+    <z-card>
+      <z-card-content>
+        <div class="flex items-start gap-4">
+          <div class="flex-1">
+            <h2 class="font-semibold text-destructive mb-1">Error loading templates</h2>
+            <p class="text-sm text-muted-foreground">{{ error() }}</p>
+          </div>
+        </div>
+      </z-card-content>
+    </z-card>
+  } @else if (!templates().length) {
+    <z-empty
+      zTitle="No active templates for your site"
+      zDescription="Create a template first."
+    />
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+      <z-card>
+        <z-card-header>
+          <z-card-title>New analysis</z-card-title>
+        </z-card-header>
+        <z-card-content>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label z-label for="analysisTemplateId">Analysis template</label>
+              <z-select
+                id="analysisTemplateId"
+                formControlName="analysisTemplateId"
+                zPlaceholder="Select a template"
+                [attr.aria-describedby]="form.get('analysisTemplateId')?.invalid && form.get('analysisTemplateId')?.touched ? 'template-error' : null"
+              >
+                @for (template of templates(); track template.id) {
+                  <z-select-item [zValue]="template.id.toString()">{{ template.name }}</z-select-item>
+                }
+              </z-select>
+              @if (form.get('analysisTemplateId')?.invalid && form.get('analysisTemplateId')?.touched) {
+                <p id="template-error" class="text-xs text-destructive">Analysis template is required</p>
+              }
+            </div>
+
+            <div class="space-y-1.5">
+              <label z-label for="sampleIdentifier">Sample identifier</label>
+              <input
+                z-input
+                id="sampleIdentifier"
+                type="text"
+                formControlName="sampleIdentifier"
+                placeholder="Enter sample identifier"
+                [disabled]="submitting()"
+                aria-describedby="sampleIdentifier-hint"
+              />
+              <p id="sampleIdentifier-hint" class="text-xs text-muted-foreground">
+                Leave blank to auto-generate (e.g. INK-2026-0007)
+              </p>
+            </div>
+          </div>
+        </z-card-content>
+      </z-card>
+
+      @if (submitError()) {
+        <z-alert
+          zType="destructive"
+          class="border-destructive/50 bg-destructive/10"
+          zTitle="Could not create analysis"
+          [zDescription]="submitError()"
+        />
+      }
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" z-button zType="outline" (click)="cancel()" [disabled]="submitting()">
+          <ng-icon name="lucideX" class="mr-1 h-4 w-4" />
+          Cancel
+        </button>
+        <button type="submit" z-button [disabled]="form.invalid || submitting()" [zLoading]="submitting()">
+          <ng-icon name="lucidePlus" class="mr-1 h-4 w-4" />
+          Create analysis
+        </button>
+      </div>
+    </form>
+  }
+</div>

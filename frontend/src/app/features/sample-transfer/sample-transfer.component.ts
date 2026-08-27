@@ -220,7 +220,11 @@ export class SampleTransferComponent implements OnInit {
   canTransfer(): boolean {
     const currentUser = this.currentUserService.user();
     const sampleData = this.sample();
-    return currentUser?.site === sampleData?.currentSite;
+    // Transferring is an analyst action, and only the sample's current site can move it (R10).
+    return (
+      currentUser?.role === 'ControlLabAnalyst' &&
+      currentUser?.site === sampleData?.currentSite
+    );
   }
 
   openTransferDialog(): void {

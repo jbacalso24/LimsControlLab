@@ -17,6 +17,27 @@ public sealed class AnalysesController : ControllerBase
         _analysisService = analysisService;
     }
 
+    [Authorize(Policy = "Role.ControlLabAnalyst")]
+    [HttpPost]
+    [ProducesResponseType(typeof(CreatedAnalysisDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateAnalysis(CreateAnalysisRequest request, CancellationToken ct)
+    {
+        var result = await _analysisService.CreateAdHocAnalysisAsync(request.AnalysisTemplateId, request.SampleIdentifier, ct);
+
+        if (result is Outcome<AdHocAnalysisResult>.Ok ok)
+            return Created(
+                $"/api/v1/analyses/{ok.Data.AnalysisId}",
+                new CreatedAnalysisDto
+                {
+                    AnalysisId = ok.Data.AnalysisId,
+                    SampleId = ok.Data.SampleId,
+                    SampleIdentifier = ok.Data.SampleIdentifier,
+                });
+
+        return result.ToActionResult(this);
+    }
+
     [Authorize]
     [HttpGet("{analysisId:int}")]
     [ProducesResponseType(typeof(AnalysisDetailDto), StatusCodes.Status200OK)]

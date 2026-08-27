@@ -57,6 +57,17 @@ export interface InstrumentDto {
   isActive: boolean;
 }
 
+export interface CreateAnalysisRequest {
+  analysisTemplateId: number;
+  sampleIdentifier?: string | null;
+}
+
+export interface CreatedAnalysisDto {
+  analysisId: number;
+  sampleId: number;
+  sampleIdentifier: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -95,5 +106,9 @@ export class AnalysisExecutionApiService extends LimsApiService {
 
   getInstruments(): Observable<InstrumentDto[]> {
     return this.get<InstrumentDto[]>(`/instruments`);
+  }
+
+  createAnalysis(request: CreateAnalysisRequest): Observable<CreatedAnalysisDto> {
+    return this.post<CreatedAnalysisDto>('/analyses', request);
   }
 }

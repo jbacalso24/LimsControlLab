@@ -127,4 +127,26 @@ public sealed class AnalysisRepository : IAnalysisRepository
             .Where(a => a.Sample != null && a.Sample.Site == site && a.Exceptions.Any())
             .ToListAsync(ct);
     }
+
+    public async Task AddSampleAsync(Sample sample, CancellationToken ct = default)
+    {
+        _context.Samples.Add(sample);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task AddAnalysisAsync(Analysis analysis, CancellationToken ct = default)
+    {
+        _context.Analyses.Add(analysis);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> SampleIdentifierExistsAsync(string identifier, CancellationToken ct = default)
+    {
+        return await _context.Samples.AnyAsync(s => s.Identifier == identifier, ct);
+    }
+
+    public async Task<int> CountSamplesBySiteAsync(Site site, CancellationToken ct = default)
+    {
+        return await _context.Samples.CountAsync(s => s.Site == site, ct);
+    }
 }

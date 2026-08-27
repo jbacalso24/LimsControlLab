@@ -6,6 +6,7 @@ import { of, throwError, Subject } from 'rxjs';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AnalysisExecutionComponent } from './analysis-execution.component';
 import { AnalysisExecutionApiService, AnalysisDetailDto } from './services/analysis-execution-api.service';
+import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 
 describe('AnalysisExecutionComponent', () => {
   let component: AnalysisExecutionComponent;
@@ -76,6 +77,11 @@ describe('AnalysisExecutionComponent', () => {
         provideAnimations(),
         { provide: AnalysisExecutionApiService, useValue: apiServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRoute },
+        // Capture/lifecycle UI is analyst-only; tests exercise the analyst view.
+        {
+          provide: CurrentUserService,
+          useValue: { user: () => ({ id: 1, username: 'invicta_analyst', role: 'ControlLabAnalyst', site: 'Invicta' }) },
+        },
       ],
     }).compileComponents();
 

@@ -748,4 +748,89 @@ public sealed class AnalysisExecutionServiceTests
         Assert.NotNull(captured);
         Assert.Equal("°Z", captured!.Unit);
     }
+
+    private static AnalysisTemplate BuildTemplate(Site site = Site.Inkerman, bool retired = false, int? currentVersionId = 5) =>
+        new() { Id = 1, Name = "Sugar Pol", Site = site, IsRetired = retired, CurrentVersionId = currentVersionId };
+
+    private static (Mock<IAnalysisRepository> repo, Mock<ICurrentUser> user) AdHocMocks(AnalysisTemplate template, Site userSite = Site.Inkerman)
+    {
+        var repo = new Mock<IAnalysisRepository>();
+        repo.Setup(r => r.GetTemplateByIdAsync(template.Id, It.IsAny<CancellationToken>())).ReturnsAsync(template);
+        repo.Setup(r => r.SampleIdentifierExistsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        repo.Setup(r => r.CountSamplesBySiteAsync(It.IsAny<Site>(), It.IsAny<CancellationToken>())).ReturnsAsync(6);
+        repo.Setup(r => r.AddSampleAsync(It.IsAny<Sample>(), It.IsAny<CancellationToken>()))
+            .Callback<Sample, CancellationToken>((s, _) => s.Id = 500).Returns(Task.CompletedTask);
+        repo.Setup(r => r.AddAnalysisAsync(It.IsAny<Analysis>(), It.IsAny<CancellationToken>()))
+            .Callback<Analysis, CancellationToken>((a, _) => a.Id = 900).Returns(Task.CompletedTask);
+        var user = new Mock<ICurrentUser>();
+        user.Setup(u => u.UserId).Returns(7);
+        user.Setup(u => u.Role).Returns(Role.ControlLabAnalyst);
+        user.Setup(u => u.Site).Returns(userSite);
+        return (repo, user);
+    }
+
+    [Fact]
+    public async Task CreateAdHocAnalysisAsync_CreatesSampleAndAnalysisBoundToCurrentVersion()
+    {
+        var template = BuildTemplate(currentVersionId: 5);
+        var (repo, user) = AdHocMocks(template);
+        Sample? createdSample = null;
+        Analysis? createdAnalysis = null;
+        repo.Setup(r => r.AddSampleAsync(It.IsAny<Sample>(), It.IsAny<CancellationToken>()))
+            .Callback<Sample, CancellationToken>((s, _) => { s.Id = 500; createdSample = s; }).Returns(Task.CompletedTask);
+        repo.Setup(r => r.AddAnalysisAsync(It.IsAny<Analysis>(), It.IsAny<CancellationToken>()))
+            .Callback<Analysis, CancellationToken>((a, _) => { a.Id = 900; createdAnalysis = a; }).Returns(Task.CompletedTask);
+        var service = BuildService(repo, user);
+
+        var result = await service.CreateAdHocAnalysisAsync(1, null, CancellationToken.None);
+
+        var ok = Assert.IsType<Outcome<AdHocAnalysisResult>.Ok>(result);
+        Assert.Equal(900, ok.Data.AnalysisId);
+        Assert.Equal(500, ok.Data.SampleId);
+        Assert.StartsWith("INK-", ok.Data.SampleIdentifier); // auto-generated for Inkerman
+        Assert.NotNull(createdAnalysis);
+        Assert.Equal(5, createdAnalysis!.TemplateVersionId);
+        Assert.Equal(LifecycleStatus.InProgress, createdAnalysis.Status);
+        Assert.NotNull(createdSample);
+        Assert.Equal(Site.Inkerman, createdSample!.Site);
+    }
+
+    [Fact]
+    public async Task CreateAdHocAnalysisAsync_RejectsTemplateFromAnotherSite()
+    {
+        var template = BuildTemplate(site: Site.Invicta);
+        var (repo, user) = AdHocMocks(template, userSite: Site.Inkerman);
+        var service = BuildService(repo, user);
+
+        var result = await service.CreateAdHocAnalysisAsync(1, null, CancellationToken.None);
+
+        var invalid = Assert.IsType<Outcome<AdHocAnalysisResult>.Invalid>(result);
+        Assert.Equal("analysisTemplateId", invalid.Field);
+    }
+
+    [Fact]
+    public async Task CreateAdHocAnalysisAsync_RejectsTemplateWithNoActiveVersion()
+    {
+        var template = BuildTemplate(currentVersionId: null);
+        var (repo, user) = AdHocMocks(template);
+        var service = BuildService(repo, user);
+
+        var result = await service.CreateAdHocAnalysisAsync(1, null, CancellationToken.None);
+
+        Assert.IsType<Outcome<AdHocAnalysisResult>.Invalid>(result);
+    }
+
+    [Fact]
+    public async Task CreateAdHocAnalysisAsync_RejectsDuplicateProvidedIdentifier()
+    {
+        var template = BuildTemplate();
+        var (repo, user) = AdHocMocks(template);
+        repo.Setup(r => r.SampleIdentifierExistsAsync("INK-DUP", It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        var service = BuildService(repo, user);
+
+        var result = await service.CreateAdHocAnalysisAsync(1, "INK-DUP", CancellationToken.None);
+
+        var invalid = Assert.IsType<Outcome<AdHocAnalysisResult>.Invalid>(result);
+        Assert.Equal("sampleIdentifier", invalid.Field);
+    }
 }

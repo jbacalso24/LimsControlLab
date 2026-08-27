@@ -60,8 +60,20 @@
         </z-card-content>
       </z-card>
 
+      <!-- Coordinator read-only note: capture + lifecycle are analyst tasks -->
+      @if (!isAnalyst() && !isLocked()) {
+        <z-card>
+          <z-card-content class="flex items-start gap-3 py-4">
+            <ng-icon name="lucideInfo" class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <p class="text-sm text-muted-foreground">
+              You are viewing this analysis as a coordinator. Readings and lifecycle changes are captured by analysts.
+            </p>
+          </z-card-content>
+        </z-card>
+      }
+
       <!-- Lifecycle Actions (BRD R20) -->
-      @if (availableActions().length > 0) {
+      @if (isAnalyst() && availableActions().length > 0) {
         <z-card>
           <z-card-content>
             <div class="flex flex-wrap items-center gap-3">
@@ -87,7 +99,7 @@
       }
 
       <!-- Capture Reading Card -->
-      @if (!isLocked()) {
+      @if (isAnalyst() && !isLocked()) {
         <z-card>
           <z-card-header>
             <z-card-title>Add Reading</z-card-title>

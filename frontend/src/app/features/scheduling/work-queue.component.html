@@ -34,6 +34,15 @@
       </z-card-content>
     </z-card>
   } @else {
+    @if (isAnalyst()) {
+      <div class="flex justify-end">
+        <a routerLink="/analysis/new-analysis" z-button class="flex-shrink-0">
+          <ng-icon name="lucidePlus" class="mr-1 h-4 w-4" />
+          New analysis
+        </a>
+      </div>
+    }
+
     <div class="grid gap-4 lg:grid-cols-3">
       @for (column of columns(); track column.title) {
         <div class="space-y-3">

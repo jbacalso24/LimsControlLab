@@ -60,6 +60,19 @@ public sealed record AnalysisDetailDto
     public required string RowVersion { get; init; }
 }
 
+public sealed record CreateAnalysisRequest
+{
+    public required int AnalysisTemplateId { get; init; }
+    public string? SampleIdentifier { get; init; }
+}
+
+public sealed record CreatedAnalysisDto
+{
+    public required int AnalysisId { get; init; }
+    public required int SampleId { get; init; }
+    public required string SampleIdentifier { get; init; }
+}
+
 public sealed record CreateReadingRequest
 {
     public required int TestId { get; init; }

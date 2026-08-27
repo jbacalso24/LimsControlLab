@@ -5,9 +5,10 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardCardComponent, ZardCardHeaderComponent, ZardCardContentComponent, ZardCardTitleComponent } from '@/shared/components/card/card.component';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { WorkQueueApiService } from './services/work-queue-api.service';
+import { CurrentUserService } from '@/shared/services/auth/current-user.service';
 import { SearchResultItemDto } from '../../shared/generated/models/search-result-item-dto';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideRefreshCw } from '@ng-icons/lucide';
+import { lucideRefreshCw, lucidePlus } from '@ng-icons/lucide';
 
 @Component({
   selector: 'lims-work-queue',
@@ -25,10 +26,14 @@ import { lucideRefreshCw } from '@ng-icons/lucide';
   ],
   templateUrl: './work-queue.component.html',
   styleUrl: './work-queue.component.scss',
-  viewProviders: [provideIcons({ lucideRefreshCw })],
+  viewProviders: [provideIcons({ lucideRefreshCw, lucidePlus })],
 })
 export class WorkQueueComponent {
   private apiService = inject(WorkQueueApiService);
+  private currentUserService = inject(CurrentUserService);
+
+  /** Only analysts start ad-hoc analyses (they also capture the readings). */
+  isAnalyst = computed(() => this.currentUserService.user()?.role === 'ControlLabAnalyst');
 
   loading = signal(false);
   error = signal('');
