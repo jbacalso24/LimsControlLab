@@ -453,6 +453,8 @@ public static class SeedData
             // Inter-site transfers
             An(samples[58].Id, 0, LifecycleStatus.Completed, InkAnalyst, baseDate.AddDays(-1), locked: true, completed: baseDate.AddDays(-1).AddHours(1), lockedBy: InkCoord),
             An(samples[59].Id, 5, LifecycleStatus.Completed, InvAnalyst, baseDate.AddDays(-1), locked: true, completed: baseDate.AddDays(-1).AddHours(2), lockedBy: InvCoord),
+            // Adherence demo: now-relative analyses so the adherence panel shows a live mix
+            An(samples[10].Id, 5, LifecycleStatus.Completed, InvAnalyst, DateTimeOffset.UtcNow.AddMinutes(-30), locked: true, completed: DateTimeOffset.UtcNow.AddMinutes(-15), lockedBy: InvCoord),
         };
         await db.Analyses.AddRangeAsync(analyses, ct);
         await db.SaveChangesAsync(ct);

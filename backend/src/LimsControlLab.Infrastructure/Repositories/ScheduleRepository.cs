@@ -27,6 +27,17 @@ public sealed class ScheduleRepository : IScheduleRepository
             .ToListAsync(ct);
     }
 
+    public async Task<List<AnalysisAdherenceMarker>> GetAnalysisMarkersAsync(Site site, DateTimeOffset sinceUtc, CancellationToken ct = default)
+    {
+        return await (
+            from a in _db.Analyses
+            join s in _db.Samples on a.SampleId equals s.Id
+            join t in _db.AnalysisTemplates on a.TemplateId equals t.Id
+            where s.Site == site && a.StartedAtUtc >= sinceUtc
+            select new AnalysisAdherenceMarker(t.Name, a.StartedAtUtc))
+            .ToListAsync(ct);
+    }
+
     public void Add(Schedule schedule)
     {
         _db.Schedules.Add(schedule);

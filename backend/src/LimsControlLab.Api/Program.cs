@@ -77,6 +77,7 @@ builder.Services.AddScoped<AnalysisExecutionService>();
 builder.Services.AddScoped<SearchService>();
 builder.Services.AddScoped<AnalysisTemplateService>();
 builder.Services.AddScoped<ScheduleService>();
+builder.Services.AddScoped<ScheduleAdherenceService>();
 builder.Services.AddScoped<InstrumentReadingService>();
 builder.Services.AddScoped<ResultLockingService>();
 builder.Services.AddScoped<CalibrationCurveService>();
@@ -120,7 +121,19 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<TimeProvider>(_ => TimeProvider.System);
 
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    // Behind Render's proxy TLS terminates at the edge; trust the forwarded
+    // scheme/host so HTTPS redirection sees the real request and does not loop.
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+        | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 using (var scope = app.Services.CreateScope())
 {

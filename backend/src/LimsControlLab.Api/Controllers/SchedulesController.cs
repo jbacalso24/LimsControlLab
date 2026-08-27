@@ -13,11 +13,16 @@ namespace LimsControlLab.Api.Controllers;
 public sealed class SchedulesController : ControllerBase
 {
     private readonly ScheduleService _scheduleService;
+    private readonly ScheduleAdherenceService _scheduleAdherenceService;
     private readonly ICurrentUser _currentUser;
 
-    public SchedulesController(ScheduleService scheduleService, ICurrentUser currentUser)
+    public SchedulesController(
+        ScheduleService scheduleService,
+        ScheduleAdherenceService scheduleAdherenceService,
+        ICurrentUser currentUser)
     {
         _scheduleService = scheduleService;
+        _scheduleAdherenceService = scheduleAdherenceService;
         _currentUser = currentUser;
     }
 
@@ -115,6 +120,19 @@ public sealed class SchedulesController : ControllerBase
         return result.ToActionResult(this);
     }
 
+    [Authorize]
+    [HttpGet("adherence")]
+    [ProducesResponseType(typeof(ScheduleAdherenceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAdherence(CancellationToken ct)
+    {
+        var result = await _scheduleAdherenceService.GetAdherenceAsync(_currentUser.Site, ct);
+
+        if (result is Outcome<global::LimsControlLab.Domain.Services.ScheduleAdherenceResult>.Ok ok)
+            return Ok(MapToDto(ok.Data));
+
+        return result.ToActionResult(this);
+    }
+
     [Authorize(Policy = "Role.LabCoordinator")]
     [HttpPost("{id:int}/assign")]
     [ProducesResponseType(typeof(ScheduleDto), StatusCodes.Status200OK)]
@@ -141,6 +159,34 @@ public sealed class SchedulesController : ControllerBase
         AssignedToUserId = dto.AssignedToUserId,
         IsActive = dto.IsActive,
         RowVersion = Convert.ToBase64String(dto.RowVersion),
+    };
+
+    private static ScheduleAdherenceResponse MapToDto(global::LimsControlLab.Domain.Services.ScheduleAdherenceResult result) => new()
+    {
+        AsOfUtc = result.AsOfUtc,
+        Summary = new AdherenceSummaryDto
+        {
+            OnTrack = result.Summary.OnTrack,
+            Due = result.Summary.Due,
+            Overdue = result.Summary.Overdue,
+            Missed = result.Summary.Missed,
+            Total = result.Summary.Total,
+        },
+        Schedules = result.Schedules.Select(s => new ScheduleAdherenceItemDto
+        {
+            ScheduleId = s.ScheduleId,
+            Name = s.Name,
+            AnalysisType = s.AnalysisType,
+            ShiftPattern = s.ShiftPattern,
+            CadenceLabel = s.CadenceLabel,
+            Status = s.Status,
+            AssignedToUserId = s.AssignedToUserId,
+            AssignedToUsername = s.AssignedToUsername,
+            LastAnalysisAtUtc = s.LastAnalysisAtUtc,
+            MissedPeriods = s.MissedPeriods,
+            CurrentPeriodStartUtc = s.CurrentPeriodStartUtc,
+            CurrentPeriodEndUtc = s.CurrentPeriodEndUtc,
+        }).ToList(),
     };
 }
 
