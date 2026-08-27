@@ -22,7 +22,7 @@ public sealed class SampleTransferIntegrationTests
     private async Task<LimsDbContext> CreateDbContext()
     {
         var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<LimsDbContext>()
-            .UseSqlServer($"Server=(localdb)\\mssqllocaldb;Database={_dbName};Integrated Security=true;")
+            .UseNpgsql($"Host=localhost;Port=5432;Database={_dbName};Username=lims;Password=lims_dev_pw")
             .Options;
 
         var context = new LimsDbContext(options);

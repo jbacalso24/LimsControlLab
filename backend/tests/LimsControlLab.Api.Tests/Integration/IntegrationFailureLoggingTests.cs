@@ -20,7 +20,7 @@ public sealed class IntegrationFailureLoggingTests : IAsyncLifetime
     {
         using (var scope = new ServiceCollection()
             .AddDbContext<LimsDbContext>(options =>
-                options.UseSqlServer($"Server=localhost;Database={TestDbName};Trusted_Connection=True;TrustServerCertificate=True;"))
+                options.UseNpgsql($"Host=localhost;Port=5432;Database={TestDbName};Username=lims;Password=lims_dev_pw"))
             .BuildServiceProvider()
             .CreateScope())
         {
@@ -38,7 +38,7 @@ public sealed class IntegrationFailureLoggingTests : IAsyncLifetime
                         services.Remove(descriptor);
 
                     services.AddDbContext<LimsDbContext>(options =>
-                        options.UseSqlServer($"Server=localhost;Database={TestDbName};Trusted_Connection=True;TrustServerCertificate=True;"));
+                        options.UseNpgsql($"Host=localhost;Port=5432;Database={TestDbName};Username=lims;Password=lims_dev_pw"));
                 });
             });
 
@@ -52,7 +52,7 @@ public sealed class IntegrationFailureLoggingTests : IAsyncLifetime
         _factory?.Dispose();
         using var scope = new ServiceCollection()
             .AddDbContext<LimsDbContext>(options =>
-                options.UseSqlServer($"Server=localhost;Database={TestDbName};Trusted_Connection=True;TrustServerCertificate=True;"))
+                options.UseNpgsql($"Host=localhost;Port=5432;Database={TestDbName};Username=lims;Password=lims_dev_pw"))
             .BuildServiceProvider()
             .CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<LimsDbContext>();

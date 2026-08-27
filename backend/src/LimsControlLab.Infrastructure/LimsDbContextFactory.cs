@@ -8,7 +8,7 @@ public sealed class LimsDbContextFactory : IDesignTimeDbContextFactory<LimsDbCon
     public LimsDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<LimsDbContext>()
-            .UseSqlServer("Server=localhost;Database=cane-db;Trusted_Connection=True;TrustServerCertificate=True;");
+            .UseNpgsql("Host=localhost;Port=5432;Database=cane-db;Username=lims;Password=lims_dev_pw");
 
         return new LimsDbContext(optionsBuilder.Options);
     }

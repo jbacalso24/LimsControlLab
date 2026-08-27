@@ -3,6 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LimsControlLab.Infrastructure;
 
+// ponytail: Postgres has no rowversion type, so RowVersion is mapped as a
+// plain bytea concurrency token (see OnModelCreating). EF still puts the
+// ORIGINAL loaded value in the UPDATE WHERE clause for optimistic
+// concurrency; these overrides just stamp a fresh value into the SET before
+// every insert/update, mimicking what SQL Server auto-generated.
+
 public sealed class LimsDbContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
@@ -36,7 +42,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.PasswordHash).IsRequired();
             entity.Property(e => e.Role).IsRequired();
             entity.Property(e => e.Site).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasIndex(e => e.Username).IsUnique();
         });
 
@@ -47,7 +53,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.Site).IsRequired();
             entity.Property(e => e.CurrentVersionId);
             entity.Property(e => e.IsRetired).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.CurrentVersion)
                 .WithMany()
                 .HasForeignKey(e => e.CurrentVersionId)
@@ -69,7 +75,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.MinTolerance);
             entity.Property(e => e.MaxTolerance);
             entity.Property(e => e.CreatedAtUtc).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasIndex(e => new { e.TemplateId, e.Version }).IsUnique();
         });
 
@@ -81,7 +87,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.Status).IsRequired();
             entity.Property(e => e.Site).IsRequired();
             entity.Property(e => e.CurrentSite).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.AnalysisTemplate)
                 .WithMany()
                 .HasForeignKey(e => e.AnalysisTemplateId)
@@ -106,7 +112,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.IsLocked).IsRequired();
             entity.Property(e => e.LockedAtUtc);
             entity.Property(e => e.LockedByUserId);
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.Sample)
                 .WithMany()
                 .HasForeignKey(e => e.SampleId);
@@ -153,7 +159,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.DecisionComment);
             entity.Property(e => e.DecidedByUserId);
             entity.Property(e => e.DecidedAtUtc);
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.Analysis)
                 .WithMany(a => a.Exceptions)
                 .HasForeignKey(e => e.AnalysisId)
@@ -191,7 +197,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.ExclusionRules);
             entity.Property(e => e.AssignedToUserId);
             entity.Property(e => e.IsActive).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.AssignedToUser)
                 .WithMany()
                 .HasForeignKey(e => e.AssignedToUserId)
@@ -207,7 +213,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(512);
             entity.Property(e => e.Site).IsRequired();
             entity.Property(e => e.IsActive).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasIndex(e => new { e.Site, e.Name }).IsUnique();
             entity.HasIndex(e => e.IsActive);
         });
@@ -220,7 +226,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.SerialNumber).HasMaxLength(256);
             entity.Property(e => e.Site).IsRequired();
             entity.Property(e => e.IsActive).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasIndex(e => new { e.Site, e.Name }).IsUnique();
             entity.HasIndex(e => e.IsActive);
         });
@@ -231,7 +237,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(256);
             entity.Property(e => e.AnalysisTemplateId).IsRequired();
             entity.Property(e => e.IsActive).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.AnalysisTemplate)
                 .WithMany()
                 .HasForeignKey(e => e.AnalysisTemplateId)
@@ -262,7 +268,7 @@ public sealed class LimsDbContext : DbContext
             entity.Property(e => e.ToSite).IsRequired();
             entity.Property(e => e.TransferredByUserId).IsRequired();
             entity.Property(e => e.TransferredAtUtc).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion();
+            entity.Property(e => e.RowVersion).IsConcurrencyToken();
             entity.HasOne(e => e.Sample)
                 .WithMany(s => s.Transfers)
                 .HasForeignKey(e => e.SampleId)
@@ -288,5 +294,35 @@ public sealed class LimsDbContext : DbContext
             entity.HasIndex(e => new { e.TargetSystem, e.Status });
             entity.HasIndex(e => e.AttemptedAtUtc);
         });
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        StampRowVersions();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        StampRowVersions();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void StampRowVersions()
+    {
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.State is not (EntityState.Added or EntityState.Modified))
+            {
+                continue;
+            }
+
+            var rowVersionProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == nameof(User.RowVersion)
+                && p.Metadata.ClrType == typeof(byte[]));
+            if (rowVersionProperty is not null)
+            {
+                rowVersionProperty.CurrentValue = Guid.NewGuid().ToByteArray();
+            }
+        }
     }
 }

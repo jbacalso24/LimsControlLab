@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: lims
+      POSTGRES_PASSWORD: lims_dev_pw
+      POSTGRES_DB: cane-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - lims_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  lims_postgres_data:

@@ -13,3 +13,8 @@ indent_size = 4
 
 [*.{csproj,props,targets}]
 indent_size = 2
+
+# EF Core generates these; the array-literal / composite-index patterns it
+# emits routinely trip analyzers that are otherwise appropriate for hand-written code.
+[**/Migrations/*.cs]
+dotnet_diagnostic.CA1861.severity = none

@@ -30,7 +30,7 @@ public sealed class SchedulesIntegrationTests : IAsyncLifetime
     {
         using (var scope = new ServiceCollection()
             .AddDbContext<LimsDbContext>(options =>
-                options.UseSqlServer($"Server=localhost;Database={TestDbName};Trusted_Connection=True;TrustServerCertificate=True;"))
+                options.UseNpgsql($"Host=localhost;Port=5432;Database={TestDbName};Username=lims;Password=lims_dev_pw"))
             .BuildServiceProvider()
             .CreateScope())
         {
@@ -48,7 +48,7 @@ public sealed class SchedulesIntegrationTests : IAsyncLifetime
                         services.Remove(descriptor);
 
                     services.AddDbContext<LimsDbContext>(options =>
-                        options.UseSqlServer($"Server=localhost;Database={TestDbName};Trusted_Connection=True;TrustServerCertificate=True;"));
+                        options.UseNpgsql($"Host=localhost;Port=5432;Database={TestDbName};Username=lims;Password=lims_dev_pw"));
                 });
             });
 

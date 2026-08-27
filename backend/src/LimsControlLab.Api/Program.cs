@@ -48,10 +48,10 @@ builder.Services.AddCors(options =>
         }
     }));
 builder.Services.AddDbContext<LimsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LimsDb")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LimsDb")));
 
 builder.Services.AddHealthChecks()
-    .AddSqlServer(builder.Configuration.GetConnectionString("LimsDb") ?? throw new InvalidOperationException("LimsDb connection string not configured"), name: "cane-db");
+    .AddNpgSql(builder.Configuration.GetConnectionString("LimsDb") ?? throw new InvalidOperationException("LimsDb connection string not configured"), name: "cane-db");
 
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtTokenService>();

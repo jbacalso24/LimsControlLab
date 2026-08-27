@@ -1,0 +1,45 @@
+# Render Blueprint - one file deploys both halves for free.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Frontend  -> Static Site (free forever, no sleep)
+# Backend   -> Web Service, Docker (free tier: sleeps after 15 min idle)
+# Database  -> use a free PostgreSQL from Neon (neon.tech, forever-free, no card).
+#              SQL Server is NOT free-hostable; the backend has been ported to
+#              Postgres (DONE - see deploy/postgres branch). Paste Neon's
+#              connection string into ConnectionStrings__LimsDb below (marked
+#              sync:false).
+services:
+  # ---------- Angular frontend ----------
+  - type: web
+    name: lims-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist/frontend/browser
+    routes:
+      # SPA fallback so deep links (Angular routing) resolve to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ---------- .NET API ----------
+  - type: web
+    name: lims-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # JWT signing key - Render generates a strong random value once.
+      - key: Jwt__SigningKey
+        generateValue: true
+      # Allow the frontend origin through CORS. Update the value to the real
+      # frontend URL after the first deploy (Render assigns it).
+      - key: Cors__AllowedOrigins__0
+        value: https://lims-frontend.onrender.com
+      # Postgres connection string from Neon. Paste it in the Render dashboard;
+      # sync:false keeps it out of git.
+      - key: ConnectionStrings__LimsDb
+        sync: false
