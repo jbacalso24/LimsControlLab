@@ -9,6 +9,7 @@ import { sampleTransferRoutes } from './sample-transfer/sample-transfer.routes';
 import { calibrationCurvesRoutes } from './calibration-curves/calibration-curves.routes';
 import { auditTrailRoutes } from './audit-trail/audit-trail.routes';
 import { integrationMonitoringRoutes } from './integration-monitoring/integration-monitoring.routes';
+import { resultComparisonRoutes } from './result-comparison/result-comparison.routes';
 
 export const featuresRoutes: Routes = [
   {
@@ -25,6 +26,7 @@ export const featuresRoutes: Routes = [
       ...calibrationCurvesRoutes,
       ...auditTrailRoutes,
       ...integrationMonitoringRoutes,
+      ...resultComparisonRoutes,
     ],
   },
 ];

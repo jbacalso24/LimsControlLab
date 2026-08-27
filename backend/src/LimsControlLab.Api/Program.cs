@@ -75,6 +75,7 @@ builder.Services.AddScoped<IIntegrationLogRepository, IntegrationLogRepository>(
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<AnalysisExecutionService>();
 builder.Services.AddScoped<SearchService>();
+builder.Services.AddScoped<ResultComparisonService>();
 builder.Services.AddScoped<AnalysisTemplateService>();
 builder.Services.AddScoped<ScheduleService>();
 builder.Services.AddScoped<ScheduleAdherenceService>();

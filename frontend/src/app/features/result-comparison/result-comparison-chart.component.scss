@@ -1,0 +1,28 @@
+.plot-group {
+  opacity: 0;
+  transform: scale(0.98);
+  transform-origin: center;
+  transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1), transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.plot-group.ready {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.rc-point {
+  cursor: pointer;
+  transition: r 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plot-group {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .rc-point {
+    transition: none;
+  }
+}

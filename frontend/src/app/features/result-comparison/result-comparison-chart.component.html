@@ -1,0 +1,135 @@
+@if (!hasPoints()) {
+  <div class="flex min-h-[180px] items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground">
+    No points to plot
+  </div>
+} @else {
+  <div class="w-full overflow-x-auto">
+    <svg
+      [attr.viewBox]="'0 0 ' + width + ' ' + height"
+      preserveAspectRatio="xMidYMid meet"
+      class="w-full min-w-[360px]"
+      style="height: auto;"
+      role="img"
+      [attr.aria-label]="'Result comparison plot with ' + plottedSeries().length + ' sample series'"
+    >
+      <!-- Tolerance band -->
+      @if (toleranceBand(); as band) {
+        <rect
+          [attr.x]="plotLeft"
+          [attr.width]="plotRight - plotLeft"
+          [attr.y]="band.y"
+          [attr.height]="band.height"
+          fill="var(--success)"
+          fill-opacity="0.1"
+        />
+      }
+
+      <!-- Gridlines -->
+      @for (tick of yTicks(); track tick.value) {
+        <line
+          [attr.x1]="plotLeft"
+          [attr.x2]="plotRight"
+          [attr.y1]="tick.screen"
+          [attr.y2]="tick.screen"
+          stroke="var(--border)"
+          stroke-width="1"
+        />
+        <text [attr.x]="plotLeft - 6" [attr.y]="tick.screen + 3" text-anchor="end" font-size="9" fill="var(--muted-foreground)">
+          {{ formatTick(tick.value) }}
+        </text>
+      }
+      @for (tick of xTicks(); track tick.value) {
+        <text [attr.x]="tick.screen" [attr.y]="plotBottom + 14" text-anchor="middle" font-size="8" fill="var(--muted-foreground)">
+          {{ formatTimeTick(tick.value) }}
+        </text>
+      }
+
+      <!-- Axis lines -->
+      <line [attr.x1]="plotLeft" [attr.x2]="plotRight" [attr.y1]="plotBottom" [attr.y2]="plotBottom" stroke="var(--border)" stroke-width="1" />
+      <line [attr.x1]="plotLeft" [attr.x2]="plotLeft" [attr.y1]="plotTop" [attr.y2]="plotBottom" stroke="var(--border)" stroke-width="1" />
+
+      <!-- Axis titles -->
+      <text [attr.x]="(plotLeft + plotRight) / 2" [attr.y]="height - 4" text-anchor="middle" font-size="10" fill="var(--muted-foreground)">
+        Captured at
+      </text>
+      <text
+        [attr.x]="-((plotTop + plotBottom) / 2)"
+        y="12"
+        text-anchor="middle"
+        font-size="10"
+        fill="var(--muted-foreground)"
+        transform="rotate(-90)"
+      >
+        {{ yAxisLabel() }}
+      </text>
+
+      <!-- Plotted series -->
+      <g class="plot-group" [class.ready]="ready()">
+        @for (s of plottedSeries(); track s.key) {
+          <polyline
+            [attr.points]="s.polylinePoints"
+            fill="none"
+            [attr.stroke]="s.colorVar"
+            stroke-width="2"
+            [attr.opacity]="hoveredKey() === null || hoveredKey() === s.key ? 1 : 0.35"
+          />
+          @for (point of s.points; track $index) {
+            <g [attr.opacity]="hoveredKey() === null || hoveredKey() === s.key ? 1 : 0.35">
+              @if (point.outOfSpec) {
+                <!-- Out-of-spec: hollow ring, not color alone -->
+                <circle
+                  class="rc-point"
+                  [attr.cx]="point.screenX"
+                  [attr.cy]="point.screenY"
+                  r="5"
+                  fill="none"
+                  [attr.stroke]="s.colorVar"
+                  stroke-width="2"
+                  (mouseenter)="hover(s.key)"
+                  (mouseleave)="clearHover()"
+                />
+                <circle
+                  [attr.cx]="point.screenX"
+                  [attr.cy]="point.screenY"
+                  r="1.5"
+                  [attr.fill]="s.colorVar"
+                />
+              } @else {
+                <circle
+                  class="rc-point"
+                  [attr.cx]="point.screenX"
+                  [attr.cy]="point.screenY"
+                  r="4"
+                  [attr.fill]="s.colorVar"
+                  (mouseenter)="hover(s.key)"
+                  (mouseleave)="clearHover()"
+                />
+              }
+              <title>
+                {{ point.raw.sampleIdentifier }}: {{ point.y }} {{ unit() }} at {{ formatTimeFull(point.raw.capturedAtUtc) }} ({{ point.outOfSpec ? 'out of spec' : 'in spec' }})
+              </title>
+            </g>
+          }
+        }
+      </g>
+    </svg>
+  </div>
+
+  <!-- Legend (2+ series only; title/subtitle names a single series) -->
+  @if (showLegend()) {
+    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5" role="list" aria-label="Sample series legend">
+      @for (s of plottedSeries(); track s.key) {
+        <div
+          role="listitem"
+          class="flex cursor-default items-center gap-1.5 text-xs text-foreground"
+          [class.opacity-50]="hoveredKey() !== null && hoveredKey() !== s.key"
+          (mouseenter)="hover(s.key)"
+          (mouseleave)="clearHover()"
+        >
+          <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background-color]="s.colorVar"></span>
+          <span>{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  }
+}

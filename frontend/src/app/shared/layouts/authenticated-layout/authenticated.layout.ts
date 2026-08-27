@@ -20,6 +20,7 @@ import {
   lucideChartSpline,
   lucideScrollText,
   lucideRadioTower,
+  lucideChartLine,
 } from '@ng-icons/lucide';
 import { ZardButtonComponent } from '../../components/button/button.component';
 import { ZardBadgeComponent } from '../../components/badge/badge.component';
@@ -64,6 +65,7 @@ import { environment } from '../../../../environments/environment';
       lucideChartSpline,
       lucideScrollText,
       lucideRadioTower,
+      lucideChartLine,
     }),
   ],
 })
@@ -105,6 +107,11 @@ export class AuthenticatedLayout {
       icon: 'lucideSearch',
     },
     {
+      label: 'Result Comparison',
+      route: '/analysis/result-comparison',
+      icon: 'lucideChartLine',
+    },
+    {
       label: 'Sample Transfer',
       route: '/analysis/sample-transfer',
       icon: 'lucideArrowLeftRight',
@@ -143,6 +150,7 @@ export class AuthenticatedLayout {
     if (u.includes('/calibration-curves')) return [{ label: 'Calibration Curves' }];
     if (u.includes('/exception-review')) return [{ label: 'Exception Review' }];
     if (u.includes('/history-search')) return [{ label: 'History Search' }];
+    if (u.includes('/result-comparison')) return [{ label: 'Result Comparison' }];
     if (/\/sample-transfer\/\d+/.test(u)) return [{ label: 'Sample Transfer', link: this.sampleTransferList }, { label: 'Sample' }];
     if (u.includes('/sample-transfer')) return [{ label: 'Sample Transfer' }];
     if (u.includes('/integration-monitoring')) return [{ label: 'Integration Monitoring' }];

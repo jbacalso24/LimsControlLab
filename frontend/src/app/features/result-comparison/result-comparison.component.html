@@ -1,0 +1,176 @@
+<div class="space-y-6">
+  <!-- Filter Card -->
+  <z-card>
+    <z-card-header>
+      <z-card-title>Compare Results</z-card-title>
+      <z-card-description>Plot readings across samples for a template and test</z-card-description>
+    </z-card-header>
+    <z-card-content>
+      <form [formGroup]="filterForm" (ngSubmit)="search()" class="space-y-4">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="space-y-1.5">
+            <label z-label for="templateName">Template</label>
+            <z-select id="templateName" formControlName="templateName" zPlaceholder="Any template">
+              @for (template of templateOptions(); track template.id) {
+                <z-select-item [zValue]="template.name">{{ template.name }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="space-y-1.5">
+            <label z-label for="testId">Test</label>
+            <z-select
+              id="testId"
+              formControlName="testId"
+              zPlaceholder="Any test"
+              [zDisabled]="!testOptions().length"
+            >
+              @for (test of testOptions(); track test.id) {
+                <z-select-item [zValue]="test.id + ''">{{ test.name }} ({{ test.unit }})</z-select-item>
+              }
+            </z-select>
+            @if (selectedTestUnit()) {
+              <p class="text-xs text-muted-foreground">Unit: {{ selectedTestUnit() }}</p>
+            }
+          </div>
+
+          <div class="space-y-1.5">
+            <label z-label for="sampleIdentifier">Sample Identifier</label>
+            <input
+              z-input
+              id="sampleIdentifier"
+              type="text"
+              formControlName="sampleIdentifier"
+              placeholder="Enter sample identifier"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <label z-label for="fromUtc">From Date</label>
+            <input z-input id="fromUtc" type="date" formControlName="fromUtc" />
+          </div>
+
+          <div class="space-y-1.5">
+            <label z-label for="toUtc">To Date</label>
+            <input z-input id="toUtc" type="date" formControlName="toUtc" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button z-button zType="ghost" type="button" (click)="clearFilters()">
+            <ng-icon name="lucideX" class="mr-1 h-4 w-4" />
+            Clear
+          </button>
+          <button z-button type="submit" [zLoading]="loading()">
+            <ng-icon name="lucideSearch" class="mr-1 h-4 w-4" />
+            Compare
+          </button>
+        </div>
+      </form>
+    </z-card-content>
+  </z-card>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <z-card>
+      <z-card-content class="space-y-3 py-6">
+        <z-skeleton class="h-6 w-full" />
+        <z-skeleton class="h-64 w-full" />
+        <z-skeleton class="h-6 w-3/4" />
+      </z-card-content>
+    </z-card>
+  } @else if (error()) {
+    <!-- Error State -->
+    <z-alert
+      zType="destructive"
+      class="border-destructive/50 bg-destructive/10"
+      zTitle="Error loading comparison"
+      [zDescription]="error()"
+    />
+    <button z-button zType="outline" (click)="search()">
+      <ng-icon name="lucideRefreshCw" class="h-4 w-4" />
+      Retry
+    </button>
+  } @else if (!points().length && searched()) {
+    <!-- Empty State -->
+    <z-card>
+      <z-card-content class="pt-12">
+        <z-empty
+          zIcon="lucideInbox"
+          zTitle="No results to compare"
+          zDescription="Try adjusting your filters or widening the date range."
+        />
+      </z-card-content>
+    </z-card>
+  } @else if (points().length) {
+    <!-- Summary -->
+    <p class="text-sm text-muted-foreground">
+      {{ distinctSampleCount() }} sample{{ distinctSampleCount() === 1 ? '' : 's' }}
+      &middot; {{ points().length }} point{{ points().length === 1 ? '' : 's' }}
+      @if (response()?.unit) {
+        &middot; unit {{ response()?.unit }}
+      }
+      &middot; {{ outOfSpecCount() }} out of spec
+    </p>
+
+    <!-- Chart -->
+    <z-card>
+      <z-card-header>
+        <z-card-title>Comparison Plot</z-card-title>
+      </z-card-header>
+      <z-card-content>
+        <lims-result-comparison-chart
+          [series]="chartSeries()"
+          [toleranceMin]="response()?.toleranceMin ?? null"
+          [toleranceMax]="response()?.toleranceMax ?? null"
+          [unit]="response()?.unit ?? ''"
+        />
+      </z-card-content>
+    </z-card>
+
+    <!-- Table -->
+    <z-card>
+      <z-card-header>
+        <z-card-title>Comparison Table</z-card-title>
+      </z-card-header>
+      <z-card-content>
+        <div class="overflow-x-auto">
+          <table z-table>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Sample</th>
+                <th z-table-head>Captured At</th>
+                <th z-table-head class="text-right">Value</th>
+                <th z-table-head class="text-right">Delta From Mean</th>
+                <th z-table-head>Status</th>
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @for (point of tableRows(); track point.analysisId) {
+                <tr z-table-row class="interactive-row">
+                  <td z-table-cell class="font-medium">{{ point.sampleIdentifier }}</td>
+                  <td z-table-cell class="text-sm text-muted-foreground">{{ formatCapturedAt(point.capturedAtUtc) }}</td>
+                  <td z-table-cell class="text-right tabular-nums">{{ point.value }} {{ point.unit }}</td>
+                  <td z-table-cell class="text-right tabular-nums">{{ deltaFromMean(point.value) | number: '1.2-2' }}</td>
+                  <td z-table-cell>
+                    @if (isPass(point.validationResult)) {
+                      <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-success/12 text-success border border-success/25">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>In spec</span>
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium bg-destructive/12 text-destructive border border-destructive/25">
+                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                        <span>Out of spec</span>
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </z-card-content>
+    </z-card>
+  }
+</div>
