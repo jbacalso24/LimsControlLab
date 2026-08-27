@@ -20,7 +20,7 @@ jobs:
       - name: Publish API
         run: dotnet publish backend/src/LimsControlLab.Api/LimsControlLab.Api.csproj -c Release -o publish
 
-      - name: Deploy to Azure App Service
+      - name: Deploy to Azure App Service (API)
         uses: azure/webapps-deploy@v3
         with:
           app-name: lims-controllab-api
@@ -28,7 +28,7 @@ jobs:
           package: publish
 
   web:
-    name: Build & deploy frontend (Static Web Apps)
+    name: Build & deploy frontend (App Service)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,11 +46,11 @@ jobs:
         run: npx ng build --configuration production
         working-directory: frontend
 
-      - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
+      # The web App Service serves the static build via `pm2 serve /home/site/wwwroot --spa`,
+      # so we deploy the built browser output as the package (lands in wwwroot).
+      - name: Deploy to Azure App Service (Web)
+        uses: azure/webapps-deploy@v3
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_DEPLOY_TOKEN }}
-          action: upload
-          app_location: frontend/dist/frontend/browser
-          skip_app_build: true
-          output_location: ''
+          app-name: lims-controllab-web
+          publish-profile: ${{ secrets.AZURE_WEBAPP_WEB_PUBLISH_PROFILE }}
+          package: frontend/dist/frontend/browser
