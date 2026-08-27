@@ -13,6 +13,7 @@ import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/component
 import { ZardCardComponent, ZardCardContentComponent } from '@/shared/components/card';
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { BreadcrumbService } from '@/shared/services/breadcrumb/breadcrumb.service';
 import { SchedulingApiService } from './services/scheduling-api.service';
 import { CreateScheduleRequest } from '../../shared/generated/models/create-schedule-request';
 import { UpdateScheduleRequest } from '../../shared/generated/models/update-schedule-request';
@@ -47,6 +48,7 @@ export class SchedulingFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private breadcrumb = inject(BreadcrumbService);
 
   sites = SITES;
   shiftPatterns = SHIFT_PATTERNS;
@@ -89,6 +91,7 @@ export class SchedulingFormComponent implements OnInit {
       next: (schedule) => {
         this.rowVersion = schedule.rowVersion;
         this.assignedToUserId = schedule.assignedToUserId;
+        this.breadcrumb.set([{ label: 'Schedules', link: '/analysis/schedules' }, { label: schedule.name }]);
         this.form.patchValue({
           name: schedule.name,
           site: schedule.site,

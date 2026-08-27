@@ -26,6 +26,7 @@ import { ZardBadgeComponent } from '../../components/badge/badge.component';
 import { ZardDropdownImports } from '../../components/dropdown/dropdown.imports';
 import { ZardDialogService } from '../../components/dialog/dialog.service';
 import { CurrentUserService } from '../../services/auth/current-user.service';
+import { BreadcrumbService, Crumb } from '../../services/breadcrumb/breadcrumb.service';
 import { AdminApiService } from '../../services/api/admin-api.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { environment } from '../../../../environments/environment';
@@ -120,32 +121,42 @@ export class AuthenticatedLayout {
     },
   ];
 
-  /** Title of the active page, shown in the top bar beside the sidebar toggle. */
-  pageTitle = signal('');
+  /** Breadcrumb shown in the top bar; route-derived defaults, optionally enriched by detail pages. */
+  private breadcrumb = inject(BreadcrumbService);
+  readonly crumbs = this.breadcrumb.crumbs;
 
-  private titleForUrl(url: string): string {
+  private readonly workQueue = '/analysis/work-queue';
+  private readonly templatesList = '/analysis/templates';
+  private readonly schedulesList = '/analysis/schedules';
+  private readonly sampleTransferList = '/analysis/sample-transfer';
+
+  private crumbsForUrl(url: string): Crumb[] {
     const u = url.split('?')[0].split('#')[0];
-    if (u.includes('/work-queue')) return 'Work Queue';
-    if (u.includes('/schedules')) return 'Schedules';
-    if (u.includes('/templates/create')) return 'Create template';
-    if (/\/templates\/\d+\/edit/.test(u)) return 'Edit template';
-    if (u.includes('/templates')) return 'Templates';
-    if (u.includes('/calibration-curves')) return 'Calibration Curves';
-    if (u.includes('/exception-review')) return 'Exception Review';
-    if (u.includes('/history-search')) return 'History Search';
-    if (u.includes('/sample-transfer')) return 'Sample Transfer';
-    if (u.includes('/integration-monitoring')) return 'Integration Monitoring';
-    if (u.includes('/audit-trail')) return 'Audit Trail';
-    if (u.includes('/analysis/analysis')) return 'Analysis Execution';
-    return 'LIMS Control Lab';
+    if (u.includes('/work-queue')) return [{ label: 'Work Queue' }];
+    if (u.includes('/new-analysis')) return [{ label: 'Work Queue', link: this.workQueue }, { label: 'New analysis' }];
+    if (u.includes('/schedules/create')) return [{ label: 'Schedules', link: this.schedulesList }, { label: 'New schedule' }];
+    if (/\/schedules\/\d+\/edit/.test(u)) return [{ label: 'Schedules', link: this.schedulesList }, { label: 'Edit schedule' }];
+    if (u.includes('/schedules')) return [{ label: 'Schedules' }];
+    if (u.includes('/templates/create')) return [{ label: 'Templates', link: this.templatesList }, { label: 'New template' }];
+    if (/\/templates\/\d+\/edit/.test(u)) return [{ label: 'Templates', link: this.templatesList }, { label: 'Edit template' }];
+    if (u.includes('/templates')) return [{ label: 'Templates' }];
+    if (u.includes('/calibration-curves')) return [{ label: 'Calibration Curves' }];
+    if (u.includes('/exception-review')) return [{ label: 'Exception Review' }];
+    if (u.includes('/history-search')) return [{ label: 'History Search' }];
+    if (/\/sample-transfer\/\d+/.test(u)) return [{ label: 'Sample Transfer', link: this.sampleTransferList }, { label: 'Sample' }];
+    if (u.includes('/sample-transfer')) return [{ label: 'Sample Transfer' }];
+    if (u.includes('/integration-monitoring')) return [{ label: 'Integration Monitoring' }];
+    if (u.includes('/audit-trail')) return [{ label: 'Audit Trail' }];
+    if (u.includes('/analysis/analysis')) return [{ label: 'Work Queue', link: this.workQueue }, { label: 'Analysis Execution' }];
+    return [{ label: 'LIMS Control Lab' }];
   }
 
   constructor() {
-    // Keep the top-bar title in sync with the active route.
-    this.pageTitle.set(this.titleForUrl(this.router.url));
+    // Keep the top-bar breadcrumb in sync with the active route (detail pages may enrich it).
+    this.breadcrumb.set(this.crumbsForUrl(this.router.url));
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) {
-        this.pageTitle.set(this.titleForUrl(e.urlAfterRedirects));
+        this.breadcrumb.set(this.crumbsForUrl(e.urlAfterRedirects));
       }
     });
 

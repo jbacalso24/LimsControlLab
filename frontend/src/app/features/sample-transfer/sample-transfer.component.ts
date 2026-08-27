@@ -21,6 +21,7 @@ import { ZardPaginationComponent } from '@/shared/components/pagination/paginati
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { BreadcrumbService } from '@/shared/services/breadcrumb/breadcrumb.service';
 import { SampleTransferApiService } from './services/sample-transfer-api.service';
 import { CurrentUserService } from '../../shared/services/auth/current-user.service';
 import { SampleDto } from '../../shared/generated/models/sample-dto';
@@ -69,6 +70,7 @@ export class SampleTransferComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private breadcrumb = inject(BreadcrumbService);
 
   // Picker mode (no :id in the route) — choose a sample to transfer.
   pickerMode = signal(false);
@@ -194,6 +196,12 @@ export class SampleTransferComponent implements OnInit {
     this.apiService.getSample(sampleId).subscribe({
       next: (data) => {
         this.sample.set(data);
+        if (data) {
+          this.breadcrumb.set([
+            { label: 'Sample Transfer', link: '/analysis/sample-transfer' },
+            { label: data.identifier },
+          ]);
+        }
         this.loading.set(false);
       },
       error: (err) => {

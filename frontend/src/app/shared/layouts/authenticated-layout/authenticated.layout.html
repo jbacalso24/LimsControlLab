@@ -115,7 +115,19 @@
         <button z-button zType="ghost" zSize="sm" (click)="toggleSidebar()" aria-label="Toggle sidebar">
           <ng-icon name="lucideMenu" class="h-5 w-5" />
         </button>
-        <h1 class="truncate text-base font-semibold tracking-tight">{{ pageTitle() }}</h1>
+        <nav aria-label="Breadcrumb" class="flex min-w-0 items-center gap-1.5 text-base font-semibold tracking-tight">
+          @for (crumb of crumbs(); track crumb.label; let last = $last) {
+            @if (!last && crumb.link) {
+              <a [routerLink]="crumb.link" class="shrink-0 text-muted-foreground transition-colors hover:text-foreground">{{ crumb.label }}</a>
+              <span class="shrink-0 text-muted-foreground/60" aria-hidden="true">/</span>
+            } @else if (!last) {
+              <span class="shrink-0 text-muted-foreground">{{ crumb.label }}</span>
+              <span class="shrink-0 text-muted-foreground/60" aria-hidden="true">/</span>
+            } @else {
+              <span class="truncate" aria-current="page">{{ crumb.label }}</span>
+            }
+          }
+        </nav>
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">

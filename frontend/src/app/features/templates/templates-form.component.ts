@@ -18,6 +18,7 @@ import { ZardCardComponent, ZardCardHeaderComponent, ZardCardTitleComponent, Zar
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 import { ZardSpinnerComponent } from '@/shared/components/spinner/spinner.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { BreadcrumbService } from '@/shared/services/breadcrumb/breadcrumb.service';
 import { TemplatesApiService } from './services/templates-api.service';
 import { CreateAnalysisTemplateRequest } from '../../shared/generated/models/create-analysis-template-request';
 import { UpdateAnalysisTemplateRequest } from '../../shared/generated/models/update-analysis-template-request';
@@ -68,6 +69,7 @@ export class TemplatesFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private breadcrumb = inject(BreadcrumbService);
 
   sites = SITES;
   form: FormGroup;
@@ -207,6 +209,7 @@ export class TemplatesFormComponent implements OnInit {
         });
         this.applyTestConfiguration(template.testConfiguration);
         this.form.get('site')?.disable();
+        this.breadcrumb.set([{ label: 'Templates', link: '/analysis/templates' }, { label: template.name }]);
         this.loading.set(false);
       },
       error: () => {

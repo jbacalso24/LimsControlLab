@@ -23,6 +23,7 @@ import { ZardSpinnerComponent } from '@/shared/components/spinner';
 import { StatusBadgeComponent } from '@/shared/ui/status-badge/status-badge.component';
 import { DetailDialogComponent, DetailRow } from '@/shared/ui/detail-dialog/detail-dialog.component';
 import { ToastService } from '@/shared/services/toast/toast.service';
+import { BreadcrumbService } from '@/shared/services/breadcrumb/breadcrumb.service';
 import { DatePipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -81,6 +82,7 @@ export class AnalysisExecutionComponent implements OnInit {
   private apiService = inject(AnalysisExecutionApiService);
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
+  private breadcrumb = inject(BreadcrumbService);
 
   /** Past-tense confirmation copy per lifecycle action (matches the button that triggered it). */
   private static readonly STATUS_TOASTS: Record<string, string> = {
@@ -220,6 +222,12 @@ export class AnalysisExecutionComponent implements OnInit {
         this.analysis.set(data);
         this.pageIndex.set(1);
         this.loading.set(false);
+        if (data) {
+          this.breadcrumb.set([
+            { label: 'Work Queue', link: '/analysis/work-queue' },
+            { label: 'Analysis #' + data.id },
+          ]);
+        }
         const tests = data?.availableTests ?? [];
         if (tests.length === 1) {
           this.testIdControl.setValue(tests[0].id.toString());
